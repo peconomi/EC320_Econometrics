@@ -1,4 +1,4 @@
-# Introduction to Econometrics <img align="right" height="175" src="UO.png">
+# Introduction to Econometrics <img align="right" height="45" src="UO.png">
 
 Welcome to EC 320: Introduction to Econometrics (Winter 2021) at the University of Oregon.
 
