@@ -5,7 +5,7 @@ Welcome to EC 320: Introduction to Econometrics (Winter 2021) at the University 
 - Instructor: [Philip Economides](https://philip-economides.com/)
 - GE (): 
 - GE (): 
-- [Syllabus](https://raw.githack.com/kyleraze/EC320_Econometrics/master/Syllabus/syllabus.pdf)
+- [Syllabus](https://raw.githack.com/peconomi/EC320_Econometrics/main/Syllabus/syllabus.pdf)
 
 This course introduces the statistical techniques that help economists learn about the world using data. Using calculus and introductory statistics, students will cultivate a working understanding of the theory underpinning regression analysis&mdash;*how* it works, *why* it works, and *when it can lead us astray*. As the course progresses, students will apply the insights of theory to work with and learn from actual data using `R`, a statistical programming language. My goal is for students to leave the course with marketable skills in data analysis and&mdash;most importantly&mdash;a more sophisticated understanding of the notion that correlation does not necessarily imply causation.
 
@@ -23,13 +23,13 @@ The HTML versions of the lecture slides allow you to view animations and interac
 
 5. **Regression Logic** <br> [.html]() | [.pdf]()
 
-6. **Midterm Review** <br> [.html]() | [.pdf]()
+6. **Simple Linear Regression: Estimation I** <br> [.html]() | [.pdf]() | [Handout]()
 
-7. **Simple Linear Regression: Estimation I** <br> [.html]() | [.pdf]() | [Handout]()
+7. **Simple Linear Regression: Estimation II** <br> [.html]() | [.pdf]()
 
-8. **Simple Linear Regression: Estimation II** <br> [.html]() | [.pdf]()
+8. **Classical Assumptions** <br> [.html]() | [.pdf]()
 
-9. **Classical Assumptions** <br> [.html]() | [.pdf]()
+9. **Midterm Review** <br> [.html]() | [.pdf]()
 
 10. **Simple Linear Regression: Inference** <br> [.html]() | [.pdf]()
 
@@ -37,35 +37,29 @@ The HTML versions of the lecture slides allow you to view animations and interac
 
 12. **Multiple Linear Regression: Inference** <br> [.html]() | [.pdf]()
 
-13. **Midterm Review** <br> [.html]() | [.pdf]()
+13. **Categorical Variables** <br> [.html]() | [.pdf]()
 
-14. **Categorical Variables** <br> [.html]() | [.pdf]()
+14. **Interactive Relationships** <br> [.html]() | [.pdf]()
 
-15. **Interactive Relationships** <br> [.html]() | [.pdf]()
+15. **Nonlinear Relationships** <br> [.html]() | [.pdf]()
 
-16. **Nonlinear Relationships** <br> [.html]() | [.pdf]()
-
-17. **Final Review** <br> [.html]() | [.pdf]()
+16. **Final Review** <br> [.html]() | [.pdf]()
 
 ## Labs
 
-1. **Introduction to `R`** <br> [.html]()
+1. **Introduction to `R` and `R Markdown`** <br> [.html]()
 
-2. **Introduction to the `tidyverse`** <br> [.html]() | [Data]()
+2. **Data wrangling using `tidyverse`** <br> [.html]() | [Data]()
 
-3. **Non-Experimental Data** <br> [.html]() | [Data]()
+3. **Visualization using `ggplot2`**
 
-4. **Introduction to `R Markdown`** <br> [.html]()
+4. **Non-Experimental Data** <br> [.html]() | [Data]()
 
-5. **Regression Analysis**
+5. **Regression Analysis & Hypothesis Testing**
 
-6. **Hypothesis Testing**
+6. **Hypothesis Testing and Omitted-Variable Bias**
 
-7. **Hypothesis Testing and Omitted-Variable Bias**
-
-8. **Maps with `ggplot2`!** <br> [.html]() | [Data]()
-
-9. **Happy Thanksgiving!** ***No lab*** 
+7. **Maps with `ggplot2`!** <br> [.html]() | [Data]()
 
 ## Other course content
 
