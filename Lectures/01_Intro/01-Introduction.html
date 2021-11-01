@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>What is Econometrics?</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Philip Economides" />
+    <link href="01-Introduction_files/remark-css/default.css" rel="stylesheet" />
+    <link href="01-Introduction_files/remark-css/metropolis.css" rel="stylesheet" />
+    <link href="01-Introduction_files/remark-css/metropolis-fonts.css" rel="stylesheet" />
+    <script src="01-Introduction_files/htmlwidgets/htmlwidgets.js"></script>
+    <script src="01-Introduction_files/jquery/jquery.min.js"></script>
+    <link href="01-Introduction_files/leaflet/leaflet.css" rel="stylesheet" />
+    <script src="01-Introduction_files/leaflet/leaflet.js"></script>
+    <link href="01-Introduction_files/leafletfix/leafletfix.css" rel="stylesheet" />
+    <script src="01-Introduction_files/proj4/proj4.min.js"></script>
+    <script src="01-Introduction_files/Proj4Leaflet/proj4leaflet.js"></script>
+    <link href="01-Introduction_files/rstudio_leaflet/rstudio_leaflet.css" rel="stylesheet" />
+    <script src="01-Introduction_files/leaflet-binding/leaflet.js"></script>
+    <link rel="stylesheet" href="my-css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# What is Econometrics?
+## EC 320: Introduction to Econometrics
+### Philip Economides
+### Winter 2022
+
+---
+
+class: inverse, middle
+
+
+
+
+
+# Prologue
+
+---
+# Who am I? 
+
+[**Philip Economides**](https://philip-economides.com)
+
+- Doctoral student in economics
+
+- TA in 'metrics EC320 (UG), EC423/EC523 (UG/MSc) and EC607 (PhD)
+
+- Former RA at ESRI/Trinity College Dublin, Ireland
+
+- Focused on international economics, specifically maritime transport and multinational enterprises.
+
+--
+
+Where can you find me?
+
+- Office: 520 PLC
+- Office hours: Tuesday 15:00-16:00, Friday 10:30-11:30, or by appointment
+- Email: [.mono[peconomi@uoregon.edu]](mailto:peconomi@uoregon.edu) **(use EC 320 in the subject line)**
+
+---
+
+layout: true
+
+# What will we do?
+
+---
+
+&lt;br&gt;
+
+We will use two textbooks:
+
+* Introduction to Econometrics, 5th Ed. by C. Dougherty .hi-pink[(ItE)]
+
+* Mastering 'Metrics: the Path from Cause to Effect, by Angrist &amp; Pischke .hi-pink[(MM)]
+
+--
+
+Lectures are not a substitute for these resources, but rather the finishing touch on solidifying your knowledge.
+
+Read through the prescribed readings listed in the Tentative Schedule of the syllabus .hi-pink[before each lecture].
+
+---
+
+## Coursework
+
+* W1 &amp; W2: Statistics Review + Fundamental Problem
+* W3: Logic of Regressions
+* W4: SLR - Estimation
+* W5: SLR - Classical Assumptions
+* W6: Midterm, SLR - Inference
+* W7: MLR - Estimation &amp; Inferece
+* W8: Non-linear &amp; Qualitative variables
+* W9: Interation terms &amp; Model Specifications
+* W10: Heteroskedasticity &amp; Finals Review
+
+Content will be available on Canvas. If you wish to download them faster, see the course [Github](https://github.com/peconomi/EC320_Econometrics) page.
+
+---
+
+&lt;br&gt;
+
+## Grade
+
+* 25% - Problem Sets (5pp each)
+
+* 10% - Quizzes (5pp each)
+
+* 20% - Midterm Exam
+
+* 10% - Data Assignment
+
+* 35% - Final Exam
+
+---
+
+&lt;br&gt;
+
+## Labs
+
+Develop practical skills based on the material we cover.
+
+Lab sessions will teach you how to conduct data cleaning, visualize data and produce regression analysis based on simulations and empirical questions. 
+
+Crucial for computational portions of assignments.
+
+---
+
+layout: true
+
+# Motivation
+
+---
+
+## Why study econometrics?
+
+1. Develop __skills that employers value__.
+
+--
+
+1. Cultivate __healthy skepticism__.
+
+--
+
+1. Learn about the world using __data__.
+
+???
+
+Government agencies and private firms rely on data to make informed decisions. Requires people who can clean and analyze data, create informative visualizations, and communicate results. .mono[R] facilitates these tasks.
+
+When should we trust the findings of a study? Junk science abounds. Blind faith in science and science denialism are harmful. Econometrics gives us a way to evaluate the quality of evidence. Makes us better citizens.
+
+Historically, high quality data were scarce. Econometricians had to think rigorously and creatively about how to learn from less than ideal data. Result: proliferation of robust methods with falsifiable assumptions.
+
+---
+
+## Why study econometrics?
+
+### Provide answers to important questions
+
+--
+
+- Do minimum wage policies __reduce poverty__?
+
+--
+
+- Does the death penalty __deter violent crime__?
+
+--
+
+- Does recreational marijuana __cross state lines__?
+
+--
+
+- Are recessions __good for your health__?
+
+--
+
+- How will global warming __affect the economy__?
+
+--
+
+- What __explains the gender pay gap__?
+
+--
+
+- Does corruption __impact exporting prospects in developing countries__?
+
+---
+
+layout: true
+
+# Econometrics
+
+---
+
+Most econometric inquiry concerns one of two distinct goals:
+
+1. .hi-purple[Prediction:] Accurately .purple[predict] or .purple[forecast] an outcome given a set of predictors. .purple[Given what we know about] `\(\color{#6A5ACD}{x}\)`.purple[, what values do we expect] `\(\color{#6A5ACD}{y}\)` .purple[to take?]
+
+1. .hi-green[Causal identification:] .green[Estimate] the effect of an intervention on an outcome. .green[How does] `\(\color{#007935}{y}\)` .green[change when we change] `\(\color{#007935}{x}\)`.green[?]
+
+???
+
+__Prediction examples__
+Netflix uses information on users and their choices to provide individualized movie recommendations.
+Some states use data on defendants to predict pretrial flight risk.
+The Federal Reserve uses economic data to forecast inflation, unemployment, and GDP.
+
+__Causal examples__
+Pharmaceutical companies run clinical trials to determine whether new medicines reduce symptoms or cause side effects.
+Tech companies use __A/B testing__ to improve user experience (and increase profit).
+Economists use __natural experiments__ to better understand how people respond to incentives.
+
+--
+
+The main focus of EC 320 and EC 421 is causal identification.
+
+--
+
+- But...both rely on a common set of statistical techniques.
+
+--
+
+- For those interested, Professor Tim Duy teaches forecasting (EC 422) this same term.
+
+---
+
+## Not all relationships are causal
+
+&lt;img src="01-Introduction_files/figure-html/spurious-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Correlation vs. Causation
+
+Common refrain: _"Correlation doesn't necessarily imply causation!"_
+
+- __Q:__ Why might correlation fail to describe a causal relationship?
+
+--
+
+- __A:__ Omitted-variables bias, selection bias, simultaneity, reverse causality.
+
+--
+
+Correlation can imply causation.
+
+- Requires strong assumptions.
+
+--
+
+- **Real life often violates these assumptions!**
+
+- **Solutions:** Conduct an experiment or find a natural experiment.
+
+---
+
+### Example: *Blue Paradox*
+
+[Recent study](https://www.pnas.org/content/116/12/5319) by UO economist [Grant McDermott](https://grantmcdermott.com) and coauthors.
+
+**Question:** Do commercial fishers preempt fishing bans by increasing their fishing effort before the bans go into effect?
+
+**Motivation**
+
+- Recent conservation efforts seek to preserve aquatic habitat and increase fish stocks.
+- Policy lever: Restrict fishing activity in marine protected areas.
+- Concern: Preemptive behavior could *decrease* fish stocks.
+
+--
+
+**Data**
+
+- Vessel-level data on fishing effort/intensity.
+
+---
+### Example: *Blue Paradox*
+
+**Natural Experiment**
+
+Phoenix Islands Protected Area (PIPA) 
+
+- First mentioned on 1 September 2014; implemented 1 January 2015.
+- *Treatment group:* PIPA.
+- *Control group:* Outlying Kiribati islands. 
+
+---
+
+### Example: *Blue Paradox*
+
+**Natural Experiment**
+
+Measure the causal effect of the fishing ban by comparing fishing effort in treatment and control regions, before-and-after PIPA.
+
+- A *difference-in-differences* comparison.
+- .hi[Assumption:] .pink[Parallel trends.] If we believe this assumption, then the observed change supports a causal interpretation. If not, then the change could reflect other factors and thus fail to isolate the causal effect of the ban.
+
+---
+
+### Example: *Blue Paradox*
+
+**Results**
+
+&lt;img src="figure2.jpg" width="95%" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+### Example: *Blue Paradox*
+
+**Discussion**
+
+Results provide causal evidence that commercial fishers engage in preemptive behavior in response to conservation policy changes.
+
+Results are *consistent* with economic theory, but *cannot prove* that the theory is correct.
+
+- **Science cannot prove anything.**
+- Science can .hi[falsify or reject] existing hypotheses or .hi[corroborate] existing evidence.
+
+---
+
+&lt;br&gt;
+
+Also...the causal statement rests on a critical assumption.
+
+- Cannot prove that the assumption is true, but can falsify it.
+- Failure to falsify `\(\neq\)` assumption is true.
+
+---
+
+layout: true
+
+# R
+
+---
+
+## What is .mono[R]?
+
+According to the [.mono[R] project website](https://www.r-project.org),
+
+&gt; .mono[R] is a free software environment for statistical computing and graphics. It compiles and runs on a wide variety of UNIX platforms, Windows and MacOS.
+
+--
+
+What does that mean?
+
+- .mono[R] is __free__ and __open source__.
+
+- .mono[R] executes a variety of statistical techniques and produces beautiful graphs.
+
+- .mono[R] has a vibrant, thriving online community (see [stack overflow](https://stackoverflow.com/questions/tagged/r)).
+
+
+---
+
+## Why are we using .mono[R]?
+
+1. .mono[R] is __free__.
+
+--
+
+1. __.mono[R] is popular__ among economists, political scientists, psychologists, sociologists, geographers, anthropologists, biologists, data scientists, and statisticians.
+
+--
+
+1. __Employers prefer .mono[R]__ over most competing software environments.
+
+--
+
+1. .mono[R] can __adapt to nearly any task__: 'metrics, spatial data analysis, machine learning, web scraping, data cleaning, website building, teaching.
+
+---
+
+&lt;img src="01-Introduction_files/figure-html/statistical languages-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+layout: false
+class: inverse, middle
+
+# .mono[R] + [Examples]
+
+---
+
+# .mono[R] + Regression
+
+
+```r
+# A simple regression
+*fit &lt;- lm(mpg ~ 1 + wt, data = mtcars)
+# Show the coefficients
+coef(summary(fit))
+```
+
+```
+#&gt;              Estimate Std. Error   t value     Pr(&gt;|t|)
+#&gt; (Intercept) 37.285126   1.877627 19.857575 8.241799e-19
+#&gt; wt          -5.344472   0.559101 -9.559044 1.293959e-10
+```
+
+```r
+# A nice, clear table
+library(broom)
+tidy(fit)
+```
+
+```
+#&gt; # A tibble: 2 x 5
+#&gt;   term        estimate std.error statistic  p.value
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+#&gt; 1 (Intercept)    37.3      1.88      19.9  8.24e-19
+#&gt; 2 wt             -5.34     0.559     -9.56 1.29e-10
+```
+
+---
+
+# .mono[R] + Plotting (w/ .mono[plot])
+
+&lt;img src="01-Introduction_files/figure-html/unnamed-chunk-4-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# .mono[R] + Plotting (w/ .mono[plot])
+
+
+```r
+# Load packages with dataset
+p_load(gapminder)
+# Create dataset
+plot(
+  x = gapminder$gdpPercap, y = gapminder$lifeExp,
+  xlab = "GDP per capita", ylab = "Life Expectancy"
+)
+```
+
+---
+
+# .mono[R] + Plotting (w/ .mono[ggplot2])
+
+&lt;img src="01-Introduction_files/figure-html/unnamed-chunk-6-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# .mono[R] + Plotting (w/ .mono[ggplot2])
+
+
+```r
+# Load packages
+p_load(gapminder, dplyr)
+# Create dataset
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
+geom_point(alpha = 0.75) +
+scale_x_continuous("GDP per capita", label = scales::comma) +
+ylab("Life Expectancy") +
+theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
+```
+
+---
+
+# .mono[R] + More plotting (w/ .mono[ggplot2])
+
+&lt;img src="01-Introduction_files/figure-html/unnamed-chunk-8-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# .mono[R] + More plotting (w/ .mono[ggplot2])
+
+
+```r
+# Load packages
+p_load(gapminder, dplyr)
+# Create dataset
+ggplot(
+  data = filter(gapminder, year %in% c(1952, 2002)),
+  aes(x = gdpPercap, y = lifeExp, color = continent, group = country)
+) +
+geom_path(alpha = 0.25) +
+geom_point(aes(shape = as.character(year), size = pop), alpha = 0.75) +
+scale_x_log10("GDP per capita", label = scales::comma) +
+ylab("Life Expectancy") +
+scale_shape_manual("Year", values = c(1, 17)) +
+scale_color_viridis("Continent", discrete = T, end = 0.95) +
+guides(size = F) +
+theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
+```
+
+---
+
+# .mono[R] + Maps
+
+
+```r
+p_load(leaflet)
+leaflet() %&gt;%
+  addTiles() %&gt;% 
+  addMarkers(lng = -122.6793, lat = 45.51887, popup = "Pioneer Courthouse Square")
+```
+
+<div id="htmlwidget-382d6b611fce71a81135" style="width:756px;height:432px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-382d6b611fce71a81135">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addMarkers","args":[45.51887,-122.6793,null,null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},"Pioneer Courthouse Square",null,null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[45.51887,45.51887],"lng":[-122.6793,-122.6793]}},"evals":[],"jsHooks":[]}</script>
+
+---
+
+# .mono[R] + Animated maps (w/ .mono[gganimate])
+
+.center[![](dc_gunshots_map.gif)]
+---
+class: inverse, center, middle
+# Getting Started with .mono[R]
+
+---
+layout: true
+# Starting .mono[R]
+
+---
+
+## Installation
+
+- Install [.mono[R]](https://www.r-project.org/).
+- Install [.mono[RStudio]](https://www.rstudio.com/products/rstudio/download/preview/).
+- __Note:__ [All academic workstations at the UO have .mono[R]](https://library.uoregon.edu/library-technology-services/public-info/a-software), but having a copy of .mono[R] on your computer will prove useful for the econometrics sequence and 400-level elective courses.
+
+--
+
+## Resources
+
+- Google and [StackOverflow](https://stackoverflow.com/questions/tagged/r)
+- Time
+- Your classmates
+- Your GE
+- Me
+
+---
+
+## .mono[R] basics
+
+.more-left[
+
+1. Everything is an __object__.
+
+1. Every object has a __name__ and __value__.
+
+1. You use __functions__ on these objects.
+
+1. Functions come in __libraries__ (__packages__).
+
+1. .mono[R] will try to __help__ you.
+
+1. .mono[R] has its __quirks__.
+
+]
+
+.less-right[
+
+`foo`
+
+`foo &lt;- 2`
+
+`mean(foo)`
+
+`library(dplyr)`
+
+`?dplyr`
+
+`NA; error; warning`
+
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
