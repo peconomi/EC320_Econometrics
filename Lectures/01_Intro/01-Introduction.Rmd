@@ -71,7 +71,7 @@ options(knitr.table.format = "html")
 
 - Former RA at ESRI/Trinity College Dublin, Ireland
 
-- Focused on international economics, specifically maritime transport and multinational enterprises.
+- Focus: International Economics, Applied Econometrics
 
 --
 
@@ -80,6 +80,12 @@ Where can you find me?
 - Office: 520 PLC
 - Office hours: Tuesday 15:00-16:00, Friday 10:30-11:30, or by appointment
 - Email: [.mono[peconomi@uoregon.edu]](mailto:peconomi@uoregon.edu) **(use EC 320 in the subject line)**
+
+---
+
+### Teaching Assistants
+
+
 
 ---
 
@@ -107,15 +113,15 @@ Read through the prescribed readings listed in the Tentative Schedule of the syl
 
 ## Coursework
 
-* W1 & W2: Statistics Review + Fundamental Problem
-* W3: Logic of Regressions
-* W4: SLR - Estimation
-* W5: SLR - Classical Assumptions
-* W6: Midterm, SLR - Inference
-* W7: MLR - Estimation & Inferece
-* W8: Non-linear & Qualitative variables
-* W9: Interation terms & Model Specifications
-* W10: Heteroskedasticity & Finals Review
+* .hi-slate[W1 & W2:] Statistics Review + Fundamental Problem
+* .hi-slate[W3:] Logic of Regressions
+* .hi-slate[W4:] SLR - Estimation
+* .hi-slate[W5:] SLR - Classical Assumptions
+* .hi-slate[W6:] .hi-pink[Midterm], SLR - Inference
+* .hi-slate[W7:] MLR - Estimation & Inferece
+* .hi-slate[W8:] Non-linear & Qualitative variables
+* .hi-slate[W9:] Interation terms & Model Specifications
+* .hi-slate[W10:] Heteroskedasticity & .hi-pink[Finals] Review
 
 Content will be available on Canvas. If you wish to download them faster, see the course [Github](https://github.com/peconomi/EC320_Econometrics) page.
 
@@ -146,6 +152,27 @@ Develop practical skills based on the material we cover.
 Lab sessions will teach you how to conduct data cleaning, visualize data and produce regression analysis based on simulations and empirical questions. 
 
 Crucial for computational portions of assignments.
+
+---
+
+layout: true
+
+# Good Classroom Citizenship
+
+---
+
+<br>
+
+As you all know very well by now:
+
+* Wear your mask and make sure it fits you well
+* Stay home if you’re sick
+* Get to know your neighbors in class, let them know if positive
+* Watch for signs and symptoms with the daily symptom self check
+* Wash your hands frequently or use hand sanitizer
+* Complete the UO COVID-19 case and contact reporting form if you test positive or are a close contact of someone who tests positive. 
+
+UO Corona Corps: 541-346-2292; Careteam@uoregon.edu
 
 ---
 
@@ -251,15 +278,19 @@ The main focus of EC 320 and EC 421 is causal identification.
 
 ## Not all relationships are causal
 
-```{R, spurious, echo = F, dev = "svg", fig.height = 6}
-data(divorce_margarine)
+```{R, spurious, echo = F, dev = "svg", warning=FALSE, message=FALSE, fig.height = 6}
+cheese <- c(29.8,30.1,30.5,30.6,31.3,31.7,32.6,33.1,32.7,32.8)
+bed_ded <- c(327,456,509,497,596,573,661,741,809,717)
 
-ggplot(divorce_margarine, aes(margarine_consumption_per_capita, divorce_rate_maine)) +
+df <- data.frame(cheese=cheese, 
+                 bed_ded=bed_ded)
+
+ggplot(df, aes(cheese, bed_ded)) +
   geom_point(size = 4, color = "darkslategray") +
   geom_smooth(method = "lm", se = FALSE, color = red_pink) +
-  xlab("Margarine consumption per capita (lbs.)") +
-  ylab("Divorce rate in Maine (per 1000)") + 
-  theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
+  xlab("Per Capita Cheese Consumption (lbs.)") +
+  ylab("Death by bedsheet tangling") + 
+  theme_pander(base_size = 17, base_family = "FiraSans-Regular", fc = met_slate)
 ```
 
 ---
@@ -302,9 +333,7 @@ Correlation can imply causation.
 
 --
 
-**Data**
-
-- Vessel-level data on fishing effort/intensity.
+**Data:**  Vessel-level data on fishing effort/intensity.
 
 ---
 ### Example: *Blue Paradox*
