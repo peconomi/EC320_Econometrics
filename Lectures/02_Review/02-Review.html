@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Statistics Review I</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Philip Economides" />
+    <script src="02-Review_files/header-attrs/header-attrs.js"></script>
+    <link href="02-Review_files/remark-css/default.css" rel="stylesheet" />
+    <link href="02-Review_files/remark-css/metropolis.css" rel="stylesheet" />
+    <link href="02-Review_files/remark-css/metropolis-fonts.css" rel="stylesheet" />
+    <script src="02-Review_files/htmlwidgets/htmlwidgets.js"></script>
+    <script src="02-Review_files/jquery/jquery.min.js"></script>
+    <link href="02-Review_files/datatables-css/datatables-crosstalk.css" rel="stylesheet" />
+    <script src="02-Review_files/datatables-binding/datatables.js"></script>
+    <link href="02-Review_files/dt-core/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="02-Review_files/dt-core/css/jquery.dataTables.extra.css" rel="stylesheet" />
+    <script src="02-Review_files/dt-core/js/jquery.dataTables.min.js"></script>
+    <link href="02-Review_files/crosstalk/css/crosstalk.css" rel="stylesheet" />
+    <script src="02-Review_files/crosstalk/js/crosstalk.min.js"></script>
+    <link rel="stylesheet" href="my-css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Statistics Review I
+## EC 320: Introduction to Econometrics
+### Philip Economides
+### Winter 2022
+
+---
+
+class: inverse, middle
+
+
+
+# Prologue
+
+---
+# Housekeeping
+
+&lt;br&gt;
+
+Problem set 1 is posted. Will post next one upon deadline of the previous.
+This will allow folks more time/flexibility to get homework(s) organized. 
+
+- Due next Monday on Canvas by 1pm.
+- Analytical and computational components (turned in separately).
+- Each homework due every 2 weeks, Monday 1pm, last homework graded within week 10.
+
+Issues with .mono[R]?
+
+- Office hours times included here.
+
+---
+# Motivation
+
+&lt;br&gt;
+
+The focus of our course is __regression analysis__, a useful toolkit for learning from data.
+
+--
+
+To understand regression, its mechanics, and its pitfalls, __we need to understand the underlying statistical theory.__
+
+- Insights from theory can help us become better practitioners and savvier consumers of science.
+
+--
+
+Today, we will review important concepts you learned in Math 243.
+
+- Maybe some you missed, too.
+
+---
+class: inverse, middle
+
+# A Brief Math Review
+
+---
+# Notation
+
+__Data__ on a variable `\(X\)` __are__&lt;sup&gt;*&lt;/sup&gt; a sequence of `\(n\)` observations, indexed by `\(i\)`: `$$\{x_i: 1, \dots, n \}.$$`
+
+--
+
+.pull-left[
+
+<div id="htmlwidget-8513e4377bf99cb83a41" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-8513e4377bf99cb83a41">{"x":{"filter":"none","caption":"<caption>Example: \\(n = 5\\)<\/caption>","data":[[1,2,3,4,5],[8,9,4,7,2]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>\\(i\\)<\/th>\n      <th>\\(x_i\\)<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","ordering":false,"columnDefs":[{"className":"dt-center","targets":"_all"}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+
+]
+
+.pull-right[
+
+- `\(i\)` indicates the row number.
+
+- `\(n\)` is the number of rows.
+
+- `\(x_i\)` is the value of `\(X\)` for row `\(i\)`.
+
+]
+
+.footnote[
+&lt;sup&gt;*&lt;/sup&gt; _Data_ .mono[=] __plural__ of _datum_.
+]
+
+---
+# Summation
+
+The __summation operator__ adds a sequence of numbers over an index:
+
+`$$\sum_{i=1}^{n} x_i \equiv x_1 + x_2 + \dots + x_n.$$`
+
+- "The sum of `\(x_i\)` from 1 to `\(n\)`."
+
+--
+
+.pull-left[
+
+<div id="htmlwidget-60a130a718c5cb49aa43" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-60a130a718c5cb49aa43">{"x":{"filter":"none","caption":"<caption>Example: \\(n = 4\\)<\/caption>","data":[[1,2,3,4],[7,4,10,3]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>\\(i\\)<\/th>\n      <th>\\(x_i\\)<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","ordering":false,"columnDefs":[{"className":"dt-center","targets":"_all"}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+
+]
+
+.pull-right[
+
+$$
+`\begin{aligned}
+ \sum_{i=1}^{4} x_i &amp;= 7 + 4 + 10 + 3 \\
+               &amp;= 23\\
+\frac{1}{4} \sum_{i=1}^4 x_i &amp;= \  6 \ \  \text{(sample average)}
+\end{aligned}`
+$$
+
+]
+
+---
+# Summation
+
+## Rule 1
+
+For any constant `\(c\)`, `$$\sum_{i=1}^{n} c = nc.$$`
+
+--
+
+.pull-left[
+
+<div id="htmlwidget-1ca579f9e3e6722f381e" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1ca579f9e3e6722f381e">{"x":{"filter":"none","caption":"<caption>Example: \\(n = 4\\)<\/caption>","data":[[1,2,3,4],[2,2,2,2]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>\\(i\\)<\/th>\n      <th>\\(c\\)<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","ordering":false,"columnDefs":[{"className":"dt-center","targets":"_all"}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+
+]
+
+.pull-right[
+
+$$
+`\begin{aligned}
+ \sum_{i=1}^{4} 2 &amp;= 4 \times 2 \\
+                  &amp;= 8
+\end{aligned}`
+$$
+
+]
+
+---
+# Summation
+
+## Rule 2
+
+For any constant `\(c\)`, `$$\sum_{i=1}^{n} cx_i = c \sum_{i=1}^{n} x_i.$$`
+
+--
+
+.pull-left[
+
+<div id="htmlwidget-2a3ad0e91ba064ce3643" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-2a3ad0e91ba064ce3643">{"x":{"filter":"none","caption":"<caption>Example: \\(n = 3\\)<\/caption>","data":[[1,2,3],[2,2,2],[7,4,10]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>\\(i\\)<\/th>\n      <th>\\(c\\)<\/th>\n      <th>\\(x_i\\)<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","ordering":false,"columnDefs":[{"className":"dt-center","targets":"_all"}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+
+]
+
+.pull-right[
+
+$$
+`\begin{aligned}
+ \sum_{i=1}^{3} 2x_i &amp;= 2\times7 + 2\times4 + 2 \times10\\
+               &amp;= 14 + 8 + 20\\
+               &amp;= 42
+\end{aligned}`
+$$
+
+$$
+`\begin{aligned}
+ 2 \sum_{i=1}^{3} x_i &amp;= 2(7 + 4 + 10) \\
+               &amp;= 42
+\end{aligned}`
+$$
+
+]
+
+---
+# Summation
+
+## Rule 3
+
+If `\(\{(x_i, y_i): 1, \dots, n \}\)` is a set of `\(n\)` pairs, and `\(a\)` and `\(b\)` are constants, then `$$\sum_{i=1}^{n} (ax_i + by_i) = a \sum_{i=1}^{n} x_i + b \sum_{i=1}^{n} y_i.$$`
+
+--
+
+.pull-left[
+
+<div id="htmlwidget-9bf4504ac15a8f7ccd71" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-9bf4504ac15a8f7ccd71">{"x":{"filter":"none","caption":"<caption>Example: \\(n = 2\\)<\/caption>","data":[[1,2],[2,2],[7,4],[1,1],[4,2]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>\\(i\\)<\/th>\n      <th>\\(a\\)<\/th>\n      <th>\\(x_i\\)<\/th>\n      <th>\\(b\\)<\/th>\n      <th>\\(y_i\\)<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","ordering":false,"columnDefs":[{"className":"dt-center","targets":"_all"}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+
+]
+
+.pull-right[
+
+$$
+`\begin{aligned}
+ \sum_{i=1}^{2} (2x_i + y_i) &amp;= 18 + 10 \\
+               &amp;= 28
+\end{aligned}`
+$$
+
+$$
+`\begin{aligned}
+ 2 \sum_{i=1}^{2} x_i + \sum_{i=1}^{2} y_i &amp;= 2 \times 11 + 6 \\
+               &amp;= 28
+\end{aligned}`
+$$
+
+]
+
+---
+# Summation
+
+## __Caution__
+
+The .hi-purple[sum of the ratios] __is not__ the .hi-green[ratio of the sums]: `$$\color{#9370DB}{\sum_{i=1}^{n} x_i / y_i} \neq \color{#007935}{\left(\sum_{i=1}^{n} x_i \right) \Bigg/ \left(\sum_{i=1}^{n} y_i \right)}.$$`
+
+- If `\(n = 2\)`, then `\(\frac{x_1}{y_1} + \frac{x_2}{y_2} \neq \frac{x_1 + x_2}{y_1 + y_2}\)`.
+
+--
+
+The .hi-purple[sum of squares] __is not__ the .hi-green[square of the sums]: `$$\color{#9370DB}{\sum_{i=1}^{n} x_i^2} \neq \color{#007935}{\left(\sum_{i=1}^{n} x_i \right)^2}.$$`
+
+- If `\(n = 2\)`, then `\(x_1^2 + x_2^2 \neq (x_1 + x_2)^2 = x_1^2 + 2x_1x_2 + x_2^2\)`.
+
+
+---
+
+class: inverse, middle
+
+# Cartesian coordinate system
+
+---
+
+# Cartesian coordinate system
+
+A Cartesian plane (named after French mathematician Rene
+Descartes, who formalized its use in mathematics) is defined by two
+perpendicular number lines: the x-axis, which is horizontal, and the
+y-axis, which is vertical. Using these axes, we can describe any
+point in the plane using an ordered pair of numbers (x,y).
+
+--
+
+&lt;br&gt;
+
+A particular line on this plane takes the form
+$$
+`\begin{aligned}
+y= a+ bx
+\end{aligned}`
+$$
+where `\(a\)` is known as the intercept and `\(b\)` is the slope.
+
+Any incremental unit increase in `\(x\)` results in `\(y\)` increasing by `\(b\)`.
+
+---
+
+# Cartesian coordinate system
+
+&lt;img src="02-Review_files/figure-html/spurious-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+class: inverse, middle
+
+# Probability Review
+
+---
+# Random Variables
+
+__Experiment:__ Any procedure that is _infinitely repeatable_ and has a _well-defined set of outcomes_.
+
+- Flip a coin 10 times and record the number of heads.
+- Roll two six-sided dice and record the sum.
+
+--
+
+__Random Variable:__ A variable with _numerical values determined by an experiment or a random phenomenon_.
+
+- Describes the .purple[sample space] of an experiment.
+- .hi-purple[Sample space:] The set of potential outcomes an experiment could generate, _e.g._, the sum of two dice is an integer from 2 to 12.
+- .hi-green[Event:] A subset of the .purple[sample space] or a combination of outcomes, _e.g._, rolling a two or a four.
+
+---
+# Random Variables
+
+__Notation:__ capital letters for random variables (_e.g._, `\(X\)`, `\(Y\)`, or `\(Z\)`) and lowercase letters for particular outcomes (_e.g._, `\(x\)`, `\(y\)`, or `\(z\)`).
+
+--
+
+__Example 1:__ Flipping a coin.
+
+- .hi-green[Events:] heads or tails.
+- Random Variable X: Win 1USD if heads ($x_i=$), pay 1USD if tails ($x_i=-1$)
+- .hi-purple[Sample Space:] `\(\{-1,1\}\)`
+
+--
+
+__Example 2:__ Wages in a Census Study.
+
+- .hi-green[Events:] people make a certain wage.
+- Random Variable W: the number that the study records as wage. 
+- .hi-purple[Sample Space:] `\([0, \text{max}(\text{wage})]\)`
+
+---
+# Discrete Random Variables
+
+__Discrete Random Variable:__ A random variable that takes a countable set of values.
+
+--
+
+A __Bernoulli__ (or binary) random variable takes values of either 1 or 0.
+
+- Characterized by `\(\mathop{\mathbb{P}}(X=1)\)`, "the probability of success."
+
+- Probabilities sum to 1: `\(\mathop{\mathbb{P}}(X=1) + \mathop{\mathbb{P}}(X=0) = 1\)`.
+
+    - For a "fair" coin, `\(\mathop{\mathbb{P}}(\text{Heads}=1)=\frac{1}{2} \implies \mathop{\mathbb{P}}(\text{Heads}=0)=\frac{1}{2}\)`.
+
+--
+
+- More generally, if `\(\mathop{\mathbb{P}}(X=1) = \theta\)` for some `\(\theta \in [0,1]\)`, then `\(\mathop{\mathbb{P}}(X=0) = 1 - \theta\)`.
+
+    - If the probability of passing this class is 75%, then the probability of not passing is 25%.
+
+---
+# Discrete Random Variables
+
+## Probabilities 
+
+We describe a discrete random variable by listing its possible values with associated probabilities.
+
+If `\(X\)` takes on `\(k\)` possible values `\(\{x_1, \dots, x_k\}\)`, then the probabilities `\(p_1, p_2, \dots, p_k\)` are defined by `$$p_j = \mathop{\mathbb{P}}(X=x_j), \quad j = 1,2, \dots, k,$$` where `$$p_j \in [0,1]$$` and `$$p_1 + p_2 + \dots + p_k = 1.$$`
+
+---
+# Discrete Random Variables
+
+## Probability density function
+
+The __probability density function__ (__pdf__) of `\(X\)` summarizes possible outcomes and associated probabilities: `$$f(x_j)=p_j, \quad j=1,2,\dots,k.$$`
+
+--
+
+## Example
+
+2020 Presidential election: 538 electoral votes at stake.
+
+- `\(\{X:0,1, \dots, 538\}\)` is the number of electoral votes won by the Democratic candidate. 
+- Extremely unlikely that she will win 0 votes or all 538 votes: `\(f(0) \approx 0\)` and `\(f(538) \approx 0\)`.
+- Nonzero probability of winning an exact majority: `\(f(270) &gt; 0\)`.
+
+---
+# Discrete Random Variables
+
+## Example
+
+Basketball player goes to the foul line to shoot two free throws.
+
+- `\(X\)` is the number of shots made (either 0, 1, or 2).
+
+- The pdf of `\(X\)` is `\(f(0)= 0.3\)`, `\(f(1) = 0.4\)`, `\(f(2) = 0.3\)`.
+
+- __Note:__ the probabilities sum to 1.
+
+Use the pdf to calculate the probability of the .hi-green[event] that the player makes _at least one shot_, _i.e._, `\(\mathop{\mathbb{P}}(X \geq 1)\)`.
+
+--
+
+- `\(\mathop{\mathbb{P}}(X \geq 1) = \mathop{\mathbb{P}}(X=1) + \mathop{\mathbb{P}}(X=2)= 0.4 + 0.3 = 0.7\)`.
+
+---
+# Continuous Random Variables
+
+__Continuous Random Variable:__ A random variable that takes any real value with _zero_ probability.
+
+- .hi-purple[Wait, what?!] The variable takes so many values that we can't count all possibilities, so the probability of any one particular value is zero.
+
+--
+
+Measurement is discrete (_e.g._, dollars and cents), but variables with many possible values are best treated as continuous.
+
+- _e.g._, electoral votes, height, wages, temperature, _etc._
+
+--
+
+In some cases, beneficial to switch to .hi-purple[bins] of measurement values.
+
+- .hi-pink[B., Hansen (2015)] "Punishment and Deterrence: Evidence from Drunk Driving", AER
+- Presents blood alcohol content within bins of 0.05 units
+
+---
+# Continuous Random Variables
+
+Probability density functions also describe continuous random variables.
+
+- Difference: Interested in the probability of events within a _range_ of values.
+- _e.g._ What is the probability of more than 1 inch of rain tomorrow? 
+
+---
+# Continuous Random Variables
+
+## Uniform Distribution
+
+The probability density function of a variable uniformly distributed between 0 and 2 is
+
+$$
+f(x) =
+`\begin{cases}
+  \frac{1}{2} &amp; \text{if } 0 \leq x \leq 2 \\
+  0 &amp; \text{otherwise}
+\end{cases}`
+$$
+
+&lt;img src="02-Review_files/figure-html/unif-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Continuous Random Variables
+
+## Uniform Distribution
+
+By definition, the area under `\(f(x)\)` is equal to 1.
+
+The .hi[shaded area] illustrates the probability of the event `\(1 \leq X \leq 1.5\)`.
+
+- `\(\mathop{\mathbb{P}}(1 \leq X \leq 1.5) = (1.5-1) \times0.5 = 0.25\)`.
+
+&lt;img src="02-Review_files/figure-html/unif2-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Continuous Random Variables
+
+## Normal Distribution
+
+.hi-purple[The "bell curve."]
+
+- Symmetric: mean and median occur at the same point (_i.e._, no skew).
+
+- Low-probability events in tails; high-probability events near center.
+
+&lt;img src="02-Review_files/figure-html/norm-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Continuous Random Variables
+
+## Normal Distribution
+
+The .hi[shaded area] illustrates the probability of the event `\(-2 \leq X \leq 2\)`.
+
+- "Find area under curve" .mono[=] use integral calculus (or, in practice, .mono[R]).
+
+- `\(\mathop{\mathbb{P}}(-2 \leq X \leq 2) \approx 0.95\)`. 
+
+&lt;img src="02-Review_files/figure-html/norm2-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Expected Value
+
+A density function describes an entire distribution, but sometimes we just want a summary.
+
+--
+
+The __expected value__ describes the _central tendency_ of distribution in a single number.
+
+- _Central tendency_ .mono[=] typical value to expect upon drawing from the distribution.
+
+Other summary statistics we may be interested in include
+
+* Median
+* Standard deviation
+* 25th percentile
+* 75th percentile
+
+---
+# Expected Value
+
+## Definition (Discrete)
+
+The expected value of a discrete random variable `\(X\)` is the weighted average of its `\(k\)` values `\(\{x_1, \dots, x_k\}\)` and their associated probabilities:
+
+$$
+`\begin{aligned}
+\mathop{\mathbb{E}}(X) &amp;= x_1 \mathop{\mathbb{P}}(x_1) + x_2 \mathop{\mathbb{P}}(x_2) + \dots +x_k \mathop{\mathbb{P}}(x_k) \\
+&amp;= \sum_{j=1}^{k} x_j\mathop{\mathbb{P}}(x_j).
+\end{aligned}`
+$$
+
+--
+
+- Also known as the .hi[population mean].
+
+
+---
+# Expected Value
+
+## Example
+
+Rolling a six-sided die once can take values `\(\{1, 2, 3, 4, 5, 6\}\)`, each with equal probability. .hi-purple[What is the expected value of a roll?]
+
+--
+
+`\(\mathop{\mathbb{E}}(\text{Roll}) = 1 \times \frac{1}{6} + 2 \times \frac{1}{6} + 3 \times \frac{1}{6} + 4 \times \frac{1}{6} + 5 \times \frac{1}{6} + 6 \times \frac{1}{6} = \color{#9370DB}{3.5}\)`.
+
+- __Note:__ The expected value can be a number that isn't a possible outcome of `\(X\)`.
+
+---
+# Expected Value
+
+## Definition (Continuous)
+
+If `\(X\)` is a continuous random variable and `\(f(x)\)` is its probability density function, then the expected value of `\(X\)` is
+
+$$
+\mathop{\mathbb{E}}(X) = \int_{-\infty}^{\infty} x f(x) dx.
+$$
+
+- __Note:__ `\(x\)` represents the particular values of `\(X\)`.
+
+- Same idea as the discrete definition: describes the .hi[population mean].
+
+&lt;img src="02-Review_files/figure-html/unnamed-chunk-6-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Expected Value
+
+## Rule 1 
+
+For any constant `\(c\)`, `\(\mathop{\mathbb{E}}(c) = c\)`.
+
+--
+
+## Not-so-exciting examples 
+
+`\(\mathop{\mathbb{E}}(5) = 5\)`.
+
+`\(\mathop{\mathbb{E}}(1) = 1\)`.
+
+`\(\mathop{\mathbb{E}}(4700) = 4700\)`.
+
+---
+# Expected Value
+
+## Rule 2
+
+For any constants `\(a\)` and `\(b\)`, `\(\mathop{\mathbb{E}}(aX + b) = a\mathop{\mathbb{E}}(X) + b\)`.
+
+--
+
+## Example 
+
+Suppose `\(X\)` is the high temperature in degrees Celsius in Eugene during August. The long-run average is `\(\mathop{\mathbb{E}}(X) = 28\)`. If `\(Y\)` is the temperature in degrees Fahrenheit, then `\(Y = 32 + \frac{9}{5} X\)`. .hi-purple[What is] `\(\color{#9370DB}{\mathop{\mathbb{E}}(Y)}\)`.hi-purple[?]
+
+--
+
+- `\(\mathop{\mathbb{E}}(Y) = 32 + \frac{9}{5} \mathop{\mathbb{E}}(X) = 32 + \frac{9}{5} \times 28 = \color{#9370DB}{82.4}\)`.
+
+---
+# Expected Value
+
+## Rule 3
+
+If `\(\{a_1, a_2, \dots , a_n\}\)` are constants and `\(\{X_1, X_2, \dots , X_n\}\)` are random variables, then
+
+$$
+\color{#FD5F00}{\mathop{\mathbb{E}}(a_1 X_1 + a_2 X_2 + \dots + a_n X_n)} = \color{#007935}{a_1 \mathop{\mathbb{E}}(X_1) + a_2 \mathop{\mathbb{E}}(X_2) + \dots + a_n \mathop{\mathbb{E}}(X_n)}.
+$$
+
+In English, .hi-orange[the expected value of the sum] .mono[=] .hi-green[the sum of expected values].
+
+---
+# Expected Value
+
+## Rule 3
+
+.hi-orange[The expected value of the sum] .mono[=] .hi-green[the sum of expected values].
+
+## Example 
+
+Suppose that a coffee shop sells `\(X_1\)` small, `\(X_2\)` medium, and `\(X_3\)` large caffeinated beverages in a day. The quantities sold are random with expected values `\(\mathop{\mathbb{E}}(X_1) = 43\)`, `\(\mathop{\mathbb{E}}(X_2) = 56\)`, and `\(\mathop{\mathbb{E}}(X_3) = 21\)`. The prices of small, medium, and large beverages are `\(1.75\)`, `\(2.50\)`, and `\(3.25\)` dollars. .hi-purple[What is expected revenue?]
+
+--
+
+$$
+`\begin{aligned}
+\color{#FD5F00}{\mathop{\mathbb{E}}(1.75 X_1 + 2.50 X_2 + 3.35 X_n)} &amp;= \color{#007935}{1.75 \mathop{\mathbb{E}}(X_1) + 2.50 \mathop{\mathbb{E}}(X_2) + 3.25 \mathop{\mathbb{E}}(X_3)} \\
+&amp;= \color{#9370DB}{1.75(43) + 2.50(56) + 3.25(21)} \\
+&amp;= \color{#9370DB}{283.5}
+\end{aligned}`
+$$
+
+---
+# Expected Value
+
+## __Caution__
+
+Previously, we found that the expected value of rolling a six-sided die is `\(\mathop{\mathbb{E}} \left(\text{Roll} \right) = 3.5\)`.
+
+- If we square this number, we get `\(\left[\mathop{\mathbb{E}} ( \text{Roll} ) \right]^2 = 12.25\)`.
+
+__Is__ `\(\left[\mathop{\mathbb{E}} \left( \text{Roll} \right) \right]^2\)` __the same as__ `\(\mathop{\mathbb{E}} \left(\text{Roll}^2 \right)\)`__?__
+
+--
+
+__No!__
+
+$$
+`\begin{aligned}
+\mathop{\mathbb{E}} \left( \text{Roll}^2 \right) &amp;= 1^2 \times \frac{1}{6} + 2^2 \times \frac{1}{6} + 3^2 \times \frac{1}{6} + 4^2 \times \frac{1}{6} + 5^2 \times \frac{1}{6} + 6^2 \times \frac{1}{6} \\ &amp;\approx 15.167 \\ &amp;\neq 12.25.
+\end{aligned}`
+$$
+
+---
+# Expected Value
+
+## __Caution__
+
+Except in special cases, .hi-purple[the transformation of an expected value] __is not__ .hi-green[the expected value of a transformed random variable].
+
+For some function `\(g(\cdot)\)`, it is typically the case that
+
+`$$\color{#9370DB}{g \left( \mathop{\mathbb{E}}(X) \right)} \neq \color{#007935}{\mathop{\mathbb{E}} \left( g(X) \right)}.$$`
+
+---
+# Variance
+
+Random variables `\(\color{#e64173}{X}\)` and `\(\color{#9370DB}{Y}\)` share the same population mean, but are distributed differently.
+
+&lt;img src="02-Review_files/figure-html/unnamed-chunk-7-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Variance
+
+How tightly is a random variable distributed about its mean?
+
+- Let `\(\mu = \mathop{\mathbb{E}}(X)\)`. 
+
+- Describe the distance of `\(X\)` from its population mean `\(\mu\)` as the squared difference: `\((X - \mu)^2\)`.
+
+--
+
+__Variance__ tells us how far `\(X\)` deviates from `\(\mu\)`, _on average_:
+
+$$
+\mathop{\text{Var}}(X) \equiv \mathop{\mathbb{E}}\left( (X - \mu)^2 \right) = \sigma^2
+$$
+
+- `\(\sigma^2\)` is shorthand for variance.
+
+&lt;!-- - Distributing the terms above yields `\(\sigma^2 = \mathop{\mathbb{E}}(X^2 - 2X \mu + \mu^2) = \mathop{\mathbb{E}}(X^2) - 2 \mu^2 + \mu^2 = \mathop{\mathbb{E}}(X^2) - \mu^2\)`. --&gt;
+
+---
+# Variance
+
+## Rule 1
+
+`\(\mathop{\text{Var}}(X) = 0 \iff X\)` is a constant.
+
+- If a random variable never deviates from its mean, then it has zero variance.
+
+- If a random variable is always equal to its mean, then it's a (not-so-random) constant.
+
+---
+# Variance
+
+## Rule 2
+
+For any constants `\(a\)` and `\(b\)`, `\(\mathop{\text{Var}}(aX + b) = a^2\mathop{\text{Var}}(X)\)`.
+
+--
+
+## Example 
+
+Suppose `\(X\)` is the high temperature in degrees Celsius in Eugene during August. If `\(Y\)` is the temperature in degrees Fahrenheit, then `\(Y = 32 + \frac{9}{5} X\)`. .hi-purple[What is] `\(\color{#9370DB}{\mathop{\text{Var}}(Y)}\)`.hi-purple[?]
+
+--
+
+- `\(\mathop{\text{Var}}(Y) = (\frac{9}{5})^2 \mathop{\text{Var}}(X) = \color{#9370DB}{\frac{81}{25} \mathop{\text{Var}}(X)}\)`.
+
+---
+# Standard Deviation
+
+__Standard deviation__ is the positive square root of the variance:
+
+$$
+\mathop{\text{sd}}(X) = +\sqrt{\mathop{\text{Var}}(X)} = \sigma
+$$
+
+- `\(\sigma\)` is shorthand for standard deviation.
+
+---
+# Standard Deviation
+
+## Rule 1
+
+For any constant `\(c\)`, `\(\mathop{\text{sd}}(c) = 0\)`.
+
+--
+
+## Rule 2
+
+For any constants `\(a\)` and `\(b\)`, `\(\mathop{\text{sd}}(aX + b) = \left| a \right|\mathop{\text{sd}}(X)\)`.
+
+---
+# Standardizing a Random Variable
+
+When we're working with a random variable `\(X\)` with an unfamiliar scale, it is useful to __standardize__ it by defining a new variable `\(Z\)`:
+
+$$
+Z \equiv \frac{X - \mu}{\sigma}.
+$$
+
+--
+
+`\(Z\)` has mean `\(0\)` and standard deviation `\(1\)`. How?
+
+--
+
+- First, some simple trickery: `\(Z = aX + b\)`, where `\(a \equiv \frac{1}{\sigma}\)` and `\(b \equiv - \frac{\mu}{\sigma}\)`.
+
+--
+
+- `\(\mathop{\mathbb{E}}(Z) = a \mathop{\mathbb{E}}(X) + b = \mu \frac{1}{\sigma} - \frac{\mu}{\sigma} = 0\)`.
+
+--
+
+- `\(\text{Var}(Z) = a^2\text{Var}(X) = \frac{1}{\sigma^2} \sigma^2 = 1\)`.
+
+---
+# Covariance
+
+__Idea:__ Characterize the relationship between two random variables `\(X\)` and `\(Y\)`.
+
+__Definition:__ `\(\mathop{\text{Cov}}(X, Y) \equiv \mathop{\mathbb{E}} \left[ (X - \mu_X) (Y - \mu_Y) \right] = \sigma_{xy}\)`.
+
+--
+
+- .hi-orange[Positive correlation:] When `\(\sigma_{xy} &gt; 0\)`, then `\(X\)` is .orange[above] its mean when `\(Y\)` is .orange[above] its mean, _on average_.
+
+- .hi-green[Negative correlation:] When `\(\sigma_{xy} &lt; 0\)`, then `\(X\)` is .green[below] its mean when `\(Y\)` is .green[above] its mean, _on average_.
+
+---
+# Covariance
+
+## Rule 1
+
+If `\(X\)` and `\(Y\)` are independent, then `\(\mathop{\text{Cov}}(X, Y) = 0\)`.
+
+--
+
+- __Statistical independence:__ If `\(X\)` and `\(Y\)` are independent, then `\(\mathop{\mathbb{E}}(XY) = \mathop{\mathbb{E}}(X)\mathop{\mathbb{E}}(Y)\)`.
+
+--
+
+- `\(\mathop{\text{Cov}}(X, Y) = 0\)` means that `\(X\)` and `\(Y\)` are _uncorrelated_. 
+
+__Caution:__ `\(\mathop{\text{Cov}}(X, Y) = 0\)` .hi-red[does not imply] that `\(X\)` and `\(Y\)` are independent.
+
+---
+# Covariance
+
+## Rule 2
+
+For any constants `\(a\)`, `\(b\)`, `\(c\)`, and `\(d\)`, `\(\mathop{\text{Cov}}(aX + b, cY + d) = ac\mathop{\text{Cov}}(X, Y)\)`
+
+---
+# Correlation Coefficient
+
+A problem with covariance is that it is sensitive to units of measurement.
+
+--
+
+The __correlation coefficient__ solves this problem by rescaling the covariance:
+
+$$
+\mathop{\text{Corr}}(X,Y) \equiv \frac{\mathop{\text{Cov}}(X,Y)}{\mathop{\text{sd}}(X) \times \mathop{\text{sd}}(Y)} = \frac{\sigma_{XY}}{\sigma_X \sigma_Y}.
+$$
+
+- Also denoted as `\(\rho_{XY}\)`.
+
+- `\(-1 \leq \mathop{\text{Corr}}(X,Y) \leq 1\)`
+
+- Invariant to scale: if I double `\(Y\)`, `\(\mathop{\text{Corr}}(X,Y)\)` will not change.
+
+---
+# Correlation Coefficient
+
+Perfect positive correlation: `\(\mathop{\text{Corr}}(X,Y) = 1\)`.
+
+&lt;img src="02-Review_files/figure-html/unnamed-chunk-8-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Correlation Coefficient
+
+Perfect negative correlation: `\(\mathop{\text{Corr}}(X,Y) = -1\)`.
+
+&lt;img src="02-Review_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Correlation Coefficient
+
+Positive correlation: `\(\mathop{\text{Corr}}(X,Y) &gt; 0\)`.
+
+&lt;img src="02-Review_files/figure-html/unnamed-chunk-10-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Correlation Coefficient
+
+Negative correlation: `\(\mathop{\text{Corr}}(X,Y) &lt; 0\)`.
+
+&lt;img src="02-Review_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Correlation Coefficient
+
+No correlation: `\(\mathop{\text{Corr}}(X,Y) = 0\)`.
+
+&lt;img src="02-Review_files/figure-html/unnamed-chunk-12-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Variance, Revisited
+
+## Variance Rule 3
+
+For constants `\(a\)` and `\(b\)`,
+
+$$
+\mathop{\text{Var}} (aX + bY) = a^2 \mathop{\text{Var}}(X) + b^2 \mathop{\text{Var}}(Y) + 2ab\mathop{\text{Cov}}(X, Y).
+$$
+--
+
+- If `\(X\)` and `\(Y\)` are uncorrelated, then `\(\mathop{\text{Var}} (X + Y) = \mathop{\text{Var}}(X) + \mathop{\text{Var}}(Y)\)`
+
+- If `\(X\)` and `\(Y\)` are uncorrelated, then `\(\mathop{\text{Var}} (X - Y) = \mathop{\text{Var}}(X) + \mathop{\text{Var}}(Y)\)`
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
