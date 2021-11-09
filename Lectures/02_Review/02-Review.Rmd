@@ -65,7 +65,7 @@ theme_empty <- theme_bw() + theme(
 
 <br>
 
-Problem set 1 is posted. Will post next one upon deadline of the previous.
+Problem set 1 posted. Will post next one upon deadline of the previous.
 This will allow folks more time/flexibility to get homework(s) organized. 
 
 - Due next Monday on Canvas by 1pm.
