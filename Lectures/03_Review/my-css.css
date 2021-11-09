@@ -139,7 +139,7 @@
 
 .remark-slide-content {
   background-color: #ffffff;
-  border-top: 80px solid #23373B;
+  border-top: 80px solid #233b25;
   font-size: 24px;
   /* font-weight: 300; */
   /* line-height: 1.5; */
@@ -147,7 +147,7 @@
 }
 
 .inverse {
-  background-color: #23373B;
+  background-color: #233b25;
   text-shadow: 0 0 20px #333;
   /* text-shadow: none; */
 }
@@ -163,7 +163,7 @@
 }
 
 .dark-slide {
-  background-color: #23373B;
+  background-color: #233b25;
   border-top: 0px solid #23373B;
 }
 .dark-slide .remark-slide-number {

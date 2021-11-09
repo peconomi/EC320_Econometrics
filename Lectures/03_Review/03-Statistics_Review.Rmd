@@ -17,7 +17,8 @@ class: inverse, middle
 ```{r Setup, include = F}
 options(htmltools.dir.version = FALSE)
 library(pacman)
-p_load(ggthemes, viridis, knitr, extrafont, tidyverse, magrittr, latex2exp, parallel, Ecdat, wooldridge, dslabs, ggforce)
+p_load(ggthemes, viridis, knitr, extrafont, tidyverse, magrittr,
+       latex2exp, parallel, Ecdat, wooldridge, dslabs, ggforce, DT)
 # Define colors
 red_pink <- "#e64173"
 met_slate <- "#272822" 
@@ -74,9 +75,32 @@ theme_empty <- theme_bw() + theme(
 ---
 # Overview
 
-__Goal:__ Learn about a population.
+A few key terms:
 
-- In particular, learn about an unknown population _parameter_.
+--
+
+- .hi-pink[Population:] a (usually large) group of items or events we would like to know about. 
+
+--
+
+- .hi-pink[Parameter:] a value that describes that population. The parameter of interest is the parameter that the researcher seeks to learn about.
+
+--
+
+- .hi-pink[Sample:] a survey of a subset of the population. 
+
+--
+
+Usually we aim to draw observations .hi-blue[randomly] from the population, such that it becomes a .hi-blue[representative sample] of the population. More details on this later!
+
+---
+# Overview
+
+__Focus:__ Populations vs Samples
+
+- How can we make inferences about a .hi-pink[population] based on a small .hi-blue[sample] of the population?
+
+- In particular, how do we learn about an unknown population _parameter_ of interest?
 
 __Challenge:__ Usually cannot access information about the entire population.
 
@@ -123,177 +147,6 @@ $$
 - Given a sample, $\bar{X}$ yields an __estimate__ $\bar{x}$ or $\hat{\mu}$, a specific number.
 
 ---
-class: clear-slide, middle
-
-A physicist, a chemist, and an econometrician go to an archery range...
-
-```{R, include = F}
-theme_empty_arrows <- theme_bw() + theme(
-  line = element_blank(),
-  rect = element_blank(),
-  strip.text = element_blank(),
-  axis.text = element_blank(),
-  plot.title = element_blank(),
-  axis.title = element_blank(),
-  plot.margin = structure(c(0, 0, 0, 0), unit = "lines", valid.unit = 3L, class = "unit"),
-  legend.position = "none",
-  aspect.ratio = 1
-)
-
-circle <- function(center = c(0, 0), diameter = 1, n = 1000){
-  r <-  diameter / 2
-  tt <- seq(0,2*pi,length.out = n)
-  xx <- center[1] + r * cos(tt)
-  yy <- center[2] + r * sin(tt)
-  return(data.frame(x = xx, y = yy))
-}
-
-ring1 <- circle(diameter = 1)
-ring2 <- circle(diameter = 2)
-ring3 <- circle(diameter = 3)
-ring4 <- circle(diameter = 4)
-ring5 <- circle(diameter = 5)
-
-arrow1 <- tibble(
-  x = -2.25,
-  y = 0
-)
-arrow2 <- tibble(
-  x = 2.25,
-  y = 0
-)
-arrows_u_lv <- tibble(
-  x = rnorm(10, mean = 0, sd = 0.25),
-  y = rnorm(10, mean = 0, sd = 0.25)
-) %>% filter(abs(y) <= 2.5 & abs(x) <= 2.5)
-arrows_b_lv <- tibble(
-  x = rnorm(10, mean = 1, sd = 0.25),
-  y = rnorm(10, mean = 1, sd = 0.25)
-) %>% filter(abs(y) <= 2.5 & abs(x) <= 2.5)
-arrows_b_hv <- tibble(
-  x = rnorm(10, mean = 1, sd = 1),
-  y = rnorm(10, mean = 0, sd = 0.75)
-) %>% filter(abs(y) <= 2.5 & abs(x) <= 2.5)
-arrows_u_hv <- tibble(
-  x = rnorm(10, mean = 0, sd = 1),
-  y = rnorm(10, mean = 0, sd = 1)
-) %>% filter(abs(y) <= 2.5 & abs(x) <= 2.5)
-```
-
-```{R, echo = F, fig.fullwidth = T, dev = "svg"}
-ggplot() + 
-  geom_polygon(data = filter(ring5, abs(x) > abs(ring4$x) & abs(y) > abs(ring4$y)), aes(x, y), color = met_slate, fill = "white", alpha = 1, size = 1) +
-  geom_polygon(data = filter(ring4, abs(x) > abs(ring3$x) & abs(y) > abs(ring3$y)), aes(x, y), color = "grey55", fill = "grey55", alpha = 1, size = 0) +
-  geom_polygon(data = filter(ring3, abs(x) > abs(ring2$x) & abs(y) > abs(ring2$y)), aes(x, y), color = "#07506F", fill = "#07506F", alpha = 1, size = 0) +
-  geom_polygon(data = filter(ring2, abs(x) > abs(ring1$x) & abs(y) > abs(ring1$y)), aes(x, y), color = "#b92e34", fill = "#b92e34", alpha = 1, size = 0) +
-  geom_polygon(data = ring1, aes(x, y), color = "#D7AA27", fill = "#D7AA27", alpha = 1, size = 0) +
-  # geom_point(data = arrow1, aes(x, y), shape = 4, size = 8) +
-  # geom_point(data = arrow1, aes(x, y), size = 3) +
-  # geom_point(data = arrow2, aes(x, y), shape = 4, size = 8) +
-  # geom_point(data = arrow2, aes(x, y), size = 3) +
-  theme_empty_arrows
-```
-
----
-class: clear-slide, middle
-count: false
-
-A physicist, a chemist, and an econometrician go to an archery range...
-
-```{R, echo = F, fig.fullwidth = T, dev = "svg"}
-ggplot() + 
-  geom_polygon(data = filter(ring5, abs(x) > abs(ring4$x) & abs(y) > abs(ring4$y)), aes(x, y), color = met_slate, fill = "white", alpha = 1, size = 1) +
-  geom_polygon(data = filter(ring4, abs(x) > abs(ring3$x) & abs(y) > abs(ring3$y)), aes(x, y), color = "grey55", fill = "grey55", alpha = 1, size = 0) +
-  geom_polygon(data = filter(ring3, abs(x) > abs(ring2$x) & abs(y) > abs(ring2$y)), aes(x, y), color = "#07506F", fill = "#07506F", alpha = 1, size = 0) +
-  geom_polygon(data = filter(ring2, abs(x) > abs(ring1$x) & abs(y) > abs(ring1$y)), aes(x, y), color = "#b92e34", fill = "#b92e34", alpha = 1, size = 0) +
-  geom_polygon(data = ring1, aes(x, y), color = "#D7AA27", fill = "#D7AA27", alpha = 1, size = 0) +
-  geom_point(data = arrow1, aes(x, y), shape = 4, size = 8) +
-  geom_point(data = arrow1, aes(x, y), size = 3) +
-  # geom_point(data = arrow2, aes(x, y), shape = 4, size = 8) +
-  # geom_point(data = arrow2, aes(x, y), size = 3) +
-  theme_empty_arrows
-```
-
----
-class: clear-slide, middle
-count: false
-
-A physicist, a chemist, and an econometrician go to an archery range...
-
-```{R, echo = F, fig.fullwidth = T, dev = "svg"}
-ggplot() + 
-  geom_polygon(data = filter(ring5, abs(x) > abs(ring4$x) & abs(y) > abs(ring4$y)), aes(x, y), color = met_slate, fill = "white", alpha = 1, size = 1) +
-  geom_polygon(data = filter(ring4, abs(x) > abs(ring3$x) & abs(y) > abs(ring3$y)), aes(x, y), color = "grey55", fill = "grey55", alpha = 1, size = 0) +
-  geom_polygon(data = filter(ring3, abs(x) > abs(ring2$x) & abs(y) > abs(ring2$y)), aes(x, y), color = "#07506F", fill = "#07506F", alpha = 1, size = 0) +
-  geom_polygon(data = filter(ring2, abs(x) > abs(ring1$x) & abs(y) > abs(ring1$y)), aes(x, y), color = "#b92e34", fill = "#b92e34", alpha = 1, size = 0) +
-  geom_polygon(data = ring1, aes(x, y), color = "#D7AA27", fill = "#D7AA27", alpha = 1, size = 0) +
-  geom_point(data = arrow1, aes(x, y), shape = 4, size = 8) +
-  geom_point(data = arrow1, aes(x, y), size = 3) +
-  geom_point(data = arrow2, aes(x, y), shape = 4, size = 8) +
-  geom_point(data = arrow2, aes(x, y), size = 3) +
-  theme_empty_arrows
-```
-
----
-class: clear-slide, middle
-
-.pull-left[
-.center[**Archer 1**]
-```{R, echo = F, fig.fullwidth = T, dev = "svg"}
-ggplot() + 
-  geom_polygon(data = filter(ring5, abs(x) > abs(ring4$x) & abs(y) > abs(ring4$y)), aes(x, y), color = met_slate, fill = "white", alpha = 1, size = 1) +
-  geom_polygon(data = filter(ring4, abs(x) > abs(ring3$x) & abs(y) > abs(ring3$y)), aes(x, y), color = "grey55", fill = "grey55", alpha = 1, size = 0) +
-  geom_polygon(data = filter(ring3, abs(x) > abs(ring2$x) & abs(y) > abs(ring2$y)), aes(x, y), color = "#07506F", fill = "#07506F", alpha = 1, size = 0) +
-  geom_polygon(data = filter(ring2, abs(x) > abs(ring1$x) & abs(y) > abs(ring1$y)), aes(x, y), color = "#b92e34", fill = "#b92e34", alpha = 1, size = 0) +
-  geom_polygon(data = ring1, aes(x, y), color = "#D7AA27", fill = "#D7AA27", alpha = 1, size = 0) +
-  geom_point(data = arrows_u_lv, aes(x, y), shape = 4, size = 10) +
-  geom_point(data = arrows_u_lv, aes(x, y), size = 4) +
-  theme_empty_arrows
-```
-
-.center[**Archer 3**]
-```{R, echo = F, fig.fullwidth = T, dev = "svg"}
-ggplot() + 
-  geom_polygon(data = filter(ring5, abs(x) > abs(ring4$x) & abs(y) > abs(ring4$y)), aes(x, y), color = met_slate, fill = "white", alpha = 1, size = 1) +
-  geom_polygon(data = filter(ring4, abs(x) > abs(ring3$x) & abs(y) > abs(ring3$y)), aes(x, y), color = "grey55", fill = "grey55", alpha = 1, size = 0) +
-  geom_polygon(data = filter(ring3, abs(x) > abs(ring2$x) & abs(y) > abs(ring2$y)), aes(x, y), color = "#07506F", fill = "#07506F", alpha = 1, size = 0) +
-  geom_polygon(data = filter(ring2, abs(x) > abs(ring1$x) & abs(y) > abs(ring1$y)), aes(x, y), color = "#b92e34", fill = "#b92e34", alpha = 1, size = 0) +
-  geom_polygon(data = ring1, aes(x, y), color = "#D7AA27", fill = "#D7AA27", alpha = 1, size = 0) +
-  geom_point(data = arrows_b_lv, aes(x, y), shape = 4, size = 10) +
-  geom_point(data = arrows_b_lv, aes(x, y), size = 4) +
-  theme_empty_arrows
-```
-]
-
-.pull-right[
-.center[**Archer 2**]
-```{R, echo = F, fig.fullwidth = T, dev = "svg"}
-ggplot() + 
-  geom_polygon(data = filter(ring5, abs(x) > abs(ring4$x) & abs(y) > abs(ring4$y)), aes(x, y), color = met_slate, fill = "white", alpha = 1, size = 1) +
-  geom_polygon(data = filter(ring4, abs(x) > abs(ring3$x) & abs(y) > abs(ring3$y)), aes(x, y), color = "grey55", fill = "grey55", alpha = 1, size = 0) +
-  geom_polygon(data = filter(ring3, abs(x) > abs(ring2$x) & abs(y) > abs(ring2$y)), aes(x, y), color = "#07506F", fill = "#07506F", alpha = 1, size = 0) +
-  geom_polygon(data = filter(ring2, abs(x) > abs(ring1$x) & abs(y) > abs(ring1$y)), aes(x, y), color = "#b92e34", fill = "#b92e34", alpha = 1, size = 0) +
-  geom_polygon(data = ring1, aes(x, y), color = "#D7AA27", fill = "#D7AA27", alpha = 1, size = 0) +
-  geom_point(data = arrows_u_hv, aes(x, y), shape = 4, size = 10) +
-  geom_point(data = arrows_u_hv, aes(x, y), size = 4) +
-  theme_empty_arrows
-```
-
-.center[**Archer 4**]
-```{R, echo = F, fig.fullwidth = T, dev = "svg"}
-ggplot() + 
-  geom_polygon(data = filter(ring5, abs(x) > abs(ring4$x) & abs(y) > abs(ring4$y)), aes(x, y), color = met_slate, fill = "white", alpha = 1, size = 1) +
-  geom_polygon(data = filter(ring4, abs(x) > abs(ring3$x) & abs(y) > abs(ring3$y)), aes(x, y), color = "grey55", fill = "grey55", alpha = 1, size = 0) +
-  geom_polygon(data = filter(ring3, abs(x) > abs(ring2$x) & abs(y) > abs(ring2$y)), aes(x, y), color = "#07506F", fill = "#07506F", alpha = 1, size = 0) +
-  geom_polygon(data = filter(ring2, abs(x) > abs(ring1$x) & abs(y) > abs(ring1$y)), aes(x, y), color = "#b92e34", fill = "#b92e34", alpha = 1, size = 0) +
-  geom_polygon(data = ring1, aes(x, y), color = "#D7AA27", fill = "#D7AA27", alpha = 1, size = 0) +
-  geom_point(data = arrows_b_hv, aes(x, y), shape = 4, size = 10) +
-  geom_point(data = arrows_b_hv, aes(x, y), size = 4) +
-  theme_empty_arrows
-```
-]
-
----
 # Population *vs.* Sample
 
 **Question:** Why do we care about *population vs. sample*?
@@ -332,7 +185,7 @@ sim_df <- mclapply(mc.cores = 1, X = 1:1e4, FUN = function(x, size = n_s) {
 
 ```{R, pop1, echo = F, fig.fullwidth = T, dev = "svg"}
 ggplot(data = pop_df, aes(x = row, y = col)) +
-geom_point(color = "darkslategray", size = 10) +
+geom_point(color = "#195c23", size = 10) +
 theme_empty
 ```
 
@@ -346,8 +199,8 @@ theme_empty
 
 ```{R, mean1, echo = F, fig.fullwidth = T, dev = "svg"}
 ggplot() +
-  geom_histogram(data = pop_df, aes(x), fill = "darkslategray", alpha = 0.50) +
-  geom_vline(xintercept = m0, size = 2, color = "darkslategray") +
+  geom_histogram(data = pop_df, aes(x), fill = "#195c23", alpha = 0.50) +
+  geom_vline(xintercept = m0, size = 2, color = "#195c23") +
   theme_empty
 ```
 
@@ -366,7 +219,7 @@ $\mu = `r round(m0, 2)`$
 
 ```{R, sample1, echo = F, fig.fullwidth = T, dev = "svg"}
 ggplot(data = pop_df, aes(x = row, y = col, shape = s1)) +
-geom_point(color = "darkslategray", size = 10) +
+geom_point(color = "#ffa600", size = 10) +
 scale_shape_manual(values = c(1, 19)) +
 theme_empty
 ```
@@ -379,12 +232,12 @@ theme_empty
 
 .pull-right[
 
-```{R, sample1 mean, echo = F, fig.fullwidth = T, dev = "svg"}
+```{R, sample1 mean, echo = F, fig.fullwidth = T, dev = "svg", message=FALSE}
 ggplot() +
-  geom_histogram(data = pop_df, aes(x), fill = "darkslategray", alpha = 0.50) +
-  geom_vline(xintercept = m0, size = 2, color = "darkslategray") +
-  geom_histogram(data = subset(pop_df, s1 == T), aes(x), fill = red_pink, alpha = 0.50) +
-  geom_vline(xintercept = m1, size = 2, color = red_pink) +
+  geom_histogram(data = pop_df, aes(x), fill = "#195c23", alpha = 0.50) +
+  geom_vline(xintercept = m0, size = 2, color = "#195c23") +
+  geom_histogram(data = subset(pop_df, s1 == T), aes(x), fill = "#ffa600", alpha = 0.40) +
+  geom_vline(xintercept = m1, size = 2, color = "#ffa600") +
   theme_empty
 ```
 
@@ -411,7 +264,7 @@ $\hat{\mu} = `r round(m1, 2)`$
 
 ```{R, sample2, echo = F, fig.fullwidth = T, dev = "svg"}
 ggplot(data = pop_df, aes(x = row, y = col, shape = s2)) +
-geom_point(color = "darkslategray", size = 10) +
+geom_point(color = "#ffa600", size = 10) +
 scale_shape_manual(values = c(1, 19)) +
 theme_empty
 ```
@@ -426,10 +279,10 @@ theme_empty
 
 ```{R, sample2 mean, echo = F, fig.fullwidth = T, dev = "svg"}
 ggplot() +
-  geom_histogram(data = pop_df, aes(x), fill = "darkslategray", alpha = 0.50) +
-  geom_vline(xintercept = m0, size = 2, color = "darkslategray") +
-  geom_histogram(data = subset(pop_df, s2 == T), aes(x), fill = red_pink, alpha = 0.50) +
-  geom_vline(xintercept = m2, size = 2, color = red_pink) +
+  geom_histogram(data = pop_df, aes(x), fill = "#195c23", alpha = 0.50) +
+  geom_vline(xintercept = m0, size = 2, color = "#195c23") +
+  geom_histogram(data = subset(pop_df, s2 == T), aes(x), fill = "#ffa600", alpha = 0.50) +
+  geom_vline(xintercept = m2, size = 2, color = "#ffa600") +
   theme_empty
 ```
 
@@ -456,7 +309,7 @@ $\hat{\mu} = `r round(m2, 2)`$
 
 ```{R, sample3, echo = F, fig.fullwidth = T, dev = "svg"}
 ggplot(data = pop_df, aes(x = row, y = col, shape = s3)) +
-geom_point(color = "darkslategray", size = 10) +
+geom_point(color = "#ffa600", size = 10) +
 scale_shape_manual(values = c(1, 19)) +
 theme_empty
 ```
@@ -469,12 +322,12 @@ theme_empty
 
 .pull-right[
 
-```{R, sample3 mean, echo = F, fig.fullwidth = T, dev = "svg"}
+```{R, sample3 mean, echo = F, fig.fullwidth = T, dev = "svg", message=FALSE}
 ggplot() +
-  geom_histogram(data = pop_df, aes(x), fill = "darkslategray", alpha = 0.50) +
-  geom_vline(xintercept = m0, size = 2, color = "darkslategray") +
-  geom_histogram(data = subset(pop_df, s3 == T), aes(x), fill = red_pink, alpha = 0.50) +
-  geom_vline(xintercept = m3, size = 2, color = red_pink) +
+  geom_histogram(data = pop_df, aes(x), fill = "#195c23", alpha = 0.50) +
+  geom_vline(xintercept = m0, size = 2, color = "#195c23") +
+  geom_histogram(data = subset(pop_df, s3 == T), aes(x), fill = "#ffa600", alpha = 0.50) +
+  geom_vline(xintercept = m3, size = 2, color = "#ffa600") +
   theme_empty
 ```
 
@@ -502,10 +355,10 @@ Let's repeat this **10,000 times** and then plot the estimates.
 ---
 class: clear-slide, middle
 
-```{R, simulation, echo = F, dev = "svg"}
+```{R, simulation, echo = F, dev = "svg",  message=FALSE}
 ggplot() +
-  geom_histogram(data = sim_df, aes(mu_hat), fill = red_pink, alpha = 0.75) +
-  geom_vline(xintercept = m0, size = 2, color = "darkslategray") +
+  geom_histogram(data = sim_df, aes(mu_hat), fill = "#ffa600", alpha = 0.6) +
+  geom_vline(xintercept = m0, size = 2, color = "#195c23") +
   scale_x_continuous(breaks = m0, labels = TeX("$\\mu$")) +
   xlab(TeX("$\\hat{\\mu}$")) +
   theme(axis.text.x = element_text(size = 20),
@@ -522,10 +375,10 @@ ggplot() +
 **Question:** Why do we care about *population vs. sample*?
 
 .pull-left[
-```{R, simulation2, echo = F, dev = "svg"}
+```{R, simulation2, echo = F, dev = "svg", message=FALSE}
 ggplot() +
-  geom_histogram(data = sim_df, aes(mu_hat), fill = red_pink, alpha = 0.75) +
-  geom_vline(xintercept = m0, size = 2, color = "darkslategray") +
+  geom_histogram(data = sim_df, aes(mu_hat), fill = "#ffa600", alpha = 0.6) +
+  geom_vline(xintercept = m0, size = 2, color = "#195c23") +
   scale_x_continuous(breaks = m0, labels = TeX("$\\mu$")) +
   xlab(TeX("$\\hat{\\mu}$")) +
   theme(axis.text.x = element_text(size = 20),
