@@ -360,6 +360,7 @@ ggplot() +
   geom_histogram(data = sim_df, aes(mu_hat), fill = "#ffa600", alpha = 0.6) +
   geom_vline(xintercept = m0, size = 2, color = "#195c23") +
   scale_x_continuous(breaks = m0, labels = TeX("$\\mu$")) +
+scale_y_continuous(expand = c(0, 0), limits = c(0, NA))+
   xlab(TeX("$\\hat{\\mu}$")) +
   theme(axis.text.x = element_text(size = 20),
       axis.text.y = element_blank(),
@@ -380,6 +381,7 @@ ggplot() +
   geom_histogram(data = sim_df, aes(mu_hat), fill = "#ffa600", alpha = 0.6) +
   geom_vline(xintercept = m0, size = 2, color = "#195c23") +
   scale_x_continuous(breaks = m0, labels = TeX("$\\mu$")) +
+scale_y_continuous(expand = c(0, 0), limits = c(0, NA))+
   xlab(TeX("$\\hat{\\mu}$")) +
   theme(axis.text.x = element_text(size = 20),
       axis.text.y = element_blank(),
@@ -420,7 +422,7 @@ ggplot() +
 
 Imagine that we want to estimate an unknown parameter $\mu$, and we know the distributions of three competing estimators. __Which one should we use?__ 
 
-```{R, competing pdfs, echo = F, dev = "svg", fig.height = 4.5}
+```{R, competing pdfs, echo = F, dev = "svg", fig.height = 4.5, message=FALSE, warning=FALSE}
 # Generate data for densities' polygons
 d1 <- tibble(x = seq(-7.5, 7.5, 0.01), y = dnorm(x, mean = 1, sd = 1)) %>%
   rbind(., tibble(x = seq(7.5, -7.5, -0.01), y = 0))
@@ -436,6 +438,7 @@ geom_polygon(data = d3, aes(x, y), alpha = 0.6, fill = "darkslategray") +
 geom_hline(yintercept = 0, color = "black") +
 geom_vline(xintercept = 0, size = 1, linetype = "dashed") +
 scale_x_continuous(breaks = 0, labels = TeX("$\\mu$")) +
+scale_y_continuous(expand = c(0, 0), limits = c(0, NA))+
 theme_simple + 
 theme(axis.text.x = element_text(size = 20),
       axis.text.y = element_blank(),
@@ -477,6 +480,7 @@ geom_polygon(fill = red_pink, alpha = 0.9) +
 geom_hline(yintercept = 0, color = "black") +
 geom_vline(xintercept = 0, size = 1, linetype = "dashed") +
 scale_x_continuous(breaks = 0, labels = TeX("$\\mu$")) +
+scale_y_continuous(expand = c(0, 0), limits = c(0, NA))+
 theme_simple +
 theme(axis.text.x = element_text(size = 40),
       axis.text.y = element_blank(),
@@ -500,6 +504,7 @@ geom_polygon(aes(x = x + 2), fill = "darkslategray", alpha = 0.9) +
 geom_hline(yintercept = 0, color = "black") +
 geom_vline(xintercept = 0, size = 1, linetype = "dashed") +
 scale_x_continuous(breaks = 0, labels = TeX("$\\mu$")) +
+scale_y_continuous(expand = c(0, 0), limits = c(0, NA))+
 theme_simple +
 theme(axis.text.x = element_text(size = 40),
       axis.text.y = element_blank(),
@@ -510,11 +515,28 @@ theme(axis.text.x = element_text(size = 40),
 ]
 
 ---
+
+# Unbiasedness Example
+
+Is the sample mean $\frac{1}{n} \sum_{i=1}^n x_i = \hat{\mu}$ an unbiased estimator of the population mean $E(x_i) = \mu$?
+
+$$
+\begin{aligned}
+\mathop{\mathbb{E}}\left[ \hat{\mu} \right] &= \mathop{\mathbb{E}}\left[ \frac{1}{n} \sum_{i=1}^n x_i \right] \\
+&=\frac{1}{n} \sum_{i=1}^n\mathop{\mathbb{E}}\left[ x_i \right]\\
+&=\frac{1}{n} \sum_{i=1}^n \mu\\
+&= \mu
+\end{aligned}
+$$
+
+
+---
+
 # Properties of Estimators
 
 **Question:** What properties make an estimator reliable?
 
-**Answer 2: Low Variance (a.k.a. Efficiency).**
+**Answer 2: Efficiency (low variance).**
 
 The central tendencies (means) of competing distributions are not the only things that matter. We also care about the **variance** of an estimator.
 
@@ -540,6 +562,7 @@ geom_polygon(data = d5, aes(x, y), fill = "darkslategray", alpha = 0.8) +
 geom_hline(yintercept = 0, color = "black") +
 geom_vline(xintercept = 0, size = 1, linetype = "dashed") +
 scale_x_continuous(breaks = 0, labels = TeX("$\\mu$")) +
+scale_y_continuous(expand = c(0, 0), limits = c(0, NA))+
 theme_simple +
 theme(axis.text.x = element_text(size = 20),
       axis.text.y = element_blank(),
@@ -565,6 +588,7 @@ geom_polygon(data = d5, aes(x, y), fill = "darkslategray", alpha = 0.8) +
 geom_hline(yintercept = 0, color = "black") +
 geom_vline(xintercept = 0, size = 1, linetype = "dashed") +
 scale_x_continuous(breaks = 0, labels = TeX("$\\mu$")) +
+scale_y_continuous(expand = c(0, 0), limits = c(0, NA))+
 theme_simple +
 theme(axis.text.x = element_text(size = 20),
       axis.text.y = element_blank(),
@@ -574,6 +598,8 @@ theme(axis.text.x = element_text(size = 20),
 
 ---
 # Unbiased Estimators
+
+<br>
 
 In addition to the sample mean, there are several other unbiased estimators we will use often.
 
@@ -586,29 +612,144 @@ In addition to the sample mean, there are several other unbiased estimators we w
 ---
 # Unbiased Estimators
 
-The sample variance $S_X^2$ is an unbiased estimator of the population variance $\sigma^2$:
+Sample variance $S_X^2$ is an unbiased estimator of the population variance $\sigma^2$
 
 $$S_{X}^2 = \dfrac{1}{n-1} \sum_{i=1}^n (X_i - \bar{X})^2.$$
 
----
-# Unbiased Estimators
+--
 
-The sample covariance $S_{XY}$ is an unbiased estimator of the population covariance $\sigma_{XY}$:
+Sample covariance $S_{XY}$ is an unbiased estimator of the population covariance $\sigma_{XY}$
 
 
 $$S_{XY} = \dfrac{1}{n-1} \sum_{i=1}^{n} (X_i - \bar{X})(Y_i - \bar{Y}).$$
 
----
-# Unbiased Estimators
+--
 
-The sample correlation $r_{XY}$ is an unbiased estimator of the population correlation coefficient $\rho_{XY}$:
+Sample correlation $r_{XY}$ is an unbiased estimator of the population correlation coefficient $\rho_{XY}$
 
 $$r_{XY} = \dfrac{S_{XY}}{\sqrt{S_X^2} \sqrt{S_Y^2}}.$$
 
 ---
+
+# Population Distributions
+
+Suppose we have some estimator $\hat{\theta}$ for a parameter $\theta$:
+
+- We don’t know $\theta$, but say we assume that $\hat{\theta}$ follows some probability distribution $p(\hat{\theta})$
+- Next, suppose we hypothesize some value for $\theta$, say $\theta = 2.5$
+- Now we use our estimator $\hat{\theta}$ to calculate an estimate for $\theta$. Say that
+we get $\hat{\theta} = 45$
+- We "know" the distribution of $\hat{\theta}$, so we know the probability of getting $\hat{\theta}= 45$ if really $\theta= 2.5$. So we can say ” if $\theta$ really was 2.5,
+then the probability of getting $\hat{\theta} = 45$ is super super low. Thus the
+probability that $\theta= 2.5$ is super super low”.
+- We are able to make a statement about the true value of $\theta$ just by
+knowing the distribution of our preferred estimator $\hat{\theta}$
+
+Sweet, but what distribution should we be assuming?
+
+
+---
+
+# The Central Limit Theorem
+
+<br>
+
+.hi-blue[Theorem]<br>
+*Let* $x_1, x_2, \dots, x_n$ *be a random sample from a population with mean* $\mathop{\mathbb{E}}\left[ X \right] = \mu$ *and variance* $\text{Var}\left( X \right) = \sigma^2 < \infty$*, let* $\bar{X}$ *be the sample mean.* 
+*Then, as* $n\rightarrow \infty$*, the function* $\frac{\sqrt{n}\left(\bar{X}-\mu\right)}{S_x}$ *converges to a* .hi-pink[Normal Distribution] *with mean 0 and variance 1.* 
+
+--
+
+- $\implies$ as your sample gets larger, $n\rightarrow \infty$, we have a statistic that starts to distribute according to a very consistent pattern. 
+
+--
+
+- The only unknown parameter is this is $\mu$, and we can get around that by making probabilistic statements about it. 
+
+---
+
+# Normal Distribution
+
+.pull-left[
+- Continuous distribution where $x_i$ can take the value of any real number
+
+- Domain spans the entire real line
+
+- Centered on the distriubtion mean $\mu$
+
+- The width of the distribution (fatness of its tails) is moderated $\sigma^2$
+]
+
+.pull-right[
+```{R, normdist, echo = F, dev = "svg"}
+ggplot(data.frame(x = c(-4, 4)), aes(x)) + 
+  mapply(function(mean, sd, col) {
+    stat_function(fun = dnorm, args = list(mean = mean, sd = sd), col = col)
+  }, 
+  # enter means, standard deviations and colors here
+  mean = c(0, 0, 0), 
+  sd = c(.5, 1, 2), 
+  col = c('red', 'blue', 'green')
+) +
+  ylab("p(x)") + xlab("\u03BC")+
+  scale_y_continuous(expand=c(0,0), limits=c(0,0.9))+
+  theme_bw() + theme(axis.text.x = element_text(color = "grey20", size = 16, face = "plain"),
+        axis.text.y = element_text(color = "grey20", size = 16, angle = 0, hjust = 1, vjust = 0, face = "plain"),  
+        axis.title.x = element_text(color = "grey20", size = 24, angle = 0, hjust = .5, vjust = 0, face = "plain"),
+        axis.title.y = element_text(color = "grey20", size = 16, angle = 90, hjust = .5, vjust = .5, face = "plain"))
+```
+
+The greater the variance, the wider the range of values that commonly appear, hence greater probability density mass.
+]
+
+---
+
+# Normal Distribution
+
+.pull-left[
+__Rule 1:__ The probability that the random variable takes a value $x_i$ is 0 for any $x_i\in {\mathbb{R}}$<br>
+__Rule 2:__ The probability that the random variable takes a value within $[x_i,x_j]$ range, where $x_i \neq x_j$, is the area under $p(x)$ between those two values 
+]
+
+.pull-right[
+```{R, normdist_II, echo = F, dev = "svg", out.width="95%"}
+limitRange <- function(fun, min, max) {
+    function(x) {
+        y <- fun(x)
+        y[x < min  |  x > max] <- NA
+        return(y)
+    }
+}
+
+ggplot(data.frame(x = c(-4, 4)), aes(x)) + 
+  mapply(function(mean, sd, col) {
+    stat_function(fun = dnorm, args = list(mean = mean, sd = sd), col = col)
+  }, 
+  # enter means, standard deviations and colors here
+  mean = c(0), 
+  sd = c(1), 
+  col = c('blue')
+) +
+  stat_function(fun = limitRange(dnorm, -1.96, 1.96),
+                  geom="area", fill="blue", alpha=0.2) +
+  ylab("p(x)") + xlab("\u03BC")+
+  scale_y_continuous(expand=c(0,0), limits=c(0,0.9))+
+  theme_bw() + theme(axis.text.x = element_text(color = "grey20", size = 16, face = "plain"),
+        axis.text.y = element_text(color = "grey20", size = 16, angle = 0, hjust = 1, vjust = 0, face = "plain"),  
+        axis.title.x = element_text(color = "grey20", size = 24, angle = 0, hjust = .5, vjust = 0, face = "plain"),
+        axis.title.y = element_text(color = "grey20", size = 16, angle = 90, hjust = .5, vjust = .5, face = "plain"))
+```
+]
+
+The area above represents $p(x)=0.95$. The values $\{-1.96, 1.96\}$ represent the 95% confidence interval for $\mu$.
+
+---
+
 # Hypothesis Testing
 
-Given What do we make of an estimate of the population mean?
+<br>
+
+How do we assess an estimate of the population mean?
 
 - Is it meaningfully different than existing evidence on the population mean?
 - Is is _statistically distinguishable_ from previously hypothesized values of the population mean?
@@ -616,7 +757,9 @@ Given What do we make of an estimate of the population mean?
 
 We can conduct statistical tests to address these questions.
 
+
 ---
+
 # Hypothesis Testing
 
 __Null hypothesis (H.sub[0]):__ $\mu = \mu_0$
@@ -648,8 +791,7 @@ We __reject__ the null hypothesis and the null is false.
 
 - The defendant was convicted and he did the crime.
 
----
-# Hypothesis Testing
+--
 
 We __reject__ the null hypothesis, but the null is actually true. 
 
@@ -923,7 +1065,7 @@ You may find it helpful to review the following topics from Math 243:
 ---
 class: inverse, middle
 
-# Data and the .mono[tidyverse]
+# Working with Data
 
 ---
 # Data
@@ -1014,26 +1156,6 @@ __Main focus of this course.__
 ]
 
 ---
-# Cross Sectional Data
-
-```{r, echo=FALSE}
-data(wage1)
-wage1 <- select(wage1, wage, educ, tenure, female, nonwhite) %>%
-  mutate(wage = round(wage, 2))
-DT::datatable(
-  wage1,
-  caption = c("Sample of US workers (Current Population Survey, 1976)"),
-  colnames = c('<span style="color: #007935 !important">Wage</span>', '<span style="color: #007935 !important">Education</span>', '<span style="color: #007935 !important">Tenure</span>', '<span style="color: #007935 !important">Female?</span>', '<span style="color: #007935 !important">Non-white?</span>'),
-  fillContainer = FALSE, options = list(pageLength = 6, lengthChange = FALSE, searching = FALSE), escape = FALSE) %>%
-  DT::formatStyle('wage', color = '#9370DB') %>%
-  DT::formatStyle('educ', color = '#9370DB') %>%
-  DT::formatStyle('tenure', color = '#9370DB') %>%
-  DT::formatStyle('female', color = '#9370DB') %>%
-  DT::formatStyle('nonwhite', color = '#9370DB') %>%
-  DT::formatStyle(0, color = '#FD5F00')
-```
-
----
 # Time Series Data
 
 .hi-purple[Observations of variables over time.]
@@ -1051,23 +1173,6 @@ Used extensively in empirical macroeconomics.
 Requires more-advanced methods (EC 421 and EC 422).
 
 ---
-# Time Series Data
-
-```{r, echo=FALSE}
-data(StrikeNb)
-StrikeNb <- select(StrikeNb, time, strikes, output)
-DT::datatable(
-  StrikeNb,
-  caption = c("Number of US manufacturing strikes per month (Jan. 1968 to Dec. 1976)"),
-  colnames = c('<span style="color: #007935 !important">Period</span>', '<span style="color: #007935 !important">Strikes</span>', '<span style="color: #007935 !important">Output</span>'),
-  fillContainer = FALSE, options = list(pageLength = 6, lengthChange = FALSE, searching = FALSE), escape = FALSE) %>%
-  DT::formatStyle('time', color = '#9370DB') %>%
-  DT::formatStyle('strikes', color = '#9370DB') %>%
-  DT::formatStyle('output', color = '#9370DB') %>%
-  DT::formatStyle(0, color = '#FD5F00')
-```
-
----
 # Pooled Cross Sectional Data
 
 .hi-purple[Cross sections from different points in time.]
@@ -1075,25 +1180,6 @@ DT::datatable(
 Useful for studying policy changes and relationship that change over time.
 
 Requires more-advanced methods (EC 421 and many 400-level applied micro classes).
-
----
-# Pooled Cross Sectional Data
-
-```{r, echo=FALSE}
-data('fertil1')
-fertil1 <- select(fertil1, year, educ, age, kids, black)
-DT::datatable(
-  fertil1,
-  caption = c("Sample of US women (General Social Survey, 1972 to 1984)"),
-  colnames = c('<span style="color: #007935 !important">Year</span>', '<span style="color: #007935 !important">Education</span>', '<span style="color: #007935 !important">Age</span>', '<span style="color: #007935 !important">Children</span>', '<span style="color: #007935 !important">Black?</span>'),
-  fillContainer = FALSE, options = list(pageLength = 6, lengthChange = FALSE, searching = FALSE), escape = FALSE) %>%
-  DT::formatStyle('year', color = '#9370DB') %>%
-  DT::formatStyle('educ', color = '#9370DB') %>%
-  DT::formatStyle('age', color = '#9370DB') %>%
-  DT::formatStyle('kids', color = '#9370DB') %>%
-  DT::formatStyle('black', color = '#9370DB') %>%
-  DT::formatStyle(0, color = '#FD5F00')
-```
 
 ---
 # Panel or Longitudinal Data
@@ -1107,26 +1193,6 @@ Difficult to collect, but useful for causal identification.
 - Can control for _unobserved_ characteristics.
 
 Requires more-advanced methods (EC 421 and many 400-level applied micro classes).
-
----
-# Panel or Longitudinal Data
-
-```{r, echo=FALSE}
-data(Males)
-Males <- select(Males, nr, year, exper, wage, union) %>%
-  mutate(wage = round(wage, 2))
-DT::datatable(
-  Males,
-  caption = c("Panel of US workers (National Longitudinal Survey of Youth, 1980 to 1987)"),
-  colnames = c('<span style="color: #007935 !important">ID</span>', '<span style="color: #007935 !important">Year</span>', '<span style="color: #007935 !important">Experience</span>', '<span style="color: #007935 !important">log(Wage)</span>', '<span style="color: #007935 !important">Union</span>'),
-  fillContainer = FALSE, options = list(pageLength = 6, lengthChange = FALSE, searching = FALSE), escape = FALSE) %>%
-  DT::formatStyle('nr', color = '#9370DB') %>%
-  DT::formatStyle('year', color = '#9370DB') %>%
-  DT::formatStyle('exper', color = '#9370DB') %>%
-  DT::formatStyle('union', color = '#9370DB') %>%
-  DT::formatStyle('wage', color = '#9370DB') %>%
-  DT::formatStyle(0, color = '#FD5F00')
-```
 
 ---
 # Messy Data
@@ -1157,174 +1223,15 @@ The focus of this class is data analysis, but .hi[data wrangling] is a non-trivi
 ---
 # Workflow
 
-## Step 1: Load packages with `pacman`
+- Step 1: Load packages with `pacman`
 
-```{r}
-library(pacman)
-p_load(tidyverse)
-```
+- Step 2: Import data with `readr`
 
-If the `tidyverse` hasn't already been installed, `p_load` will install it. 
+- Step 3: Reshape data with `tidyr`
 
-Loading the `tidyverse` automatically loads `readr`, `tidyr`, `dplyr`, `ggplot2`, and a few other packages.
+- Step 4: Manipulate data with `dplyr`
 
----
-# Workflow
-
-## Step 2: Import data with `readr`
-
-```{r, eval=FALSE}
-workers <- read_csv("03-example_data.csv")
-```
-
-CSV files are a common non-proprietary format for storing tabular data.
-
-The `read_csv` function imports CSV (comma-separated values) files.
-
-- Converts the CSV file to a [`tibble`](https://tibble.tidyverse.org), the `tidyverse` version of a `data.frame`.
-
----
-# Workflow
-
-## Step 3: Reshape data with `tidyr`
-
-Variables are stored in rows instead of columns:
-
-```{r, eval=FALSE}
-workers
-```
-
----
-# Workflow
-
-## Step 3: Reshape data with `tidyr`
-
-Make the data tidy by using the `spread` function:
-
-```{r, eval=FALSE}
-workers <- workers %>% 
-  spread(key = variable, value = value)
-```
-
-Note the use of the .hi[pipe operator].
-
-- .hi[`%>%`] .mono[=] *"and then."*
-
-- Chains multiple commands together without having to define intermediate objects.
-
----
-# Workflow
-
-## Step 3: Reshape data with `tidyr`
-
-The result:
-
-```{r, eval=FALSE}
-workers
-```
-
----
-# Workflow
-
-## Step 4: Manipulate data with `dplyr`
-
-Generate new variables with `mutate`:
-
-```{r, eval=FALSE}
-workers <- workers %>% 
-  mutate(union = ifelse(union == 1, "Yes", "No"))
-```
-
-Before, `union` was a binary variable equal to 1 if the worker is in a union or 0 if otherwise.
-
-Now `union` is a character variable.
-
----
-# Workflow
-
-## Step 4: Manipulate data with `dplyr`
-
-The result:
-
-```{r, eval=FALSE}
-workers
-```
-
----
-# Workflow
-
-## Step 6: Visualize and analyze data with `ggplot2`
-
-**How are education and earnings correlated?**
-
-```{r, eval=FALSE}
-workers %>% 
-  ggplot(aes(x = educ, y = earnings)) +
-  geom_point()
-```
-
----
-# Workflow
-
-## Step 6: Visualize and analyze data with `ggplot2`
-
-**How are education and earnings correlated?**
-
-Can also use the `cor` function from `base` .mono[R]:
-
-```{r, eval=FALSE}
-cor(workers$educ, workers$earnings)
-```
-
----
-# Workflow
-
-## Step 6: Visualize and analyze data with `ggplot2`
-
-**How are education and earnings correlated?**
-
-```{r, eval=FALSE}
-workers %>% 
-  ggplot(aes(x = educ, y = earnings, color = union)) +
-  geom_point()
-```
-
----
-# Workflow
-
-## Step 6: Visualize and analyze data with `ggplot2`
-
-**How are education and earnings correlated?**
-
-```{r, eval=FALSE}
-workers %>% 
-  ggplot(aes(x = educ, y = earnings, color = union)) +
-  geom_point() +
-  facet_grid(~union)
-```
-
----
-# Workflow
-
-## Step 6: Visualize and analyze data with `ggplot2`
-
-**How are education and earnings correlated?**
-
-Can .hi[subset] the data to get group-specific correlations: 
-
-```{r,eval=FALSE}
-workers_union <- workers %>% 
-  filter(union == "Yes") #<<
-
-cor(workers_union$educ, workers_union$earnings)
-```
-
-```{r,eval=FALSE}
-workers_nounion <- workers %>% 
-  filter(union == "No") #<<
-
-cor(workers_nounion$educ, workers_nounion$earnings)
-```
+- Step 5: Visualize and analyze data with `ggplot2`
 
 ---
 # Why Bother?
@@ -1355,28 +1262,3 @@ cor(workers_nounion$educ, workers_nounion$earnings)
 
 - Lower marginal costs in exchange for higher fixed costs.
 
----
-# Further Reading
-
-1. [Tidy Data](https://vita.had.co.nz/papers/tidy-data.pdf) by Hadley Wickham (creator of the `tidyverse`)
-
-2. [Cheatsheets](https://rstudio.com/resources/cheatsheets/)
-
----
-# The Week Ahead
-
-## Lab 2
-
-Learn `tidyverse` basics.
-
-Tips for the computational section of Problem Set 1.
-
-## Week 3 Reading
-
-Mastering 'Metrics chapters 1 and 2.
-
-Read these chapters before lecture.
-
-## Week 3 Lectures
-
-Goal: Structure our thinking about causality.
