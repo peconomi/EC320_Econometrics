@@ -45,6 +45,10 @@ The HTML versions of the lecture slides allow you to view animations and interac
 
 16. **Final Review** <br> [.html]() | [.pdf]()
 
+## Problem Sets
+
+1. ** Problem Set 1** [.pdf](https://raw.githack.com/peconomi/EC320_Econometrics/main/Problem-Sets/01/PBS1.pdf)
+
 ## Labs
 
 1. **Introduction to `R` and `R Markdown`** <br> [.html]()
