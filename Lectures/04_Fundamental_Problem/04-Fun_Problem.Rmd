@@ -17,8 +17,7 @@ class: inverse, middle
 ```{r Setup, include = F}
 options(htmltools.dir.version = FALSE)
 library(pacman)
-# devtools::install_github("dill/emoGG")
-library(pacman)
+#devtools::install_github("dill/emoGG")
 p_load(
   broom, here, tidyverse,
   emoGG, latex2exp, ggplot2, ggthemes, viridis, extrafont, gridExtra,
@@ -825,6 +824,34 @@ Many important variables have the same challenge: gender, race, income.
 - .purple[Lottery] enrollment and/or capacity .purple[constraints]
 
 ---
+# Summary
+
+.hi-blue[Takeaway]
+
+--
+
+* The fundamental problem of econometrics is our inability to observe the outcome of a particular unit if assigned to treatment and control at once
+
+--
+
+* This introduces challenges in finding a way to construct a valid counterfactual using group means
+
+--
+
+* This quasi-experimental approach is valid if there is no selection bias or if we control for selection bias such that it is eliminated
+
+--
+
+* RCTs and natural experiments are one way to avoid selection bias. 
+
+--
+
+* Since these events are often rare or infeasible, we will explore many other ways to approach this challenge
+
+
+---
+
+exclude: true
 
 ```{R generate pdfs, include = F, eval = F}
 #remotes::install_github('rstudio/pagedown')
