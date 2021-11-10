@@ -52,7 +52,6 @@ Posted every week
 **Problem Set 1** <br> 
 [Assignment](https://raw.githack.com/peconomi/EC320_Econometrics/main/Problem-Sets/01/PBS1.pdf) <br>
 [Solutions](https://i.imgur.com/767Ks9Q.gif)<br>
-**Problem Set 2** <br>
 Available:  01/03/2022 | Due: 01/10/2022
 
 **Problem Set 2** <br>
