@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>The Fundamental Problem of Econometrics</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Philip Economides" />
+    <link href="04-Fun_Problem_files/remark-css/default.css" rel="stylesheet" />
+    <link href="04-Fun_Problem_files/remark-css/metropolis.css" rel="stylesheet" />
+    <link href="04-Fun_Problem_files/remark-css/metropolis-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="my-css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# The Fundamental Problem of Econometrics
+## EC 320: Introduction to Econometrics
+### Philip Economides
+### Winter 2022
+
+---
+
+class: inverse, middle
+
+
+
+# Prologue
+
+---
+
+# Statistics Inform Policy
+
+__Policy:__ In 2017, the University of Oregon started requiring first-year students to live on campus.
+
+__Rationale:__ First-year students who live on campus fare better than those who live off campus.
+
+- _80 percent more likely_ to graduate in four years.
+- Second-year retention rate _5 percentage points higher_.
+- GPAs _0.13 points higher_, on average. 
+
+--
+
+.hi-pink[Do these comparisons suggest that the policy will improve student outcomes?]
+
+--
+
+.pink[Do they describe the effect of living on campus?]
+
+--
+
+.pink[Do they describe] .hi-pink[_something else_?]
+
+---
+# Other Things Equal
+
+The UO's interpretation of those comparisons warrants skepticism.
+
+- The decision to live on campus is probably related to family wealth and interest in school.
+
+- Family wealth and interest in school are also related to academic achievement.
+
+--
+
+__Why?__ The difference in outcomes between those on and off campus is not an .hi-purple[_all else equal_]&lt;sup&gt;*&lt;/sup&gt; comparison.
+
+__Upshot:__ We can't attribute the difference in outcomes solely to living on campus.
+
+.footnote[
+&lt;sup&gt;*&lt;/sup&gt; _All else equal_ .mono[=] _ceteris paribus_, _all else held constant_, _etc_.
+]
+
+---
+# Other Things Equal
+
+## A high bar
+
+When all other factors are held constant, statistical comparisons detect causal relationships.
+
+--
+
+(Micro)economics has developed a comparative advantage in understanding where .hi-purple[_all else equal_] comparisons can and cannot be made.
+
+- Anyone can retort "_correlation doesn't necessarily imply causation_."
+
+- Understanding _why_ is difficult, but useful for learning from data.
+
+---
+class: inverse, middle
+
+# The Fundamental Problem of Econometrics
+
+---
+# Causal Identification
+
+## Goal 
+
+Identify the effect of a .hi[treatment], `\(D_i\)`, on individual `\(i\)`'s .hi[outcome], `\(Y_{D,i}\)`.
+
+--
+
+## Ideal data
+
+Ideally, we could calculate the .hi[treatment effect] *for each individual* `\(i\)` as
+
+`$$Y_{1,i} - Y_{0,i}$$` 
+
+- `\(Y_{1,i}\)` is the outcome for person `\(i\)` when she receives the treatment.
+- `\(Y_{0,i}\)` is the outcome for person `\(i\)` when she does not receive the treatment.
+- Known as .pink[potential outcomes].
+
+---
+# Causal Identification
+
+## Ideal data
+
+.pull-left[
+The *ideal* data for 10 people
+
+```
+#&gt;     i trt  y1i  y0i
+#&gt; 1   1   1 5.01 2.56
+#&gt; 2   2   1 8.85 2.53
+#&gt; 3   3   1 6.31 2.67
+#&gt; 4   4   1 5.97 2.79
+#&gt; 5   5   1 7.61 4.34
+#&gt; 6   6   0 7.63 4.15
+#&gt; 7   7   0 4.75 0.56
+#&gt; 8   8   0 5.77 3.52
+#&gt; 9   9   0 7.47 4.49
+#&gt; 10 10   0 7.79 1.40
+```
+]
+
+--
+
+.pull-right[
+Calculate the causal effect of treatment.
+$$
+`\begin{align}
+  \tau_i = y_{1,i} -  y_{0,i}
+\end{align}`
+$$
+for each individual `\(i\)`.
+]
+---
+count: false
+# Causal Identification
+
+## Ideal data
+
+.pull-left[
+The *ideal* data for 10 people
+
+```
+#&gt;     i trt  y1i  y0i effect_i
+#&gt; 1   1   1 5.01 2.56     2.45
+#&gt; 2   2   1 8.85 2.53     6.32
+#&gt; 3   3   1 6.31 2.67     3.64
+#&gt; 4   4   1 5.97 2.79     3.18
+#&gt; 5   5   1 7.61 4.34     3.27
+#&gt; 6   6   0 7.63 4.15     3.48
+#&gt; 7   7   0 4.75 0.56     4.19
+#&gt; 8   8   0 5.77 3.52     2.25
+#&gt; 9   9   0 7.47 4.49     2.98
+#&gt; 10 10   0 7.79 1.40     6.39
+```
+]
+
+.pull-right[
+Calculate the causal effect of treatment.
+$$
+`\begin{align}
+  \tau_i = y_{1,i} -  y_{0,i}
+\end{align}`
+$$
+for each individual `\(i\)`.
+]
+---
+count: false
+# Causal Identification
+
+## Ideal data
+
+.pull-left[
+The *ideal* data for 10 people
+
+```
+#&gt;     i trt  y1i  y0i effect_i
+#&gt; 1   1   1 5.01 2.56     2.45
+#&gt; 2   2   1 8.85 2.53     6.32
+#&gt; 3   3   1 6.31 2.67     3.64
+#&gt; 4   4   1 5.97 2.79     3.18
+#&gt; 5   5   1 7.61 4.34     3.27
+#&gt; 6   6   0 7.63 4.15     3.48
+#&gt; 7   7   0 4.75 0.56     4.19
+#&gt; 8   8   0 5.77 3.52     2.25
+#&gt; 9   9   0 7.47 4.49     2.98
+#&gt; 10 10   0 7.79 1.40     6.39
+```
+]
+
+.pull-right[
+Calculate the causal effect of treatment.
+$$
+`\begin{align}
+  \tau_i = y_{1,i} -  y_{0,i}
+\end{align}`
+$$
+for each individual `\(i\)`.
+
+The mean of `\(\tau_i\)` is the&lt;br&gt;.hi[average treatment effect] (.pink[ATE]).
+
+Thus, `\(\color{#e64173}{\overline{\tau} = 3.82}\)`
+]
+
+--
+
+Notice the assignment of treatment does not influence ATE. Information on who was treated is irrelevant in this setting. 
+
+---
+# Fundamental Problem of Econometrics
+
+## Ideal comparison
+$$
+`\begin{align}
+  \tau_i = \color{#e64173}{y_{1,i}} &amp;- \color{#9370DB}{y_{0,i}}
+\end{align}`
+$$
+
+Highlights the fundamental problem of econometrics, much like when a traveller assesses options down two separate roads.
+
+--
+
+## The problem
+
+- If we observe `\(\color{#e64173}{y_{1,i}}\)`, then we cannot observe `\(\color{#9370DB}{y_{0,i}}\)`.
+
+- If we observe `\(\color{#9370DB}{y_{0,i}}\)`, then we cannot observe `\(\color{#e64173}{y_{1,i}}\)`.
+
+- Can only observe what actually happened; cannot observe the **counterfactual**.
+
+The traveller's alternative outcome is forever unknown to them.
+
+---
+# Fundamental Problem of Econometrics
+
+A dataset that we can observe for 10 people looks something like
+.pull-left[
+
+```
+#&gt;     i trt  y1i  y0i
+#&gt; 1   1   1 5.01   NA
+#&gt; 2   2   1 8.85   NA
+#&gt; 3   3   1 6.31   NA
+#&gt; 4   4   1 5.97   NA
+#&gt; 5   5   1 7.61   NA
+#&gt; 6   6   0   NA 4.15
+#&gt; 7   7   0   NA 0.56
+#&gt; 8   8   0   NA 3.52
+#&gt; 9   9   0   NA 4.49
+#&gt; 10 10   0   NA 1.40
+```
+]
+
+--
+
+.pull-right[
+We can't observe `\(\color{#e64173}{y_{1,i}}\)` and `\(\color{#9370DB}{y_{0,i}}\)`.
+
+But, we do observe
+- `\(\color{#e64173}{y_{1,i}}\)` for `\(i\)` in 1, 2, 3, 4, 5
+- `\(\color{#9370DB}{y_{0,i}}\)` for `\(i\)` in 6, 7, 8, 9, 10
+
+]
+
+--
+
+**Q:** How do we "fill in" the `NA`s and estimate `\(\overline{\tau}\)`?
+
+---
+# Estimating Causal Effects
+
+**Notation:** `\(D_i\)` is a binary indicator variable such that
+
+- `\(\color{#e64173}{D_i=1}\)` .pink[if individual] `\(\color{#e64173}{i}\)` .pink[is treated].
+- `\(\color{#9370DB}{D_i=0}\)` .purple[if individual] `\(\color{#9370DB}{i}\)` .purple[is not treated (*control* group).]
+
+--
+
+Then, rephrasing the previous slide,
+
+- We only observe `\(\color{#e64173}{y_{1,i}}\)` when `\(\color{#e64173}{D_{i}=1}\)`.
+- We only observe `\(\color{#9370DB}{y_{0,i}}\)` when `\(\color{#9370DB}{D_{i}=0}\)`.
+
+--
+
+**Q:** How can we estimate `\(\overline{\tau}\)` using only `\(\left(\color{#e64173}{y_{1,i}|D_i=1}\right)\)` and `\(\left(\color{#9370DB}{y_{0,i}|D_i=0}\right)\)`?
+
+---
+# Estimating Causal Effects
+
+**Q:** How can we estimate `\(\overline{\tau}\)` using only `\(\left(\color{#e64173}{y_{1,i}|D_i=1}\right)\)` and `\(\left(\color{#9370DB}{y_{0,i}|D_i=0}\right)\)`?
+
+--
+
+**Idea:** What if we compare the group of `\(n\)` peoples' means? _I.e._,
+$$
+`\begin{aligned}
+  =&amp;\color{#e64173}{\mathop{Avg_n}\left( y_i\mid D_i = 1 \right)} - \color{#9370DB}{\mathop{Avg_n}\left( y_i\mid D_i =0 \right)}\\
+  =&amp;\color{#e64173}{\mathop{Avg_n}\left( y_{1i}\mid D_i = 1 \right)} - \color{#9370DB}{\mathop{Avg_n}\left( y_{0i}\mid D_i =0 \right)}
+\end{aligned}`
+$$
+
+--
+
+**Q:** When does a simple difference-in-means provide information on the .hi-slate[causal effect] of the treatment?
+
+--
+
+**Q.sub[2.0]:** Is `\(\color{#e64173}{\mathop{Avg}\left( y_i\mid D_i = 1 \right)} - \color{#9370DB}{\mathop{Avg}\left( y_i\mid D_i =0 \right)}\)` a *good* estimator for `\(\overline{\tau}\)`?
+
+---
+# Estimating Causal Effects
+
+**Assumption:** Let `\(\tau_i = \tau\)` for all `\(i\)`.
+
+- The treatment effect is equal (constant) across all individuals `\(i\)`.
+
+--
+
+**Note:** We defined
+
+$$
+`\begin{align}
+  \tau_i = \tau = \color{#e64173}{y_{1,i}} - \color{#9370DB}{y_{0,i}}
+\end{align}`
+$$
+
+which implies
+
+$$
+`\begin{align}
+   \color{#e64173}{y_{1,i}} = \color{#9370DB}{y_{0,i}} + \tau
+\end{align}`
+$$
+
+---
+class: clear-slide
+
+**Q:** Is `\(\color{#e64173}{\mathop{Avg}\left( y_i\mid D_i = 1 \right)} - \color{#9370DB}{\mathop{Avg}\left( y_i\mid D_i =0 \right)}\)` a *good* estimator for `\(\tau\)`?
+
+--
+
+Difference-in-means
+--
+&lt;br&gt; `\(\quad \color{#ffffff}{\Bigg|}=\color{#e64173}{\mathop{Avg}\left( y_i\mid D_i = 1 \right)} - \color{#9370DB}{\mathop{Avg}\left( y_i\mid D_i =0 \right)}\)`
+--
+&lt;br&gt; `\(\quad \color{#ffffff}{\Bigg|}=\color{#e64173}{\mathop{Avg}\left( y_{1,i}\mid D_i = 1 \right)} - \color{#9370DB}{\mathop{Avg}\left( y_{0,i}\mid D_i =0 \right)}\)`
+--
+&lt;br&gt; `\(\quad \color{#ffffff}{\Bigg|}=\color{#e64173}{\mathop{Avg}\left( \color{#000000}{\tau \: +} \: \color{#9370DB}{y_{0,i}} \mid D_i = 1 \right)} - \color{#9370DB}{\mathop{Avg}\left( y_{0,i}\mid D_i =0 \right)}\)`
+--
+&lt;br&gt; `\(\quad \color{#ffffff}{\Bigg|}=\tau + \color{#e64173}{\mathop{Avg}\left(\color{#9370DB}{y_{0,i}} \mid D_i = 1 \right)} - \color{#9370DB}{\mathop{Avg}\left( y_{0,i}\mid D_i =0 \right)}\)`
+--
+&lt;br&gt; `\(\quad \color{#ffffff}{\Bigg|}= \text{Average causal effect} + \color{#FD5F00}{\text{Selection bias}}\)`
+
+--
+
+Our proposed difference-in-means estimator gives us the sum of
+
+1. `\(\tau\)`, the .hi-slate[causal, average treatment effect] that we want.
+2. .hi-orange[Selection bias:] How much treatment and control groups differ, on average.
+
+---
+class: inverse, middle
+
+# Randomized Control Trials 
+
+---
+# Selection Bias
+
+**Problem:** Existence of selection bias precludes *all else equal* comparisons.
+
+- To make valid comparisons that yield causal effects, we need to shut down the bias term.
+
+--
+
+**Potential solution:** Conduct an experiment.
+
+- How? .hi[Random assignment of treatment].
+
+- Hence the name, .hi[*randomized* control trial] (RCT).
+
+--
+
+Groups will need to be large enough to be comparable. As we saw with small sample extraction, the resulting estimated parameters may be far off from their population values. Following the LLN, as we increase `\(n\)` of both groups, our randomly assigned treatment estimate is .hi-blue[more likely] to be representative of the population mean. 
+
+---
+# Randomized Control Trials 
+
+## Example: Effect of de-worming on attendance
+
+**Motivation:** Intestinal worms are common among children in less-developed countries. The symptoms of these parasites can keep school-aged children at home, disrupting human capital accumulation.
+
+**Policy Question:** Do school-based de-worming interventions provide a cost-effective way to increase school attendance? 
+
+---
+# Randomized Control Trials 
+
+## Example: Effect of de-worming on attendance
+
+**Research Question:** How much do de-worming interventions increase school attendance?
+
+**Q:** Could we simply compare average attendance among children with and without access to de-worming medication?
+--
+&lt;br&gt;**A:** If we're after the causal effect, probably not.
+--
+&lt;br&gt;&lt;br&gt;**Q:** Why not?
+--
+&lt;br&gt;**A:** Selection bias: Families with access to de-worming medication probably have healthier children for other reasons, too (wealth, access to clean drinking water, *etc.*).&lt;br&gt;.pink[Can't make an *all else equal* comparison. Biased and/or spurious results.]
+
+---
+# Randomized Control Trials 
+
+## Example: Effect of de-worming on attendance
+
+**Solution:** Run an experiment.
+
+--
+
+Imagine an RCT where we have two groups:
+
+- .hi-slate[Treatment:] Villages that where children get de-worming medication in school.
+- .hi-slate[Control:] Villages that where children don't get de-worming medication in school (status quo).
+
+--
+
+By randomizing villages into .hi-slate[treatment] or .hi-slate[control], we will, on average, include all kinds of villages (poor _vs._ less poor, access to clean water _vs._ contaminated water, hospital _vs._ no hospital, *etc.*) in both groups.
+
+--
+
+*All else equal*!
+
+---
+class: clear-slide
+
+.hi-slate[54 villages]
+&lt;img src="04-Fun_Problem_files/figure-html/plot1-1.png" style="display: block; margin: auto;" /&gt;
+---
+class: clear-slide
+count: false
+
+.hi-slate[54 villages] .hi[of varying levels of development]
+&lt;img src="04-Fun_Problem_files/figure-html/plot2-1.png" style="display: block; margin: auto;" /&gt;
+---
+class: clear-slide
+count: false
+
+.hi-slate[54 villages] .hi[of varying levels of development] .hi-orange[plus randomly assigned treatment]
+&lt;img src="04-Fun_Problem_files/figure-html/plot3_1-1.png" style="display: block; margin: auto;" /&gt;
+---
+class: clear-slide
+count: false
+
+.hi-slate[54 villages] .hi[of varying levels of development] .hi-orange[plus randomly assigned treatment]
+&lt;img src="04-Fun_Problem_files/figure-html/plot3_2-1.png" style="display: block; margin: auto;" /&gt;
+---
+class: clear-slide
+count: false
+
+.hi-slate[54 villages] .hi[of varying levels of development] .hi-orange[plus randomly assigned treatment]
+&lt;img src="04-Fun_Problem_files/figure-html/plot3_3-1.png" style="display: block; margin: auto;" /&gt;
+---
+class: clear-slide
+count: false
+
+.hi-slate[54 villages] .hi[of varying levels of development] .hi-orange[plus randomly assigned treatment]
+&lt;img src="04-Fun_Problem_files/figure-html/plot3_4-1.png" style="display: block; margin: auto;" /&gt;
+---
+class: clear-slide
+count: false
+
+.hi-slate[54 villages] .hi[of varying levels of development] .hi-orange[plus randomly assigned treatment]
+&lt;img src="04-Fun_Problem_files/figure-html/plot3_5-1.png" style="display: block; margin: auto;" /&gt;
+---
+class: clear-slide
+count: false
+
+.hi-slate[54 villages] .hi[of varying levels of development] .hi-orange[plus randomly assigned treatment]
+&lt;img src="04-Fun_Problem_files/figure-html/plot3_6-1.png" style="display: block; margin: auto;" /&gt;
+---
+class: clear-slide
+count: false
+
+.hi-slate[54 villages] .hi[of varying levels of development] .hi-orange[plus randomly assigned treatment]
+&lt;img src="04-Fun_Problem_files/figure-html/plot3_7-1.png" style="display: block; margin: auto;" /&gt;
+---
+class: clear-slide
+count: false
+
+.hi-slate[54 villages] .hi[of varying levels of development] .hi-orange[plus randomly assigned treatment]
+&lt;img src="04-Fun_Problem_files/figure-html/plot3_8-1.png" style="display: block; margin: auto;" /&gt;
+---
+class: clear-slide
+count: false
+
+.hi-slate[54 villages] .hi[of varying levels of development] .hi-orange[plus randomly assigned treatment]
+&lt;img src="04-Fun_Problem_files/figure-html/plot3_9-1.png" style="display: block; margin: auto;" /&gt;
+---
+class: clear-slide
+count: false
+
+.hi-slate[54 villages] .hi[of varying levels of development] .hi-orange[plus randomly assigned treatment]
+&lt;img src="04-Fun_Problem_files/figure-html/plot3_10-1.png" style="display: block; margin: auto;" /&gt;
+---
+class: clear-slide
+count: false
+
+.hi-slate[54 villages] .hi[of varying levels of development] .hi-orange[plus randomly assigned treatment]
+&lt;img src="04-Fun_Problem_files/figure-html/plot3_11-1.png" style="display: block; margin: auto;" /&gt;
+---
+class: clear-slide
+count: false
+
+.hi-slate[54 villages] .hi[of varying levels of development] .hi-orange[plus randomly assigned treatment]
+&lt;img src="04-Fun_Problem_files/figure-html/plot3_12-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# Randomized Control Trials 
+
+## Example: Effect of de-worming on attendance
+
+We can estimate the .hi[causal effect] of de-worming on school attendance by comparing the average attendance rates in the treatment group (💊) with those in the control group (no 💊).
+
+$$
+`\begin{align}
+  \overline{\text{Attendance}}_\text{Treatment} - \overline{\text{Attendance}}_\text{Control}
+\end{align}`
+$$
+
+--
+
+Alternatively, we can use the regression
+
+--
+
+$$
+`\begin{align}
+  \text{Attendance}_i = \beta_0 + \beta_1 \text{Treatment}_i + u_i \tag{1}
+\end{align}`
+$$
+
+where `\(\text{Treatment}_i\)` is a binary variable (=1 if village `\(i\)` received the de-worming treatment).
+
+--
+**Q:** Should trust the results of `\((1)\)`? Why?
+&lt;br&gt;**A:** On average, .hi[randomly assigning treatment should balance] treatment and control across the other dimensions that affect school attendance.
+
+---
+class: clear-slide
+
+.hi[Randomization can go wrong!]
+&lt;img src="04-Fun_Problem_files/figure-html/fertilizer_plot3_bad-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# Causality
+
+## Example: Returns to education 
+
+The optimal investment in education by students, parents, and legislators depends in part on the monetary *return to education*.
+
+--
+
+.hi-purple[Thought experiment:]
+- Randomly select an individual.
+- Give her an additional year of education.
+- How much do her earnings increase?
+
+The change in her earnings describes the .hi-slate[causal effect] of education on earnings.
+
+---
+# Causality
+
+## Example: Returns to education 
+
+**Q:** Could we simply compare the earnings those with more education to those with less?
+--
+&lt;br&gt;**A:** If we want to measure the causal effect, probably not.
+
+--
+1. People *choose* education based on their ability and other factors.
+1. High-ability people tend to earn more *and* stay in school longer.
+1. Education likely reduces experience (time out of the workforce).
+
+--
+
+Point (3) also illustrates the difficulty in learning about the effect of education while *holding all else constant*.
+
+Many important variables have the same challenge: gender, race, income.
+
+---
+# Causality
+
+## Example: Returns to education 
+
+**Q:** How can we estimate the returns to education?
+
+--
+
+.hi-slate[Option 1:] Run an .hi[experiment].
+
+--
+
+- Randomly .pink[assign education] (might be difficult).
+- Randomly .pink[encourage education] (might work).
+- Randomly .pink[assign programs] that affect education (*e.g.*, mentoring).
+
+--
+
+.hi-slate[Option 2:] Look for a .hi-purple[*natural experiment*] (a policy or accident in society that arbitrarily increased education for one subset of people).
+
+--
+
+- Admissions .purple[cutoffs]
+- .purple[Lottery] enrollment and/or capacity .purple[constraints]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

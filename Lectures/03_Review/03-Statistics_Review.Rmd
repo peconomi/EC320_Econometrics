@@ -652,19 +652,21 @@ Sweet, but what distribution should we be assuming?
 
 # The Central Limit Theorem
 
-<br>
-
 .hi-blue[Theorem]<br>
 *Let* $x_1, x_2, \dots, x_n$ *be a random sample from a population with mean* $\mathop{\mathbb{E}}\left[ X \right] = \mu$ *and variance* $\text{Var}\left( X \right) = \sigma^2 < \infty$*, let* $\bar{X}$ *be the sample mean.* 
 *Then, as* $n\rightarrow \infty$*, the function* $\frac{\sqrt{n}\left(\bar{X}-\mu\right)}{S_x}$ *converges to a* .hi-pink[Normal Distribution] *with mean 0 and variance 1.* 
 
 --
 
-- $\implies$ as your sample gets larger, $n\rightarrow \infty$, we have a statistic that starts to distribute according to a very consistent pattern. 
+- CLT states that when $n \rightarrow \infty$, the sample mean will be normally distributed. 
 
 --
 
-- The only unknown parameter is this is $\mu$, and we can get around that by making probabilistic statements about it. 
+- The Law of Large Number (LLN) states that as $n \rightarrow \infty$, the sample converges on the population mean.
+
+--
+
+- The only unknown parameter is $\mu$, and we can get around that by making probabilistic statements about it. 
 
 ---
 
