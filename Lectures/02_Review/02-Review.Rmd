@@ -1068,6 +1068,8 @@ $$
 
 ---
 
+exclude: true
+
 ```{R generate pdfs, include = F, eval = F}
 #remotes::install_github('rstudio/pagedown')
 library(pagedown)

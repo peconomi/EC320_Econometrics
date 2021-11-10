@@ -1266,6 +1266,8 @@ The focus of this class is data analysis, but .hi[data wrangling] is a non-trivi
 
 ---
 
+exclude: true
+
 ```{R generate pdfs, include = F, eval = F}
 #remotes::install_github('rstudio/pagedown')
 library(pagedown)
