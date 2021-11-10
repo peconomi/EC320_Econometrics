@@ -52,22 +52,23 @@ Posted every week
 **Problem Set 1** <br> 
 [Assignment](https://raw.githack.com/peconomi/EC320_Econometrics/main/Problem-Sets/01/PBS1.pdf) <br>
 [Solutions](https://i.imgur.com/767Ks9Q.gif)<br>
-Due: 01/10/2022
+**Problem Set 2** <br>
+Available:  01/03/2022 | Due: 01/10/2022
 
 **Problem Set 2** <br>
-Available:  01/17/2022
+Available:  01/17/2022 |
 Due: 01/24/2022
 
 **Problem Set 3** <br>
-Available: 01/31/2022
+Available: 01/31/2022 |
 Due: 02/07/2022
 
 **Problem Set 4** <br>
-Available: 02/14/2022 
+Available: 02/14/2022 |
 Due: 02/21/2022
 
 **Problem Set 5** <br>
-Available: 02/28/2022 
+Available: 02/28/2022 |
 Due: 03/07/2022
 
 ## Labs
