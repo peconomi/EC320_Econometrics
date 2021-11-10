@@ -824,4 +824,10 @@ Many important variables have the same challenge: gender, race, income.
 - Admissions .purple[cutoffs]
 - .purple[Lottery] enrollment and/or capacity .purple[constraints]
 
+---
 
+```{R generate pdfs, include = F, eval = F}
+#remotes::install_github('rstudio/pagedown')
+library(pagedown)
+pagedown::chrome_print("04-Fun_Problem.html", output = "04-Fun_Problem.pdf")
+```

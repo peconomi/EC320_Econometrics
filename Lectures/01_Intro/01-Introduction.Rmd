@@ -665,3 +665,13 @@ layout: true
 `NA; error; warning`
 
 ]
+
+---
+
+exclude: true
+
+```{R generate pdfs, include = F, eval = F}
+#remotes::install_github('rstudio/pagedown')
+library(pagedown)
+pagedown::chrome_print("01-Introduction.html", output = "01-Introduction.pdf")
+```

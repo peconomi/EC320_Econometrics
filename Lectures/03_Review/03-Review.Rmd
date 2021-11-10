@@ -1,0 +1,1273 @@
+---
+title: "Statistics Review II"
+subtitle: "EC 320: Introduction to Econometrics"
+author: "Philip Economides"
+date: "Winter 2022"
+output:
+  xaringan::moon_reader:
+    css: ['default', 'metropolis', 'metropolis-fonts', 'my-css.css']
+    # self_contained: true
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+class: inverse, middle
+
+```{r Setup, include = F}
+options(htmltools.dir.version = FALSE)
+library(pacman)
+p_load(ggthemes, viridis, knitr, extrafont, tidyverse, magrittr,
+       latex2exp, parallel, Ecdat, wooldridge, dslabs, ggforce, DT)
+# Define colors
+red_pink <- "#e64173"
+met_slate <- "#272822" 
+turquoise <- "#20B2AA"
+orange <- "#FFA500"
+red <- "#fb6107"
+blue <- "#2b59c3"
+green <- "#8bb174"
+grey_light <- "grey70"
+grey_mid <- "grey50"
+grey_dark <- "grey20"
+purple <- "#6A5ACD"
+slate <- "#314f4f"
+# Notes directory
+dir_slides <- "Lectures/03-Review/"
+# Knitr options
+opts_chunk$set(
+  comment = "#>",
+  fig.align = "center",
+  fig.height = 7,
+  fig.width = 10.5,
+  #dpi = 300,
+  #cache = T,
+  warning = F,
+  message = F
+)
+theme_simple <- theme_bw() + theme(
+  axis.line = element_line(color = met_slate),
+  panel.grid = element_blank(),
+  rect = element_blank(),
+  strip.text = element_blank(),
+  text = element_text(family = "Fira Sans", color = met_slate, size = 14),
+  axis.text.x = element_text(size = 12),
+  axis.text.y = element_text(size = 12),
+  axis.ticks = element_blank(),
+  plot.title = element_blank(),
+  legend.position = "none"
+)
+theme_empty <- theme_bw() + theme(
+  line = element_blank(),
+  rect = element_blank(),
+  strip.text = element_blank(),
+  axis.text = element_blank(),
+  plot.title = element_blank(),
+  axis.title = element_blank(),
+  plot.margin = structure(c(0, 0, -1, -1), unit = "lines", valid.unit = 3L, class = "unit"),
+  legend.position = "none"
+)
+```
+
+
+# Statistics Review
+
+---
+# Overview
+
+A few key terms:
+
+--
+
+- .hi-pink[Population:] a (usually large) group of items or events we would like to know about. 
+
+--
+
+- .hi-pink[Parameter:] a value that describes that population. The parameter of interest is the parameter that the researcher seeks to learn about.
+
+--
+
+- .hi-pink[Sample:] a survey of a subset of the population. 
+
+--
+
+Usually we aim to draw observations .hi-blue[randomly] from the population, such that it becomes a .hi-blue[representative sample] of the population. More details on this later!
+
+---
+# Overview
+
+__Focus:__ Populations vs Samples
+
+- How can we make inferences about a .hi-pink[population] based on a small .hi-blue[sample] of the population?
+
+- In particular, how do we learn about an unknown population _parameter_ of interest?
+
+__Challenge:__ Usually cannot access information about the entire population.
+
+__Solution:__ Sample from the population and estimate the parameter.
+
+- Draw $n$ observations from the population, then use an estimator.
+
+---
+# Sampling
+
+There are myriad ways to produce a sample,<sup>*</sup> but we will restrict our attention to __simple random sampling__, where
+
+1. Each observation is a random variable.
+
+2. The $n$ random variables are independent.
+
+3. Life becomes much simpler for the econometrician.
+
+.footnote[
+<sup>*</sup> Only a subset of these can help produce reliable statistics.
+]
+
+---
+# Estimators
+
+An __estimator__ is a rule (or formula) for estimating an unknown population parameter given a sample of data.
+
+--
+
+- Each observation in the sample is a random variable.
+
+--
+
+- An estimator is a combination of random variables $\implies$ it is a random variable.
+
+__Example:__ Sample mean
+
+$$
+\bar{X} = \dfrac{1}{n} \sum_{i=1}^n X_i
+$$
+
+- $\bar{X}$ is an estimator for the population mean $\mu$.
+
+- Given a sample, $\bar{X}$ yields an __estimate__ $\bar{x}$ or $\hat{\mu}$, a specific number.
+
+---
+# Population *vs.* Sample
+
+**Question:** Why do we care about *population vs. sample*?
+
+```{R, gen dataset, include = F, cache = T}
+# Set population and sample sizes
+n_p <- 100
+n_s <- 10
+# Set the seed
+set.seed(12468)
+# Generate data
+pop_df <- tibble(
+  i = 3,
+  x = rnorm(n_p, mean = 2, sd = 20),
+  row = rep(1:sqrt(n_p), times = sqrt(n_p)),
+  col = rep(1:sqrt(n_p), each = sqrt(n_p)),
+  s1 = sample(x = c(rep(T, n_s), rep(F, n_p - n_s))),
+  s2 = sample(x = c(rep(T, n_s), rep(F, n_p - n_s))),
+  s3 = sample(x = c(rep(T, n_s), rep(F, n_p - n_s)))
+)
+# Means
+m0 <- mean(pop_df$x)
+m1 <- mean(subset(pop_df$x, pop_df$s1 == T))
+m2 <- mean(subset(pop_df$x, pop_df$s2 == T))
+m3 <- mean(subset(pop_df$x, pop_df$s3 == T))
+# Simulation
+set.seed(12468)
+sim_df <- mclapply(mc.cores = 1, X = 1:1e4, FUN = function(x, size = n_s) {
+  pop_df %>% 
+    sample_n(size = size) %>% 
+    summarize(mu_hat = mean(x))
+}) %>% do.call(rbind, .) %>% as_tibble()
+```
+
+.pull-left[
+
+```{R, pop1, echo = F, fig.fullwidth = T, dev = "svg"}
+ggplot(data = pop_df, aes(x = row, y = col)) +
+geom_point(color = "#195c23", size = 10) +
+theme_empty
+```
+
+.center[**Population**]
+
+]
+
+--
+
+.pull-right[
+
+```{R, mean1, echo = F, fig.fullwidth = T, dev = "svg"}
+ggplot() +
+  geom_histogram(data = pop_df, aes(x), fill = "#195c23", alpha = 0.50) +
+  geom_vline(xintercept = m0, size = 2, color = "#195c23") +
+  theme_empty
+```
+
+.center[**Population relationship**]
+<br>
+$\mu = `r round(m0, 2)`$
+
+]
+
+---
+# Population *vs.* Sample
+
+**Question:** Why do we care about *population vs. sample*?
+
+.pull-left[
+
+```{R, sample1, echo = F, fig.fullwidth = T, dev = "svg"}
+ggplot(data = pop_df, aes(x = row, y = col, shape = s1)) +
+geom_point(color = "#ffa600", size = 10) +
+scale_shape_manual(values = c(1, 19)) +
+theme_empty
+```
+
+.center[**Sample 1:** 10 random individuals]
+
+]
+
+--
+
+.pull-right[
+
+```{R, sample1 mean, echo = F, fig.fullwidth = T, dev = "svg", message=FALSE}
+ggplot() +
+  geom_histogram(data = pop_df, aes(x), fill = "#195c23", alpha = 0.50) +
+  geom_vline(xintercept = m0, size = 2, color = "#195c23") +
+  geom_histogram(data = subset(pop_df, s1 == T), aes(x), fill = "#ffa600", alpha = 0.40) +
+  geom_vline(xintercept = m1, size = 2, color = "#ffa600") +
+  theme_empty
+```
+
+.center[
+
+**Population relationship**
+<br>
+$\mu = `r round(m0, 2)`$
+
+**Sample relationship**
+<br>
+$\hat{\mu} = `r round(m1, 2)`$
+
+]
+
+]
+
+---
+# Population *vs.* Sample
+
+**Question:** Why do we care about *population vs. sample*?
+
+.pull-left[
+
+```{R, sample2, echo = F, fig.fullwidth = T, dev = "svg"}
+ggplot(data = pop_df, aes(x = row, y = col, shape = s2)) +
+geom_point(color = "#ffa600", size = 10) +
+scale_shape_manual(values = c(1, 19)) +
+theme_empty
+```
+
+.center[**Sample 2:** 10 random individuals]
+
+]
+
+--
+
+.pull-right[
+
+```{R, sample2 mean, echo = F, fig.fullwidth = T, dev = "svg"}
+ggplot() +
+  geom_histogram(data = pop_df, aes(x), fill = "#195c23", alpha = 0.50) +
+  geom_vline(xintercept = m0, size = 2, color = "#195c23") +
+  geom_histogram(data = subset(pop_df, s2 == T), aes(x), fill = "#ffa600", alpha = 0.50) +
+  geom_vline(xintercept = m2, size = 2, color = "#ffa600") +
+  theme_empty
+```
+
+.center[
+
+**Population relationship**
+<br>
+$\mu = `r round(m0, 2)`$
+
+**Sample relationship**
+<br>
+$\hat{\mu} = `r round(m2, 2)`$
+
+]
+
+]
+
+---
+# Population *vs.* Sample
+
+**Question:** Why do we care about *population vs. sample*?
+
+.pull-left[
+
+```{R, sample3, echo = F, fig.fullwidth = T, dev = "svg"}
+ggplot(data = pop_df, aes(x = row, y = col, shape = s3)) +
+geom_point(color = "#ffa600", size = 10) +
+scale_shape_manual(values = c(1, 19)) +
+theme_empty
+```
+
+.center[**Sample 3:** 10 random individuals]
+
+]
+
+--
+
+.pull-right[
+
+```{R, sample3 mean, echo = F, fig.fullwidth = T, dev = "svg", message=FALSE}
+ggplot() +
+  geom_histogram(data = pop_df, aes(x), fill = "#195c23", alpha = 0.50) +
+  geom_vline(xintercept = m0, size = 2, color = "#195c23") +
+  geom_histogram(data = subset(pop_df, s3 == T), aes(x), fill = "#ffa600", alpha = 0.50) +
+  geom_vline(xintercept = m3, size = 2, color = "#ffa600") +
+  theme_empty
+```
+
+.center[
+
+**Population relationship**
+<br>
+$\mu = `r round(m0, 2)`$
+
+**Sample relationship**
+<br>
+$\hat{\mu} = `r round(m3, 2)`$
+
+]
+
+]
+
+---
+class: clear-slide, middle
+
+Let's repeat this **10,000 times** and then plot the estimates.
+
+(This exercise is called a Monte Carlo simulation.)
+
+---
+class: clear-slide, middle
+
+```{R, simulation, echo = F, dev = "svg",  message=FALSE}
+ggplot() +
+  geom_histogram(data = sim_df, aes(mu_hat), fill = "#ffa600", alpha = 0.6) +
+  geom_vline(xintercept = m0, size = 2, color = "#195c23") +
+  scale_x_continuous(breaks = m0, labels = TeX("$\\mu$")) +
+scale_y_continuous(expand = c(0, 0), limits = c(0, NA))+
+  xlab(TeX("$\\hat{\\mu}$")) +
+  theme(axis.text.x = element_text(size = 20),
+      axis.text.y = element_blank(),
+      rect = element_blank(),
+      axis.title.y = element_blank(),
+      axis.title.x = element_text(size = 20, hjust = 1, color = met_slate),
+      line = element_blank())
+```
+
+---
+# Population *vs.* Sample
+
+**Question:** Why do we care about *population vs. sample*?
+
+.pull-left[
+```{R, simulation2, echo = F, dev = "svg", message=FALSE}
+ggplot() +
+  geom_histogram(data = sim_df, aes(mu_hat), fill = "#ffa600", alpha = 0.6) +
+  geom_vline(xintercept = m0, size = 2, color = "#195c23") +
+  scale_x_continuous(breaks = m0, labels = TeX("$\\mu$")) +
+scale_y_continuous(expand = c(0, 0), limits = c(0, NA))+
+  xlab(TeX("$\\hat{\\mu}$")) +
+  theme(axis.text.x = element_text(size = 20),
+      axis.text.y = element_blank(),
+      rect = element_blank(),
+      axis.title.y = element_blank(),
+      axis.title.x = element_text(size = 20, hjust = 1, color = met_slate),
+      line = element_blank())
+```
+]
+
+.pull-right[
+
+- On average, the mean of the samples are close to the population mean.
+
+- But...some individual samples can miss the mark.
+
+- The difference between individual samples and the population creates __uncertainty__. 
+
+]
+
+---
+# Population *vs.* Sample
+
+**Question:** Why do we care about *population vs. sample*?
+
+**Answer:** Uncertainty matters.
+
+- $\hat{\mu}$ is a random variable that depends on the sample.
+
+- In practice, we don't know whether our sample is similar to the population or not. 
+
+- Individual samples may have means that differ greatly from the population.
+
+- We will have to keep track of this uncertainty.
+
+---
+# Properties of Estimators
+
+Imagine that we want to estimate an unknown parameter $\mu$, and we know the distributions of three competing estimators. __Which one should we use?__ 
+
+```{R, competing pdfs, echo = F, dev = "svg", fig.height = 4.5, message=FALSE, warning=FALSE}
+# Generate data for densities' polygons
+d1 <- tibble(x = seq(-7.5, 7.5, 0.01), y = dnorm(x, mean = 1, sd = 1)) %>%
+  rbind(., tibble(x = seq(7.5, -7.5, -0.01), y = 0))
+d2 <- tibble(x = seq(-7.5, 7.5, 0.01), y = dunif(x, min = -2.5, max = 1.5)) %>%
+  rbind(., tibble(x = seq(7.5, -7.5, -0.01), y = 0))
+d3 <- tibble(x = seq(-7.5, 7.5, 0.01), y = dnorm(x, mean = 0, sd = 2.5)) %>%
+  rbind(., tibble(x = seq(7.5, -7.5, -0.01), y = 0))
+# Plot them
+ggplot() +
+geom_polygon(data = d1, aes(x, y), alpha = 0.8, fill = "orange") +
+geom_polygon(data = d2, aes(x, y), alpha = 0.65, fill = red_pink) +
+geom_polygon(data = d3, aes(x, y), alpha = 0.6, fill = "darkslategray") +
+geom_hline(yintercept = 0, color = "black") +
+geom_vline(xintercept = 0, size = 1, linetype = "dashed") +
+scale_x_continuous(breaks = 0, labels = TeX("$\\mu$")) +
+scale_y_continuous(expand = c(0, 0), limits = c(0, NA))+
+theme_simple + 
+theme(axis.text.x = element_text(size = 20),
+      axis.text.y = element_blank(),
+      axis.title = element_blank(),
+      line = element_blank())
+```
+
+---
+# Properties of Estimators
+
+**Question:** What properties make an estimator reliable?
+
+--
+
+**Answer 1: Unbiasedness.**
+
+On average (after *many* samples), does the estimator tend toward the correct value?
+
+**More formally:** Does the mean of estimator's distribution equal the parameter it estimates?
+
+$$ \mathop{\text{Bias}_\mu} \left( \hat{\mu} \right) = \mathop{\mathbb{E}}\left[ \hat{\mu} \right] - \mu $$
+
+---
+# Properties of Estimators
+
+**Question:** What properties make an estimator reliable?
+
+**Answer 1: Unbiasedness.**
+
+.pull-left[
+
+**Unbiased estimator:** $\mathop{\mathbb{E}}\left[ \hat{\mu} \right] = \mu$
+
+```{R, unbiased pdf, echo = F, dev = "svg"}
+tmp <- tibble(x = seq(-4, 4, 0.01), y = dnorm(x))
+tmp <- rbind(tmp, tibble(x = seq(4, -4, -0.01), y = 0))
+ggplot(data = tmp, aes(x, y)) +
+geom_polygon(fill = red_pink, alpha = 0.9) +
+geom_hline(yintercept = 0, color = "black") +
+geom_vline(xintercept = 0, size = 1, linetype = "dashed") +
+scale_x_continuous(breaks = 0, labels = TeX("$\\mu$")) +
+scale_y_continuous(expand = c(0, 0), limits = c(0, NA))+
+theme_simple +
+theme(axis.text.x = element_text(size = 40),
+      axis.text.y = element_blank(),
+      axis.title = element_blank(),
+      line = element_blank())
+```
+
+]
+
+--
+
+.pull-right[
+
+**Biased estimator:** $\mathop{\mathbb{E}}\left[ \hat{\mu} \right] \neq \mu$
+
+```{R, biased pdf, echo = F, dev = "svg"}
+tmp <- tibble(x = seq(-4, 4, 0.01), y = dnorm(x))
+tmp <- rbind(tmp, tibble(x = seq(4, -4, -0.01), y = 0))
+ggplot(data = tmp, aes(x, y)) +
+geom_polygon(aes(x = x + 2), fill = "darkslategray", alpha = 0.9) +
+geom_hline(yintercept = 0, color = "black") +
+geom_vline(xintercept = 0, size = 1, linetype = "dashed") +
+scale_x_continuous(breaks = 0, labels = TeX("$\\mu$")) +
+scale_y_continuous(expand = c(0, 0), limits = c(0, NA))+
+theme_simple +
+theme(axis.text.x = element_text(size = 40),
+      axis.text.y = element_blank(),
+      axis.title = element_blank(),
+      line = element_blank())
+```
+
+]
+
+---
+
+# Unbiasedness Example
+
+Is the sample mean $\frac{1}{n} \sum_{i=1}^n x_i = \hat{\mu}$ an unbiased estimator of the population mean $E(x_i) = \mu$?
+
+$$
+\begin{aligned}
+\mathop{\mathbb{E}}\left[ \hat{\mu} \right] &= \mathop{\mathbb{E}}\left[ \frac{1}{n} \sum_{i=1}^n x_i \right] \\
+&=\frac{1}{n} \sum_{i=1}^n\mathop{\mathbb{E}}\left[ x_i \right]\\
+&=\frac{1}{n} \sum_{i=1}^n \mu\\
+&= \mu
+\end{aligned}
+$$
+
+
+---
+
+# Properties of Estimators
+
+**Question:** What properties make an estimator reliable?
+
+**Answer 2: Efficiency (low variance).**
+
+The central tendencies (means) of competing distributions are not the only things that matter. We also care about the **variance** of an estimator.
+
+$$ \mathop{\text{Var}} \left( \hat{\mu} \right) = \mathop{\mathbb{E}}\left[ \left( \hat{\mu} - \mathop{\mathbb{E}}\left[ \hat{\mu} \right] \right)^2 \right] $$
+
+Lower variance estimators produce estimates closer to the mean in each sample.
+
+---
+# Properties of Estimators
+
+**Question:** What properties make an estimator reliable?
+
+**Answer 2: Low Variance (a.k.a. Efficiency).**
+
+```{R, variance pdf, echo = F, dev = "svg", fig.height = 5}
+d4 <- tibble(x = seq(-7.5, 7.5, 0.01), y = dnorm(x, mean = 0, sd = 1)) %>%
+  rbind(., tibble(x = seq(7.5, -7.5, -0.01), y = 0))
+d5 <- tibble(x = seq(-7.5, 7.5, 0.01), y = dnorm(x, mean = 0, sd = 2)) %>%
+  rbind(., tibble(x = seq(7.5, -7.5, -0.01), y = 0))
+ggplot() +
+geom_polygon(data = d4, aes(x, y), fill = red_pink, alpha = 0.9) +
+geom_polygon(data = d5, aes(x, y), fill = "darkslategray", alpha = 0.8) +
+geom_hline(yintercept = 0, color = "black") +
+geom_vline(xintercept = 0, size = 1, linetype = "dashed") +
+scale_x_continuous(breaks = 0, labels = TeX("$\\mu$")) +
+scale_y_continuous(expand = c(0, 0), limits = c(0, NA))+
+theme_simple +
+theme(axis.text.x = element_text(size = 20),
+      axis.text.y = element_blank(),
+      axis.title = element_blank(),
+      line = element_blank())
+```
+
+---
+# The Bias-Variance Tradeoff
+
+Should we be willing to take a bit of bias to reduce the variance?
+
+In econometrics, we generally prefer unbiased estimators. Some other disciplines think more about this tradeoff.
+
+```{R, variance bias, echo = F, dev = "svg", fig.height = 4.5}
+d4 <- tibble(x = seq(-7.5, 7.5, 0.01), y = dnorm(x, mean = 0.3, sd = 1)) %>%
+  rbind(., tibble(x = seq(7.5, -7.5, -0.01), y = 0))
+d5 <- tibble(x = seq(-7.5, 7.5, 0.01), y = dnorm(x, mean = 0, sd = 2)) %>%
+  rbind(., tibble(x = seq(7.5, -7.5, -0.01), y = 0))
+ggplot() +
+geom_polygon(data = d4, aes(x, y), fill = red_pink, alpha = 0.9) +
+geom_polygon(data = d5, aes(x, y), fill = "darkslategray", alpha = 0.8) +
+geom_hline(yintercept = 0, color = "black") +
+geom_vline(xintercept = 0, size = 1, linetype = "dashed") +
+scale_x_continuous(breaks = 0, labels = TeX("$\\mu$")) +
+scale_y_continuous(expand = c(0, 0), limits = c(0, NA))+
+theme_simple +
+theme(axis.text.x = element_text(size = 20),
+      axis.text.y = element_blank(),
+      axis.title = element_blank(),
+      line = element_blank())
+```
+
+---
+# Unbiased Estimators
+
+<br>
+
+In addition to the sample mean, there are several other unbiased estimators we will use often.
+
+- __Sample variance__ to estimate variance $\sigma^2$.
+
+- __Sample covariance__ to estimate covariance $\sigma_{XY}$.
+
+- __Sample correlation__ to estimate the population correlation coefficient $\rho_{XY}$.
+
+---
+# Unbiased Estimators
+
+Sample variance $S_X^2$ is an unbiased estimator of the population variance $\sigma^2$
+
+$$S_{X}^2 = \dfrac{1}{n-1} \sum_{i=1}^n (X_i - \bar{X})^2.$$
+
+--
+
+Sample covariance $S_{XY}$ is an unbiased estimator of the population covariance $\sigma_{XY}$
+
+
+$$S_{XY} = \dfrac{1}{n-1} \sum_{i=1}^{n} (X_i - \bar{X})(Y_i - \bar{Y}).$$
+
+--
+
+Sample correlation $r_{XY}$ is an unbiased estimator of the population correlation coefficient $\rho_{XY}$
+
+$$r_{XY} = \dfrac{S_{XY}}{\sqrt{S_X^2} \sqrt{S_Y^2}}.$$
+
+---
+
+# Population Distributions
+
+Suppose we have some estimator $\hat{\theta}$ for a parameter $\theta$:
+
+- We don’t know $\theta$, but say we assume that $\hat{\theta}$ follows some probability distribution $p(\hat{\theta})$
+- Next, suppose we hypothesize some value for $\theta$, say $\theta = 2.5$
+- Now we use our estimator $\hat{\theta}$ to calculate an estimate for $\theta$. Say that
+we get $\hat{\theta} = 45$
+- We "know" the distribution of $\hat{\theta}$, so we know the probability of getting $\hat{\theta}= 45$ if really $\theta= 2.5$. So we can say ” if $\theta$ really was 2.5,
+then the probability of getting $\hat{\theta} = 45$ is super super low. Thus the
+probability that $\theta= 2.5$ is super super low”.
+- We are able to make a statement about the true value of $\theta$ just by
+knowing the distribution of our preferred estimator $\hat{\theta}$
+
+Sweet, but what distribution should we be assuming?
+
+
+---
+
+# The Central Limit Theorem
+
+.hi-blue[Theorem]<br>
+*Let* $x_1, x_2, \dots, x_n$ *be a random sample from a population with mean* $\mathop{\mathbb{E}}\left[ X \right] = \mu$ *and variance* $\text{Var}\left( X \right) = \sigma^2 < \infty$*, let* $\bar{X}$ *be the sample mean.* 
+*Then, as* $n\rightarrow \infty$*, the function* $\frac{\sqrt{n}\left(\bar{X}-\mu\right)}{S_x}$ *converges to a* .hi-pink[Normal Distribution] *with mean 0 and variance 1.* 
+
+--
+
+- CLT states that when $n \rightarrow \infty$, the sample mean will be normally distributed. 
+
+--
+
+- The Law of Large Number (LLN) states that as $n \rightarrow \infty$, the sample converges on the population mean.
+
+--
+
+- The only unknown parameter is $\mu$, and we can get around that by making probabilistic statements about it. 
+
+---
+
+# Normal Distribution
+
+.pull-left[
+- Continuous distribution where $x_i$ can take the value of any real number
+
+- Domain spans the entire real line
+
+- Centered on the distriubtion mean $\mu$
+
+- The width of the distribution (fatness of its tails) is moderated $\sigma^2$
+]
+
+.pull-right[
+```{R, normdist, echo = F, dev = "svg"}
+ggplot(data.frame(x = c(-4, 4)), aes(x)) + 
+  mapply(function(mean, sd, col) {
+    stat_function(fun = dnorm, args = list(mean = mean, sd = sd), col = col)
+  }, 
+  # enter means, standard deviations and colors here
+  mean = c(0, 0, 0), 
+  sd = c(.5, 1, 2), 
+  col = c('red', 'blue', 'green')
+) +
+  ylab("p(x)") + xlab("\u03BC")+
+  scale_y_continuous(expand=c(0,0), limits=c(0,0.9))+
+  theme_bw() + theme(axis.text.x = element_text(color = "grey20", size = 16, face = "plain"),
+        axis.text.y = element_text(color = "grey20", size = 16, angle = 0, hjust = 1, vjust = 0, face = "plain"),  
+        axis.title.x = element_text(color = "grey20", size = 24, angle = 0, hjust = .5, vjust = 0, face = "plain"),
+        axis.title.y = element_text(color = "grey20", size = 16, angle = 90, hjust = .5, vjust = .5, face = "plain"))
+```
+
+The greater the variance, the wider the range of values that commonly appear, hence greater probability density mass.
+]
+
+---
+
+# Normal Distribution
+
+.pull-left[
+__Rule 1:__ The probability that the random variable takes a value $x_i$ is 0 for any $x_i\in {\mathbb{R}}$<br>
+__Rule 2:__ The probability that the random variable takes a value within $[x_i,x_j]$ range, where $x_i \neq x_j$, is the area under $p(x)$ between those two values 
+]
+
+.pull-right[
+```{R, normdist_II, echo = F, dev = "svg", out.width="95%"}
+limitRange <- function(fun, min, max) {
+    function(x) {
+        y <- fun(x)
+        y[x < min  |  x > max] <- NA
+        return(y)
+    }
+}
+
+ggplot(data.frame(x = c(-4, 4)), aes(x)) + 
+  mapply(function(mean, sd, col) {
+    stat_function(fun = dnorm, args = list(mean = mean, sd = sd), col = col)
+  }, 
+  # enter means, standard deviations and colors here
+  mean = c(0), 
+  sd = c(1), 
+  col = c('blue')
+) +
+  stat_function(fun = limitRange(dnorm, -1.96, 1.96),
+                  geom="area", fill="blue", alpha=0.2) +
+  ylab("p(x)") + xlab("\u03BC")+
+  scale_y_continuous(expand=c(0,0), limits=c(0,0.9))+
+  theme_bw() + theme(axis.text.x = element_text(color = "grey20", size = 16, face = "plain"),
+        axis.text.y = element_text(color = "grey20", size = 16, angle = 0, hjust = 1, vjust = 0, face = "plain"),  
+        axis.title.x = element_text(color = "grey20", size = 24, angle = 0, hjust = .5, vjust = 0, face = "plain"),
+        axis.title.y = element_text(color = "grey20", size = 16, angle = 90, hjust = .5, vjust = .5, face = "plain"))
+```
+]
+
+The area above represents $p(x)=0.95$. The values $\{-1.96, 1.96\}$ represent the 95% confidence interval for $\mu$.
+
+---
+
+# Hypothesis Testing
+
+<br>
+
+How do we assess an estimate of the population mean?
+
+- Is it meaningfully different than existing evidence on the population mean?
+- Is is _statistically distinguishable_ from previously hypothesized values of the population mean?
+- Is the estimate extreme enough to update our prior beliefs about the population mean?
+
+We can conduct statistical tests to address these questions.
+
+
+---
+
+# Hypothesis Testing
+
+__Null hypothesis (H.sub[0]):__ $\mu = \mu_0$
+
+__Alternative hypothesis (H.sub[1]):__ $\mu \neq \mu_0$
+
+--
+
+There are four possible outcomes of our test:
+
+1. We __fail to reject__ the null hypothesis and the null is true.
+
+2. We __reject__ the null hypothesis and the null is false.
+
+3. We __reject__ the null hypothesis, but the null is actually true (**Type I error**).
+
+4. We __fail to reject__ the null hypothesis, but the null is actually false (**Type II error**).
+
+---
+# Hypothesis Testing
+
+We __fail to reject__ the null hypothesis and the null is true.
+
+- The defendant was acquitted and he didn't do the crime.
+
+--
+
+We __reject__ the null hypothesis and the null is false.
+
+- The defendant was convicted and he did the crime.
+
+--
+
+We __reject__ the null hypothesis, but the null is actually true. 
+
+- The defendant was convicted, but he didn't do the crime!
+- **Type I error** (a.k.a. _false positive_)
+
+--
+
+We __fail to reject__ the null hypothesis, but the null is actually false.
+
+- The defendant was acquitted, but he did the crime!
+- **Type II error** (a.k.a. _false negative_)
+
+---
+# Hypothesis Testing
+
+$\hat{\mu}$ is random: it could be anything, even if $\mu = \mu_0$ is true.
+
+- But if $\mu = 0$ is true, then $\hat{\mu}$ is unlikely to take values far from zero.
+
+- As the variance of $\hat{\mu}$ shrinks, we are even less likely to observe "extreme" values of $\hat{\mu}$ (assuming $\mu = \mu_0$).
+
+--
+
+Our test should take extreme values of $\hat{\mu}$ as evidence against the null hypothesis, but it should also weight them by what we know about the variance of $\hat{\mu}$.
+
+- For now, we'll assume that the variable of interest $X$ is normally distributed with mean $\mu$ and standard deviation $\sigma^2$.
+
+---
+# Hypothesis Testing
+
+Reject H.sub[0] if $\hat{\mu}$ lies in the .hi[rejection region].
+
+```{r, echo = F, dev = "svg", fig.height = 3.75}
+df <- tibble(
+    x = seq(-4,4, by = 0.01),
+    y = dnorm(seq(-4,4, by = 0.01))
+)
+crit <- qnorm(c(.025,.975))
+tail_left <- rbind(c(crit[1],0), subset(df, x < crit[1]))
+tail_right <- rbind(c(crit[2],0), subset(df, x > crit[2]), c(3,0))
+ggplot() +
+  scale_x_continuous(limits = c(-4, 4), expand=c(0,0), breaks = c(-1.96, 0, 1.96), labels = c(TeX("$\\mu_0 - 1.96 \\, s.d.$"), TeX("$\\mu_0$"), TeX("$\\mu_0 + 1.96 \\, sd$"))) +
+  scale_y_continuous(limits = c(0, 0.5), expand=c(0,0), breaks = c(0, 0.5), labels = c(0, 0.5)) +
+  geom_polygon(data = df, aes(x, y), fill = "grey85") +
+  geom_polygon(data = tail_left, aes(x=x, y=y), fill = red_pink) +
+  geom_polygon(data = tail_right, aes(x=x, y=y), fill = red_pink) +
+  geom_polygon(data = df %>% filter(x <= qnorm(1 - 0.975) & x >= qnorm(0.975)), aes(x, y), fill = red_pink) +
+  geom_vline(xintercept = qnorm(0.975), size = 0.35, linetype = "dashed", color = met_slate) +
+  geom_vline(xintercept = qnorm(1 - 0.975), size = 0.35, linetype = "dashed", color = met_slate) +
+  theme_simple +
+  xlab("") + 
+  ylab("") + theme(axis.text.y = element_blank(), axis.line.y = element_blank())
+```
+
+- The area of the rejection region is defined by the **significance level** of the test.
+- In a 5% test, the area is 0.05. 
+- Significance level .mono[=] tolerance for Type I error.
+
+---
+# Hypothesis Testing
+
+Reject H.sub[0] if $\left| z \right| =\left| \dfrac{\hat{\mu} - \mu_0}{\mathop{\text{sd}}(\hat{\mu})} \right| > 1.96$.
+
+```{r, echo = F, dev = "svg", fig.height = 3.75}
+df <- tibble(
+    x = seq(-4,4, by = 0.01),
+    y = dnorm(seq(-4,4, by = 0.01))
+)
+crit <- qnorm(c(.025,.975))
+tail_left <- rbind(c(crit[1],0), subset(df, x < crit[1]))
+tail_right <- rbind(c(crit[2],0), subset(df, x > crit[2]), c(3,0))
+ggplot() +
+  scale_x_continuous(limits = c(-4, 4), expand=c(0,0), breaks = c(-1.96, 0, 1.96), labels = c(TeX("$\\mu_0 - 1.96 \\, s.d.$"), TeX("$\\mu_0$"), TeX("$\\mu_0 + 1.96 \\, sd$"))) +
+  scale_y_continuous(limits = c(0, 0.5), expand=c(0,0), breaks = c(0, 0.5), labels = c(0, 0.5)) +
+  geom_polygon(data = df, aes(x, y), fill = "grey85") +
+  geom_polygon(data = tail_left, aes(x=x, y=y), fill = red_pink) +
+  geom_polygon(data = tail_right, aes(x=x, y=y), fill = red_pink) +
+  geom_polygon(data = df %>% filter(x <= qnorm(1 - 0.975) & x >= qnorm(0.975)), aes(x, y), fill = red_pink) +
+  geom_vline(xintercept = qnorm(0.975), size = 0.35, linetype = "dashed", color = met_slate) +
+  geom_vline(xintercept = qnorm(1 - 0.975), size = 0.35, linetype = "dashed", color = met_slate) +
+  theme_simple +
+  xlab("") + 
+  ylab("") + theme(axis.text.y = element_blank(), axis.line.y = element_blank())
+```
+
+What happens to $z$ as $\left| \hat{\mu} - \mu_0 \right|$ increases? 
+
+What happens to $z$ as $\mathop{\text{sd}}(\hat{\mu})$ increases?
+
+---
+# Hypothesis Testing
+
+The formula for the $z$ statistic assumes that we know $\mathop{\text{sd}}(\hat{\mu})$.
+
+- In practice, we don't know $\mathop{\text{sd}}(\hat{\mu})$, so we have to estimate it.
+
+--
+
+If the variance of $X$ is $\sigma^2$, then 
+
+$$\sigma^2_{\hat{\mu}} = \dfrac{\sigma^2}{n}.$$
+
+- We can estimate $\sigma^2$ with the sample variance $S_{X}^2$.
+
+--
+
+The sample variance of the sample mean is
+ 
+$$S_{\hat{\mu}}^2 = \dfrac{1}{n(n-1)} \sum_{i=1}^n (X_i - \bar{X})^2.$$
+
+---
+# Hypothesis Testing
+
+The .hi[standard error] of $\hat{\mu}$ is the square root of $S_{\hat{\mu}}^2$:
+
+$$\mathop{\text{SE}}(\hat{\mu}) = \sqrt{ \dfrac{1}{n(n-1)} \sum_{i=1}^n (X_i - \bar{X})^2}.$$
+
+- Standard error = sample standard deviation of an estimator.
+
+--
+
+When we use $\mathop{\text{SE}}(\hat{\mu})$ in place of $\mathop{\text{sd}}(\hat{\mu})$, the $z$ statistic becomes a $t$ statistic:
+
+$$t = \dfrac{\hat{\mu} - \mu_0}{\mathop{\text{SE}}(\hat{\mu})}.$$
+
+- Unlike the standard deviation of $\hat{\mu}$, $\mathop{\text{SE}}(\hat{\mu})$ varies from sample to sample.
+- **Consequence:** $t$ statistics do not necessarily have a normal distribution.
+
+---
+# Hypothesis Testing
+
+## .hi-green[Normal distribution] vs. .hi-purple[t distribution]
+
+- A normal distribution has the same shape for any sample size.
+- The shape of the t distribution depends the **degrees of freedom**.
+
+```{r, echo = F, dev = "svg", fig.height = 3.5}
+n <- 5
+df <- tibble(
+    x = seq(-4,4, by = 0.01),
+    y = dt(seq(-4,4, by = 0.01), n),
+    y_norm = dnorm(seq(-4,4, by = 0.01))
+)
+crit <- qt(c(.025,.975), n)
+tail_left <- rbind(c(crit[1],0), subset(df, x < crit[1]))
+tail_right <- rbind(c(crit[2],0), subset(df, x > crit[2]), c(3,0))
+ggplot() +
+  scale_x_continuous(limits = c(-4, 4), expand=c(0,0)) +
+  scale_y_continuous(limits = c(0, 0.5), expand=c(0,0), breaks = c(0, 0.5), labels = c(0, 0.5)) +
+  geom_line(data = df, aes(x, y), color = "#9370DB", size = 1) +
+  geom_line(data = df, aes(x, y_norm), color = "#007935", size = 1) +
+  # geom_polygon(data = tail_left, aes(x=x, y=y), fill = red_pink) +
+  # geom_polygon(data = tail_right, aes(x=x, y=y), fill = red_pink) +
+  # geom_polygon(data = df %>% filter(x <= qt(1 - 0.975, n) & x >= qt(0.975, n)), aes(x, y), fill = red_pink) +
+  geom_vline(xintercept = qt(0.975, n), size = 0.35, linetype = "dashed", color = "#9370DB") +
+  geom_vline(xintercept = qt(1 - 0.975, n), size = 0.35, linetype = "dashed", color = "#9370DB") +
+  geom_vline(xintercept = -1.96, size = 0.35, linetype = "dashed", color = "#007935") +
+  geom_vline(xintercept = 1.96, size = 0.35, linetype = "dashed", color = "#007935") +
+  theme_simple +
+  xlab("") + 
+  ylab("") + theme(axis.text.y = element_blank(), axis.line.y = element_blank())
+```
+
+- Degrees of freedom .mono[=] 5.
+
+---
+count: false
+
+# Hypothesis Testing
+
+## .hi-green[Normal distribution] vs. .hi-purple[t distribution]
+
+- A normal distribution has the same shape for any sample size.
+- The shape of the t distribution depends the **degrees of freedom**.
+
+```{r, echo = F, dev = "svg", fig.height = 3.5}
+n <- 50
+df <- tibble(
+    x = seq(-4,4, by = 0.01),
+    y = dt(seq(-4,4, by = 0.01), n),
+    y_norm = dnorm(seq(-4,4, by = 0.01))
+)
+crit <- qt(c(.025,.975), n)
+tail_left <- rbind(c(crit[1],0), subset(df, x < crit[1]))
+tail_right <- rbind(c(crit[2],0), subset(df, x > crit[2]), c(3,0))
+ggplot() +
+  scale_x_continuous(limits = c(-4, 4), expand=c(0,0)) +
+  scale_y_continuous(limits = c(0, 0.5), expand=c(0,0), breaks = c(0, 0.5), labels = c(0, 0.5)) +
+  geom_line(data = df, aes(x, y), color = "#9370DB", size = 1) +
+  geom_line(data = df, aes(x, y_norm), color = "#007935", size = 1) +
+  # geom_polygon(data = tail_left, aes(x=x, y=y), fill = red_pink) +
+  # geom_polygon(data = tail_right, aes(x=x, y=y), fill = red_pink) +
+  # geom_polygon(data = df %>% filter(x <= qt(1 - 0.975, n) & x >= qt(0.975, n)), aes(x, y), fill = red_pink) +
+  geom_vline(xintercept = qt(0.975, n), size = 0.35, linetype = "dashed", color = "#9370DB") +
+  geom_vline(xintercept = qt(1 - 0.975, n), size = 0.35, linetype = "dashed", color = "#9370DB") +
+  geom_vline(xintercept = -1.96, size = 0.35, linetype = "dashed", color = "#007935") +
+  geom_vline(xintercept = 1.96, size = 0.35, linetype = "dashed", color = "#007935") +
+  theme_simple +
+  xlab("") + 
+  ylab("") + theme(axis.text.y = element_blank(), axis.line.y = element_blank())
+```
+
+- Degrees of freedom .mono[=] 50.
+
+---
+count: false
+
+# Hypothesis Testing
+
+## .hi-green[Normal distribution] vs. .hi-purple[t distribution]
+
+- A normal distribution has the same shape for any sample size.
+- The shape of the t distribution depends the **degrees of freedom**.
+
+```{r, echo = F, dev = "svg", fig.height = 3.5}
+n <- 500
+df <- tibble(
+    x = seq(-4,4, by = 0.01),
+    y = dt(seq(-4,4, by = 0.01), n),
+    y_norm = dnorm(seq(-4,4, by = 0.01))
+)
+crit <- qt(c(.025,.975), n)
+tail_left <- rbind(c(crit[1],0), subset(df, x < crit[1]))
+tail_right <- rbind(c(crit[2],0), subset(df, x > crit[2]), c(3,0))
+ggplot() +
+  scale_x_continuous(limits = c(-4, 4), expand=c(0,0)) +
+  scale_y_continuous(limits = c(0, 0.5), expand=c(0,0), breaks = c(0, 0.5), labels = c(0, 0.5)) +
+  geom_line(data = df, aes(x, y), color = "#9370DB", size = 1) +
+  geom_line(data = df, aes(x, y_norm), color = "#007935", size = 1) +
+  # geom_polygon(data = tail_left, aes(x=x, y=y), fill = red_pink) +
+  # geom_polygon(data = tail_right, aes(x=x, y=y), fill = red_pink) +
+  # geom_polygon(data = df %>% filter(x <= qt(1 - 0.975, n) & x >= qt(0.975, n)), aes(x, y), fill = red_pink) +
+  geom_vline(xintercept = qt(0.975, n), size = 0.35, linetype = "dashed", color = "#9370DB") +
+  geom_vline(xintercept = qt(1 - 0.975, n), size = 0.35, linetype = "dashed", color = "#9370DB") +
+  geom_vline(xintercept = -1.96, size = 0.35, linetype = "dashed", color = "#007935") +
+  geom_vline(xintercept = 1.96, size = 0.35, linetype = "dashed", color = "#007935") +
+  theme_simple +
+  xlab("") + 
+  ylab("") + theme(axis.text.y = element_blank(), axis.line.y = element_blank())
+```
+
+- Degrees of freedom .mono[=] 500.
+
+---
+# Hypothesis Testing
+
+## **t Tests** (two-sided)
+
+To conduct a t test, compare the $t$ statistic to the appropriate .hi[critical value] of the t distribution.
+
+- To find the critical value in a t table, we need the degrees of freedom and the significance level $\alpha$.
+
+Reject H.sub[0] at the $\alpha \cdot 100$-percent level if 
+
+$$\left| t \right| = \left| \dfrac{\hat{\mu} - \mu_0}{\mathop{\text{SE}}(\hat{\mu})} \right| > t_\text{crit}.$$
+
+---
+# Hypothesis Testing
+
+## On Your Own
+
+As the term progresses, we will encounter additional flavors of hypothesis testing and other related concepts.
+
+You may find it helpful to review the following topics from Math 243:
+
+- Confidence intervals
+- One-sided $t$ tests
+- $p$ values
+
+---
+class: inverse, middle
+
+# Working with Data
+
+---
+# Data
+
+## Experimental data
+
+Data generated in controlled, laboratory settings.
+
+--
+
+Ideal for __causal identification__, but difficult to obtain in the social sciences.
+
+- Intractable logistical problems
+- Too expensive
+- Morally repugnant
+
+--
+
+Experiments outside the lab: __randomized control trials__ and __A/B testing__.
+
+---
+# Data
+
+## Observational data
+
+Data generated in non-experimental settings.
+
+--
+
+- Surveys
+- Censuses
+- Administrative records
+- Environmental data
+- Financial and sales transactions
+- Social media
+
+--
+
+Mainstay of economic research, but __poses challenges__ to causal identification.
+
+---
+# Tidy Data
+
+.more-left[
+
+```{r, echo=FALSE}
+data(murders)
+murders <- select(murders, state, population, total)
+DT::datatable(
+  murders,
+  colnames = c('<span style="color: #007935 !important">State</span>', '<span style="color: #007935 !important">Population</span>', '<span style="color: #007935 !important">Murders</span>'),
+  fillContainer = FALSE, options = list(pageLength = 6, lengthChange = FALSE, pagingType = "simple"), escape = FALSE) %>%
+  DT::formatStyle('state', color = '#9370DB') %>%
+  DT::formatStyle('population', color = '#9370DB') %>%
+  DT::formatStyle('total', color = '#9370DB') %>%
+  DT::formatStyle(0, color = '#FD5F00')
+```
+
+]
+
+.less-right[
+
+.hi-orange[Rows] represent .hi-orange[observations].
+
+.hi-green[Columns] represent .hi-green[variables].
+
+Each .hi-purple[value] is associated with an .hi-orange[observation] and a .hi-green[variable].
+
+]
+
+---
+# Cross Sectional Data
+
+.hi-purple[Sample of individuals from a population at a point in time.]
+
+Ideally, collected using __random sampling__.
+
+- Random sampling .mono[+] sufficient sample size .mono[=] representative sample.
+
+- Random sampling simplifies data analysis, but non-random samples are common (and difficult to work with).
+
+Used extensively in applied microeconomics.<sup>*</sup>
+
+__Main focus of this course.__
+
+.footnote[
+<sup>*</sup> Applied microeconomics .mono[=] Labor, health, education, public finance, development, industrial organization, and urban economics.
+]
+
+---
+# Time Series Data
+
+.hi-purple[Observations of variables over time.]
+
+- Quarterly US GDP
+- Annual US infant mortality rates
+- Daily Amazon stock prices
+
+Complication: Observations are not independent draws.
+
+- GDP this quarter highly related to GDP last quarter.
+
+Used extensively in empirical macroeconomics.
+
+Requires more-advanced methods (EC 421 and EC 422).
+
+---
+# Pooled Cross Sectional Data
+
+.hi-purple[Cross sections from different points in time.]
+
+Useful for studying policy changes and relationship that change over time.
+
+Requires more-advanced methods (EC 421 and many 400-level applied micro classes).
+
+---
+# Panel or Longitudinal Data
+
+.hi-purple[Time series for each cross-sectional unit.]
+
+- Example: daily attendance data for a sample of students.
+
+Difficult to collect, but useful for causal identification.
+
+- Can control for _unobserved_ characteristics.
+
+Requires more-advanced methods (EC 421 and many 400-level applied micro classes).
+
+---
+# Messy Data
+
+**Analysis-ready datasets are rare.** Most data are "messy."
+
+The focus of this class is data analysis, but .hi[data wrangling] is a non-trivial part of a data scientist/analyst's job.
+
+.mono[R] has a suite of packages that facilitate data wrangling. 
+
+- `readr`, `tidyr`, `dplyr`, `ggplot2` .mono[+] others.
+
+- Known collectively as the `tidyverse`.
+
+---
+# .mono[tidyverse]
+
+## The [`tidyverse`](https://www.tidyverse.org): A package of packages
+
+`readr`: Functions to import data.
+
+`tidyr`: Functions to reshape messy data.
+
+`dplyr`: Functions to work with data.
+
+`ggplot2`: Functions to visualize data.
+
+---
+# Workflow
+
+- Step 1: Load packages with `pacman`
+
+- Step 2: Import data with `readr`
+
+- Step 3: Reshape data with `tidyr`
+
+- Step 4: Manipulate data with `dplyr`
+
+- Step 5: Visualize and analyze data with `ggplot2`
+
+---
+# Why Bother?
+
+**Q:** Why not just use .mono[.hi-green[MS Excel]] for data wrangling?
+
+--
+
+**A:** .hi[Reproducibility]
+
+- Easier to retrace your steps with .mono[R].
+
+--
+
+**A:** .hi[Portability]
+
+- Easy to re-purpose .mono[R] code for new projects.
+
+--
+
+**A:** .hi[Scalability]
+
+- .mono[Excel] chokes on big datasets.
+
+--
+
+**A:** .hi[.mono[R] Saves time] (eventually)
+
+- Lower marginal costs in exchange for higher fixed costs.
+
+---
+
+```{R generate pdfs, include = F, eval = F}
+#remotes::install_github('rstudio/pagedown')
+library(pagedown)
+pagedown::chrome_print("03-Review.html", output = "03-Review.pdf")
+```

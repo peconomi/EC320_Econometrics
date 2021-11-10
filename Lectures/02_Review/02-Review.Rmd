@@ -1064,3 +1064,12 @@ $$
 - If $X$ and $Y$ are uncorrelated, then $\mathop{\text{Var}} (X + Y) = \mathop{\text{Var}}(X) + \mathop{\text{Var}}(Y)$
 
 - If $X$ and $Y$ are uncorrelated, then $\mathop{\text{Var}} (X - Y) = \mathop{\text{Var}}(X) + \mathop{\text{Var}}(Y)$
+
+
+---
+
+```{R generate pdfs, include = F, eval = F}
+#remotes::install_github('rstudio/pagedown')
+library(pagedown)
+pagedown::chrome_print("02-Review.html", output = "02-Review.pdf")
+```
