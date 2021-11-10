@@ -13,13 +13,13 @@ This course introduces the statistical techniques that help economists learn abo
 
 The HTML versions of the lecture slides allow you to view animations and interactive features, provided that you have an internet connection. The PDF slides don't require an internet connection, but they cannot display the animations or interactive features.
 
-1. **What is Econometrics?** <br> [.html]() | [.pdf]()
+1. **What is Econometrics?** <br> [.html](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/01_Intro/01-Introduction.html) | [.pdf](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/01_Intro/01-Introduction.pdf)
 
-2. **Statistics Review I** <br> [.html]() | [.pdf]()
+2. **Statistics Review I** <br> [.html](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/02_Review/02-Review.html) | [.pdf](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/02_Review/02-Review.pdf)
 
-3. **Statistics Review II** <br> [.html]() | [.pdf]()
+3. **Statistics Review II** <br> [.html](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/03_Review/03-Review.html) | [.pdf](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/03_Review/03-Review.pdf)
 
-4. **The Fundamental Problem of Econometrics** <br> [.html]() | [.pdf]()
+4. **The Fundamental Problem of Econometrics** <br> [.html](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/04_Fundamental_Problem/04-Fun_Problem.html) | [.pdf](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/04_Fundamental_Problem/04-Fun_Problem.pdf)
 
 5. **Regression Logic** <br> [.html]() | [.pdf]()
 
