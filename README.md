@@ -1,6 +1,6 @@
 # Introduction to Econometrics <img align="right" height="45" src="UO.png">
 
-Welcome to EC 320: Introduction to Econometrics (Winter 2021) at the University of Oregon.
+Welcome to EC 320: Introduction to Econometrics (Winter 2022) at the University of Oregon.
 
 - Instructor: [Philip Economides](https://philip-economides.com/)
 - GE (): 
