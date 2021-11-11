@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Regression Logic</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Philip Economides" />
+    <link href="05-Regression_files/remark-css/default.css" rel="stylesheet" />
+    <link href="05-Regression_files/remark-css/metropolis.css" rel="stylesheet" />
+    <link href="05-Regression_files/remark-css/metropolis-fonts.css" rel="stylesheet" />
+    <script src="05-Regression_files/kePrint/kePrint.js"></script>
+    <link href="05-Regression_files/lightable/lightable.css" rel="stylesheet" />
+    <link rel="stylesheet" href="my-css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Regression Logic
+## EC 320: Introduction to Econometrics
+### Philip Economides
+### Winter 2022
+
+---
+
+class: inverse, middle
+
+
+
+# Prologue
+
+---
+# Housekeeping
+
+**Problem Set 2 due 01/24**, which will address review content, fundamental thoughts and today's content. 
+
+First computational portion of problem sets, so make sure you've got **R** working **before Monday**.
+
+--
+
+.hi-pink[So far] we've identified the fundamental problem econometricians face. How do we proceed? **Regressions**
+
+--
+
+- Running models
+
+- Confounders
+
+- Omitted Variable Bias
+
+---
+class: inverse, middle
+
+# Regression Logic
+
+---
+# Regression
+
+Modeling is about reducing something really complicated into something simple that still represents some part of the complicated reality.
+
+- It’s about telling stories that are easy to understand, and thus, easy to learn from
+
+Economists often rely on .hi-pink[(linear) regression] for statistical comparisons.
+
+- *"Linear"* is more flexible than you think
+
+- Describes the relationship between a dependent (endogenous) variable and one or more explanatory (exogenous) variable(s)
+
+We will focus on the .hi-slate[simple univariate] case today.
+
+---
+
+# Regression
+
+&lt;br&gt;
+
+Regression analysis helps us make *all else equal* comparisons.
+
+- We can model the effect of `\(X\)` on `\(Y\)` while .hi[controlling] .pink[for potential confounders].
+- Forces us to be explicit about the potential sources of selection bias.
+- Failure to control for confounding variables leads to .hi[omitted-variable bias], a close cousin of selection bias
+- Why? The omitted variable, correlated with our covariate of interest, is sitting inside the error term causing chaos
+
+---
+# Returns to Private College
+
+&lt;br&gt;
+
+**Research Question:** Does going to a private college instead of a public college increase future earnings?
+
+- **Outcome variable:** earnings
+- **Treatment variable:** going to a private college (binary)
+
+--
+
+**Q:** How might a private school education increase earnings?
+
+--
+
+**Q:** Does a comparison of the average earnings of private college graduates with those of public school graduates .pink[isolate the economic returns to private college education]? Why or why not?
+
+---
+# Returns to Private College
+
+**How might we estimate the causal effect of private college on earnings?**
+
+**Approach 1:** Compare average earnings of private college graduates with those of public college graduates.
+
+- Prone to selection bias.
+
+**Approach 2:** Use a matching estimator that compares the earnings of individuals the same admissions profiles.
+
+- Cleaner comparison than a simple difference-in-means.
+- Somewhat difficult to implement.
+- Throws away data (inefficient).
+
+**Approach 3:** Estimate a regression that compares the earnings of individuals with the same admissions profiles.
+
+&lt;!-- --- --&gt;
+&lt;!-- # Difference-in-Means, Take 2 --&gt;
+
+&lt;!-- ## Example: Returns to private college --&gt;
+
+&lt;!-- show same data with groupings based on application profile; what are the differences/similarities within/across groups?; calculate within-group diff-in-means; take average of these (unweighted, then weighted); show and discuss causal diagram --&gt;
+
+&lt;!-- --- --&gt;
+&lt;!-- # Difference-in-Means, Regression style --&gt;
+
+&lt;!-- ## Example: Returns to private college --&gt;
+
+&lt;!-- write pop model, describe coefficients and regression lingo; hand wave about OLS and estimated pop model; run regression of example data --&gt;
+
+---
+# The Regression Model
+
+We can estimate the effect of `\(X\)` on `\(Y\)` by estimating a .hi[regression model]:
+
+`$$Y_i = \beta_0 + \beta_1 X_i + u_i$$`
+
+- `\(Y_i\)` is the outcome variable.
+
+--
+
+- `\(X_i\)` is the treatment variable (continuous).
+
+--
+
+- `\(\beta_0\)` is the **intercept** parameter. `\(\mathop{\mathbb{E}}\left[ {Y_i | X_i=0} \right] = \beta_0\)`
+
+--
+
+- `\(\beta_1\)` is the **slope** parameter, which under the correct causal setting represents marginal change in `\(X_i\)`'s effect on `\(Y_i\)`. `\(\frac{\partial Y_i}{\partial X_i} = \beta_1\)`
+
+
+--
+
+- `\(u_i\)` is an error (disturbance) term that includes all other (omitted) factors affecting `\(Y_i\)`.
+
+---
+
+# The Error term
+
+&lt;br&gt;
+
+`\(u_i\)` is quite special. If we consider the data generating process of variable `\(Y_i\)`, `\(u_i\)` captures all the unobserved variables that explain variation in `\(Y_i\)`. 
+
+- Always some error to our models, we just aim for it to be small relative to the challenge we face
+
+- Some aspects of the observed data that was collected may also have been inputted correctly (measurement error)
+
+The error term is the price we are willing to accept for a more simplified model. 
+
+---
+
+# Running Regressions
+
+The intercept and slope are population parameters.
+
+Using an estimator with data on `\(X_i\)` and `\(Y_i\)`, we can estimate a .hi[fitted regression line]:
+
+`$$\hat{Y_i} = \hat{\beta}_0 + \hat{\beta}_1 X_i$$`
+
+- `\(\hat{Y_i}\)` is the **fitted value** of `\(Y_i\)`.
+
+- `\(\hat{\beta}_0\)` is the **estimated intercept**.
+
+- `\(\hat{\beta}_1\)` is the **estimated slope**.
+
+--
+
+The estimation procedure produces misses called .hi[residuals], defined as `\(Y_i - \hat{Y_i}\)`.
+
+---
+# Running Regressions
+
+&lt;br&gt;
+
+In practice, we estimate the regression coefficients using an estimator called .hi[Ordinary Least Squares] (OLS).
+
+- Picks estimates that make `\(\hat{Y_i}\)` as close as possible to `\(Y_i\)` given the information we have on `\(X\)` and `\(Y\)`.
+
+- The sum of squared residuals, `\(\sum_{i=1}^n (Y_i - \hat{Y_i})^2\)`, gives us an idea of how accurate our model is. 
+
+- .hi[OLS] minimizes this sum. 
+ 
+- We will dive into the details next class.
+
+---
+# Running Regressions
+
+OLS picks `\(\hat{\beta}_0\)` and `\(\hat{\beta}_1\)` that trace out the line of best fit. Ideally, we wound like to interpret the slope of the line as the causal effect of `\(X\)` on `\(Y\)`.
+
+
+
+&lt;img src="05-Regression_files/figure-html/unnamed-chunk-2-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Confounders
+
+However, the data are grouped by a third variable `\(W\)`. How would omitting `\(W\)` from the regression model affect the slope estimator?
+
+&lt;img src="05-Regression_files/figure-html/unnamed-chunk-3-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Confounders
+
+The problem with `\(W\)` is that it affects both `\(Y\)` and `\(X\)`. Without adjusting for `\(W\)`, we cannot isolate the causal effect of `\(X\)` on `\(Y\)`.
+
+&lt;img src="05-Regression_files/figure-html/unnamed-chunk-4-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Controlling for Confounders
+
+We can control for `\(W\)` by specifying it in the regression model:
+
+`$$Y_i = \beta_0 + \beta_1 X_i + \beta_2 W_i + u_i$$`
+
+- `\(W_i\)` is a **control variable**.
+
+- By including `\(W_i\)` in the regression, we can use OLS can difference out the confounding effect of `\(W\)`.
+
+- **Note:** OLS doesn't care whether a right-hand side variable is a treatment or control variable, but we do.
+
+---
+# Controlling for Confounders
+
+
+
+.center[![Control](control.gif)]
+
+---
+# Controlling for Confounders
+
+Controlling for `\(W\)` "adjusts" the data by **differencing out** the group-specific means of `\(X\)` and `\(Y\)`. .hi-purple[Slope of the estimated regression line changes!]
+
+&lt;img src="05-Regression_files/figure-html/unnamed-chunk-6-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Controlling for Confounders
+
+Can we interpret the estimated slope parameter as the causal effect of `\(X\)` on `\(Y\)` now that we've adjusted for `\(W\)`?
+
+&lt;img src="05-Regression_files/figure-html/unnamed-chunk-7-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Controlling for Confounders
+
+## Example: Returns to schooling
+
+Last class:
+
+&gt; **Q:** Could we simply compare the earnings those with more education to those with less?
+&gt; &lt;br&gt; **A:** If we want to measure the causal effect, probably not.
+
+.hi-green[What omitted variables should we worry about?]
+
+---
+# Controlling for Confounders
+
+## Example: Returns to schooling
+
+Three regressions ***of*** wages ***on*** schooling.
+
+&lt;table&gt;
+&lt;caption&gt;Outcome variable: log(Wage)&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Explanatory variable &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; 1 &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; 2 &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; 3 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #272822 !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Intercept &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;font-weight: bold;"&gt; 5.571 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;"&gt; 5.581 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;"&gt; 5.695 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #272822 !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (0.039) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.066) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.068) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #272822 !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Education &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;font-weight: bold;"&gt; 0.052 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;"&gt; 0.026 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;"&gt; 0.027 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #272822 !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (0.003) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.005) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.005) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #272822 !important;line-height: 110%;font-style: italic;color: black !important;"&gt; IQ Score &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;font-weight: bold;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;"&gt; 0.004 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;"&gt; 0.003 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #272822 !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.001) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.001) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #272822 !important;line-height: 110%;font-style: italic;color: black !important;"&gt; South &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;font-weight: bold;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;"&gt; -0.127 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #272822 !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.019) &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+count: false
+
+# Controlling for Confounders
+
+## Example: Returns to schooling
+
+Three regressions ***of*** wages ***on*** schooling.
+
+&lt;table&gt;
+&lt;caption&gt;Outcome variable: log(Wage)&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Explanatory variable &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; 1 &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; 2 &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; 3 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #272822 !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Intercept &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;"&gt; 5.571 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;font-weight: bold;"&gt; 5.581 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;"&gt; 5.695 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #272822 !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.039) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (0.066) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.068) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #272822 !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Education &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;"&gt; 0.052 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;font-weight: bold;"&gt; 0.026 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;"&gt; 0.027 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #272822 !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.003) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (0.005) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.005) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #272822 !important;line-height: 110%;font-style: italic;color: black !important;"&gt; IQ Score &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;font-weight: bold;"&gt; 0.004 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;"&gt; 0.003 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #272822 !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (0.001) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.001) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #272822 !important;line-height: 110%;font-style: italic;color: black !important;"&gt; South &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;font-weight: bold;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;"&gt; -0.127 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #272822 !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.019) &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+count: false
+
+# Controlling for Confounders
+
+## Example: Returns to schooling
+
+Three regressions ***of*** wages ***on*** schooling.
+
+&lt;table&gt;
+&lt;caption&gt;Outcome variable: log(Wage)&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Explanatory variable &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; 1 &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; 2 &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; 3 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #272822 !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Intercept &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;"&gt; 5.571 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;"&gt; 5.581 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;font-weight: bold;"&gt; 5.695 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #272822 !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.039) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.066) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (0.068) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #272822 !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Education &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;"&gt; 0.052 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;"&gt; 0.026 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;font-weight: bold;"&gt; 0.027 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #272822 !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.003) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.005) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (0.005) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #272822 !important;line-height: 110%;font-style: italic;color: black !important;"&gt; IQ Score &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;"&gt; 0.004 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;font-weight: bold;"&gt; 0.003 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #272822 !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.001) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (0.001) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #272822 !important;line-height: 110%;font-style: italic;color: black !important;"&gt; South &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;line-height: 110%;font-weight: bold;"&gt; -0.127 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #272822 !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #272822 !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (0.019) &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+# Omitted-Variable Bias
+
+The presence of omitted-variable bias (OVB) precludes causal interpretation of our slope estimates.
+
+We can back out the sign and magnitude of OVB by subtracting the .pink[slope estimate from a ***long*** regression] from the .purple[slope estimate from a ***short*** regression]:
+
+`$$\text{OVB} = \color{#9370DB}{\hat{\beta}_1^{\text{Short}}} - \color{#e64173}{\hat{\beta}_1^{\text{Long}}}$$`
+
+--
+
+__Dealing with potential sources of OVB is one of the main objectives of econometric analysis!__
+
+&lt;!-- Find example RCT data and run through R example w/ diff-in-means and regression --&gt;
+
+&lt;!-- https://www.povertyactionlab.org/evaluation/summer-jobs-reduce-violence-among-disadvantaged-youth-united-states --&gt;
+
+---
+
+# OVB vs. Irrelevant Variables
+
+&lt;br&gt;
+
+So if we risk bias as a result of excluding a variable, why not throw every possible variable and transformation of variables (log-linearized, squared, inverted) at the model?
+
+- Time consuming
+
+- Data not always available
+
+- Irrelevant variables actually make matters **worse**
+
+---
+
+# OVB vs. Irrelevant Variables
+
+How can more variables cause trouble? .hi-pink[Loss of efficiency] in estimator while still unbiased. 
+
+- This is the classic .hi-pink[multicollinearity] problem
+
+- If an irrelevant variable is highly correlated with your explanatory variable of interest, the standard error will increase
+
+- Inference of the coefficient's significance becomes muddled by higher standard error term
+
+- More details on what this looks like statistically next week
+
+---
+
+# Summary
+
+.hi-orange[What to remember]
+
+- Regressions are models of how we imagine the data generating process plays out
+
+- They are usually simplifications of real life observations
+
+- A linear regression fits a line through the data to reveal the relationship between treatment and outcome
+
+- Confounders, omitted variables and irrelevant variables all pose risks to the identification challenge involved in estimating a population parameter of interest in our regression model
+
+- OLS is the most common algoritm for estimating regressions, and that is what our next lecture will focus on
+
+
+---
+
+exclude: true
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
