@@ -4,6 +4,7 @@
     <title>Regression Logic</title>
     <meta charset="utf-8" />
     <meta name="author" content="Philip Economides" />
+    <script src="05-Regression_files/header-attrs/header-attrs.js"></script>
     <link href="05-Regression_files/remark-css/default.css" rel="stylesheet" />
     <link href="05-Regression_files/remark-css/metropolis.css" rel="stylesheet" />
     <link href="05-Regression_files/remark-css/metropolis-fonts.css" rel="stylesheet" />
@@ -243,8 +244,6 @@ We can control for `\(W\)` by specifying it in the regression model:
 ---
 # Controlling for Confounders
 
-
-
 .center[![Control](control.gif)]
 
 ---
@@ -252,14 +251,14 @@ We can control for `\(W\)` by specifying it in the regression model:
 
 Controlling for `\(W\)` "adjusts" the data by **differencing out** the group-specific means of `\(X\)` and `\(Y\)`. .hi-purple[Slope of the estimated regression line changes!]
 
-&lt;img src="05-Regression_files/figure-html/unnamed-chunk-6-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="05-Regression_files/figure-html/unnamed-chunk-5-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 # Controlling for Confounders
 
 Can we interpret the estimated slope parameter as the causal effect of `\(X\)` on `\(Y\)` now that we've adjusted for `\(W\)`?
 
-&lt;img src="05-Regression_files/figure-html/unnamed-chunk-7-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="05-Regression_files/figure-html/unnamed-chunk-6-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 # Controlling for Confounders
@@ -550,6 +549,12 @@ How can more variables cause trouble? .hi-pink[Loss of efficiency] in estimator 
 ---
 
 exclude: true
+
+
+
+
+
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
