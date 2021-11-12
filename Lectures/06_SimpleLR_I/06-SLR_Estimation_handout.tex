@@ -1,0 +1,239 @@
+% !TEX program = XeLaTex
+\documentclass[12pt]{exam}
+\usepackage[margin=1in]{geometry}
+
+\RequirePackage{amssymb, amsfonts, amsmath, latexsym, verbatim, xspace, setspace, blindtext, graphicx, caption, enumerate, titling, textcomp, float, array, dcolumn}
+
+\usepackage{setspace, titling}
+\newcommand{\subtitle}[1]{%
+	\posttitle{%
+		\par\end{center}
+	\begin{center}\large#1\end{center}
+	\vskip0.5em}%
+}
+
+%% FONTS
+\usepackage{fontspec}
+% See: https://tex.stackexchange.com/a/50593
+\setmainfont[
+BoldFont       = FiraSans-SemiBold.otf,
+ItalicFont     = FiraSans-Italic.otf,
+BoldItalicFont = FiraSans-SemiBoldItalic.otf
+]{FiraSans-Regular.otf} %
+\setmonofont[
+BoldFont       = FiraCode-Bold.ttf
+]{FiraCode-Regular.ttf}
+%\textsc{\setmathfont(Greek){FiraSans-Italic.otf}
+%\setmathfont(Latin,Digits){FiraMath-Regular.otf}}
+\usepackage[mathrm=sym]{unicode-math}
+\setmathfont{Fira Math}
+\usepackage{marvosym} % For cool symbols.
+\usepackage{fontawesome} % Ditto
+%\usepackage{libertine}
+
+\usepackage[normalem]{ulem} %% For strikeout font: \sout()
+
+\usepackage[dvipsnames]{xcolor}
+\definecolor{uo_green}{HTML}{154733}
+\definecolor{forest_green}{HTML}{006241}
+\definecolor{pine_green}{HTML}{007935}
+\definecolor{grass_green}{HTML}{62A70F}
+\definecolor{golden_yellow}{HTML}{FFD200}
+\definecolor{cool_gray}{HTML}{54565B}
+\definecolor{light_cool_gray}{HTML}{A8A8AA}
+
+\usepackage{listings}
+\lstset{language=R,
+basicstyle=\small\ttfamily,
+stringstyle=\color{cool_gray},
+otherkeywords={0,1,2,3,4,5,6,7,8,9},
+morekeywords={TRUE,FALSE},
+deletekeywords={data,frame,length,as,character,},
+keywordstyle=\color{cool_gray},
+commentstyle=\color{pine_green},
+}
+
+\usepackage[colorlinks = true,
+linkcolor = pine_green,
+urlcolor  = pine_green,
+citecolor = pine_green,
+anchorcolor = black]{hyperref}
+\usepackage{graphicx}
+
+% For table formatting:
+\usepackage{array, booktabs, caption, siunitx}
+\newcommand{\ra}[1]{\renewcommand{\arraystretch}{#1}}
+\newcolumntype{d}[1]{D{.}{.}{#1}}
+
+% Class and assignment info
+
+\newcommand{\class}{\textbf{Introduction to Econometrics} [EC 320]}
+\newcommand{\assignment}{OLS Derivation}
+\newcommand{\instructor}{Instructor: Kyle Raze}
+\newcommand{\institution}{University of Oregon}
+\newcommand{\department}{Department of Economics}
+
+%------------------------------------------------------------------%
+
+\title{\texttt{\textbf{\assignment}} \\ \texttt{\class}}
+\author{\text{\instructor} \\ \text{\institution} \\ \text{\department}}
+\date{}
+
+%------------------------------------------------------------------%
+
+\begin{document}
+
+\maketitle
+
+\subsection*{Getting started}
+
+\noindent Our simple linear regression model is
+
+$$Y_i = \beta_1 + \beta_2 X_i + u_i.$$
+
+\noindent We can decompose $Y_i$ into estimated components:
+
+$$Y_i = \hat{\beta}_1 + \hat{\beta}_2 X_i + \hat{u}_i.$$
+
+\noindent Thus, for any regression coefficients $\hat{\beta}_1$ and $\hat{\beta}_2$ we obtain estimates of $u_i$ called residuals ($\hat{u}_i$). Residuals are the ``errors'' of the estimated regression line:
+
+$$\hat{u}_i = Y_i - \hat{\beta}_1 - \hat{\beta}_2 X_i.$$
+
+\noindent By squaring $\hat{u}_i$ and summing across $i$, we get obtain the sum of squared residuals, also known as the residual sum of squares (RSS):
+
+$$\sum_{i=1}^n \hat{u}_i^2 = \sum_{i=1}^n (Y_i - \hat{\beta}_1 - \hat{\beta}_2X_i)^2 = \text{RSS}.$$
+
+\subsection*{Objective function}
+
+\noindent Our objective is to pick the $\hat{\beta}_1$ and $\hat{\beta}_2$ that minimize the residual sum of squares:
+
+$$\underset{\hat{\beta}_1,\, \hat{\beta}_2}{\text{min}} \quad \text{RSS} = \sum_{i=1}^n (Y_i - \hat{\beta}_1 - \hat{\beta}_2X_i)^2.$$
+
+\noindent We will start by expanding the objective function and collecting like terms:
+
+\begin{align}
+\text{RSS} &= \sum_{i=1}^n (Y_i - \hat{\beta}_1 - \hat{\beta}_2X_i)^2 \\
+&= \sum_{i=1}^n (Y_i - \hat{\beta}_1 - \hat{\beta}_2X_i)(Y_i - \hat{\beta}_1 - \hat{\beta}_2X_i) \\
+& = \sum_{i=1}^n (Y_i^2 - Y_i\hat{\beta}_1 - Y_i\hat{\beta}_2X_i - \hat{\beta}_1Y_i + \hat{\beta}_1^2 + \hat{\beta}_1\hat{\beta}_2X_i - \hat{\beta}_2X_iY_i + \hat{\beta}_2X_i\hat{\beta}_1 + \hat{\beta}_2^2X_i^2) \\
+&= \sum_{i=1}^n (Y_i^2 - 2Y_i\hat{\beta}_1 - 2Y_i\hat{\beta}_2X_i + \hat{\beta}_1^2 + 2\hat{\beta}_1\hat{\beta}_2X_i  + \hat{\beta}_2^2X_i^2).
+\end{align}
+
+\subsection*{First-order conditions}
+
+\noindent Now we will find the $\hat{\beta}_1$ and $\hat{\beta}_2$ that minimize the residual sum of squares. First we need to take partial derivatives with respect to $\hat{\beta}_1$ and $\hat{\beta}_2$ and then set these derivatives equal to zero. From this we obtain our first-order conditions:
+
+\begin{align}
+\frac{\partial \text{RSS}}{\partial \hat{\beta}_1} &= \sum_{i=1}^n (-2Y_i + 2\hat{\beta}_1 + 2\hat{\beta}_2X_i) = 0 \label{foc1} \\ 
+\frac{\partial \text{RSS}}{\partial \hat{\beta}_2} &= \sum_{i=1}^n (-2Y_i X_i + 2\hat{\beta}_1X_i + 2\hat{\beta}_2X_i^2) = 0 \label{foc2}
+\end{align}
+
+\noindent The first-order conditions give us everything we need to find expressions for $\hat{\beta}_1$ and $\hat{\beta}_2$. 
+
+\subsection*{Solve for the intercept formula}
+
+\noindent We will start by solving for $\hat{\beta}_1$. From \autoref{foc1}, we can isolate the term involving $\hat{\beta}_1$ on the left hand by subtracting the other two terms from both sides:
+
+\begin{align}
+2 \sum_{i=1}^n \hat{\beta}_1 = 2 \sum_{i=1}^n Y_i - 2 \hat{\beta}_2 \sum_{i=1}^n X_i.
+\end{align}
+
+\noindent Divide by 2 to obtain
+
+\begin{align}
+\sum_{i=1}^n \hat{\beta}_1 = \sum_{i=1}^n Y_i - \hat{\beta}_2 \sum_{i=1}^n X_i. \label{midb1}
+\end{align}
+
+\noindent Notice that $\sum_{i=1}^n Y_i = n \frac{1}{n} \sum_{i=1}^n Y_i = n \bar{Y}$. Then \autoref{midb1} becomes
+
+\begin{align}
+n \hat{\beta}_1 = n \bar{Y} - \hat{\beta}_2 n \bar{X}.
+\end{align}
+
+\noindent Dividing by $n$, we obtain a simple formula for the intercept:
+
+\begin{align}
+\hat{\beta}_1 = \bar{Y} - \hat{\beta}_2 \bar{X}.
+\end{align}
+
+\subsection*{Solve for the slope formula}
+
+\noindent Next, we will solve for $\hat{\beta}_2$. From \autoref{foc2}, we have 
+
+\begin{align}
+- \sum_{i=1}^n Y_i X_i + \hat{\beta}_1 \sum_{i=1}^n X_i + \hat{\beta}_2 \sum_{i=1}^n X_i^2 = 0.
+\end{align}
+
+\noindent Now plug in the expression for $\hat{\beta}_1$:
+
+\begin{align}
+- \sum_{i=1}^n Y_i X_i + (\bar{Y} - \hat{\beta}_2 \bar{X}) \sum_{i=1}^n X_i + \hat{\beta}_2 \sum_{i=1}^n X_i^2 &= 0 \\
+- \sum_{i=1}^n Y_i X_i + \bar{Y} \sum_{i=1}^n X_i - \hat{\beta}_2 \bar{X} \sum_{i=1}^n X_i + \hat{\beta}_2 \sum_{i=1}^n X_i^2 &= 0.
+\end{align}
+
+\noindent Isolate the $\hat{\beta}_2$ terms on the left-hand side:
+
+\begin{align}
+\hat{\beta}_2 (\sum_{i=1}^n X_i^2 - \bar{X} \sum_{i=1}^n X_i) &= \sum_{i=1}^n Y_i X_i -  \bar{Y} \sum_{i=1}^n X_i.
+\end{align}
+
+\noindent Dividing both sides by $(\sum_{i=1}^n X_i^2 - \bar{X} \sum_{i=1}^n X_i)$, we obtain a formula for the slope coefficient:
+
+\begin{align}
+\hat{\beta}_2 &= \dfrac{\sum_{i=1}^n Y_i X_i -  \bar{Y} \sum_{i=1}^n X_i}{\sum_{i=1}^n X_i^2 - \bar{X} \sum_{i=1}^n X_i}.
+\end{align}
+
+\subsection*{Rearranging the slope formula}
+
+\noindent We now have an expression for $\hat{\beta}_2$ in terms of data on $X$ and $Y$, but we can rearrange terms to get a more familiar expression. To do this, we are going to ``subtract zero'' from both the numerator and the denominator of $\hat{\beta}_2$. Notice that 
+
+\begin{align}
+\sum_{i=1}^n (X_i - \bar{X}) &= \sum_{i=1}^n X_i - \sum_{i=1}^n \bar{X} \\
+							 &= \sum_{i=1}^n X_i  - n\bar{X} \\
+							 &= \sum_{i=1}^n X_i - n \frac{1}{n} \sum_{i=1}^n X_i \\
+							 &= \sum_{i=1}^n X_i - \sum_{i=1}^n X_i \\
+							 &= 0.
+\end{align}
+
+
+\noindent Using this trick, we will now subtract zero. Our choice of ``$\color{pine_green}{\text{zero}}$'' is strategic. If you have trouble following this step, you can try working backwards from the end.
+
+\begin{align}
+\hat{\beta}_2 &= \dfrac{\sum_{i=1}^n Y_i X_i -  \bar{Y} \sum_{i=1}^n X_i - \color{pine_green}{\bar{X} \sum_{i=1}^n (Y_i - \bar{Y})}} {\sum_{i=1}^n X_i^2 - \bar{X} \sum_{i=1}^n X_i - \color{pine_green}{\bar{X} \sum_{i=1}^n  (X_i - \bar{X}) }}.
+\end{align}
+
+\noindent Distribute terms and pull constants into the sums to obtain
+
+\begin{align}
+\hat{\beta}_2 &= \dfrac{\sum_{i=1}^n Y_i X_i -   \sum_{i=1}^n \bar{Y} X_i - \sum_{i=1}^n \bar{X} Y_i + \sum_{i=1}^n \bar{Y} \bar{X}} {\sum_{i=1}^n X_i^2 -  \sum_{i=1}^n \bar{X} X_i - \sum_{i=1}^n \bar{X} X_i + \sum_{i=1}^n \bar{X}^2 }.
+\end{align}
+
+\noindent By factoring we obtain a beautiful expression for $\hat{\beta}_2$:
+
+\begin{align}
+\hat{\beta}_2 &= \dfrac{\sum_{i=1}^n (Y_i - \bar{Y})(X_i - \bar{X})} {\sum_{i=1}^n (X_i - \bar{X}) (X_i - \bar{X})}.
+\end{align}
+
+\subsection*{Behold!}
+
+\noindent We have derived OLS!
+
+\begin{align}
+\hat{\beta}_1 = \bar{Y} - \hat{\beta}_2 \bar{X}
+\end{align}
+
+\begin{align}
+\hat{\beta}_2 &= \dfrac{\sum_{i=1}^n (Y_i - \bar{Y})(X_i - \bar{X})} {\sum_{i=1}^n (X_i - \bar{X}) (X_i - \bar{X})}
+\end{align}
+
+\subsection*{Oh wait, second-order conditions}
+
+\noindent We still need to check for convexity to make sure we minimized the objective function. We would feel silly if we maximized it. To make sure we minimized $\text{RSS}$, we will take second derivatives and check to see if they are positive.
+
+\begin{align}
+\frac{\partial^2 \text{RSS}}{\partial \hat{\beta}_1^2} &= \sum_{i=1}^n 2 > 0 \label{soc1} \\ 
+\frac{\partial^2 \text{RSS}}{\partial \hat{\beta}_2^2} &= \sum_{i=1}^n 2X_i^2  > 0 \label{soc2}
+\end{align}
+
+\noindent Crisis averted. Now we can say that we've minimized the residual sum of squares.
+
+\end{document}

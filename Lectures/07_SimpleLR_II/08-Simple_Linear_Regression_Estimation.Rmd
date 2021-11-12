@@ -1,0 +1,613 @@
+---
+title: "Simple Linear Regression: Estimation"
+subtitle: "EC 320: Introduction to Econometrics"
+author: "Kyle Raze"
+date: "Fall 2019"
+output:
+  xaringan::moon_reader:
+    css: ['default', 'metropolis', 'metropolis-fonts', 'my-css.css']
+    # self_contained: true
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+class: inverse, middle
+
+```{r Setup, include = F}
+options(htmltools.dir.version = FALSE)
+library(pacman)
+p_load(ggthemes, viridis, knitr, extrafont, tidyverse, magrittr, wooldridge, stargazer, ggforce, kableExtra)
+# Define colors
+red_pink <- "#e64173"
+turquoise <- "#20B2AA"
+orange <- "#FFA500"
+red <- "#fb6107"
+blue <- "#2b59c3"
+green <- "#8bb174"
+grey_light <- "grey70"
+grey_mid <- "grey50"
+grey_dark <- "grey20"
+purple <- "#6A5ACD"
+met_slate <- "#23373b" # metropolis font color
+# Knitr options
+opts_chunk$set(
+  comment = "#>",
+  fig.align = "center",
+  fig.height = 7,
+  fig.width = 10.5,
+  #dpi = 300,
+  #cache = T,
+  warning = F,
+  message = F
+)  
+theme_simple <- theme_bw() + theme(
+  axis.line = element_line(color = met_slate),
+  panel.grid = element_blank(),
+  rect = element_blank(),
+  strip.text = element_blank(),
+  text = element_text(family = "Fira Sans", color = met_slate, size = 14),
+  axis.text.x = element_text(size = 12),
+  axis.text.y = element_text(size = 12),
+  axis.ticks = element_blank(),
+  plot.title = element_blank(),
+  legend.position = "none"
+)
+theme_empty <- theme_bw() + theme(
+  line = element_blank(),
+  rect = element_blank(),
+  strip.text = element_blank(),
+  axis.text = element_blank(),
+  plot.title = element_blank(),
+  axis.title = element_blank(),
+  plot.margin = structure(c(0, 0, -1, -1), unit = "lines", valid.unit = 3L, class = "unit"),
+  legend.position = "none"
+)
+# simulated earnings data
+df_earn <- tibble(x = sample(8:20, 100, replace=T),
+             y = -14 + 2.5*x + rnorm(100, 0, 5)) %>% 
+  filter(y > 5)
+lm_earn <- lm(y ~ x, data = df_earn)
+b0_earn <- lm_earn$coefficients[1]
+b1_earn <- lm_earn$coefficients[2]
+# data for R^2 discussion
+df1 <- tibble(x = rnorm(1000, 5, 5),
+             y = 100 - 1*x + rnorm(1000, 0, 3))
+df2 <- tibble(x = rnorm(1000, 5, 5),
+             y = 100 - 1*x + rnorm(1000, 0, 20))
+r2_1 <- summary(lm(y~x, df1))$r.squared
+r2_2 <- summary(lm(y~x, df2))$r.squared
+# campus crime data
+data <- get(data(campus)) %>% 
+  mutate(crime = round(crime/enroll*1000, 2),
+         police = round(police/enroll*1000, 2)) %>% 
+  filter(police < 10) %>% # remove outlier
+  select(crime, police)
+data2 <- data %>% 
+  mutate(crime = crime/1000)
+lm0 <- lm(crime ~ police, data = data)
+lm1 <- lm(crime ~ police, data = data2)
+```
+
+# Prologue
+
+---
+# Last Time
+
+We considered a simple linear regression of $Y_i$ on $X_i$:
+
+$$
+ Y_i = \beta_1 + \beta_2X_i + u_i.
+$$
+
+--
+
+- $\beta_1$ and $\beta_2$ are __population parameters__ that describe the *"true"* relationship between $X_i$ and $Y_i$.
+
+- __Problem:__ We don't know the population parameters. The best we can do is to estimate them.
+
+---
+# Last Time
+
+We derived the OLS estimator by picking estimates that minimize $\sum_{i=1}^n \hat{u}_i^2$.
+
+- __Intercept:__
+
+$$ \hat{\beta}_1 = \bar{Y} - \hat{\beta}_2 \bar{X}. $$
+
+- __Slope:__
+
+$$
+\begin{aligned}
+\hat{\beta}_2 &= \dfrac{\sum_{i=1}^n (Y_i - \bar{Y})(X_i - \bar{X})}{\sum_{i=1}^n  (X_i - \bar{X})^2}.
+\end{aligned}
+$$
+
+We used these formulas to obtain estimates of the parameters $\beta_1$ and $\beta_2$ in a regression of $Y_i$ on $X_i$.
+
+---
+# Last Time
+
+With the OLS estimates of the population parameters, we constructed a regression line: 
+
+$$
+ \hat{Y_i} = \hat{\beta}_1 + \hat{\beta}_2X_i.
+$$
+
+- $\hat{Y_i}$ are predicted or __fitted__ values of $Y_i$. 
+
+- You can think of $\hat{Y_i}$ as an estimate of the average value of $Y_i$ given a particular of $X_i$. 
+
+--
+
+OLS still produces prediction errors: $\hat{u}_i = Y_i - \hat{Y_i}$.
+
+- Put differently, there is a part of $Y_i$ we can explain and a part we cannot: $Y_i = \hat{Y_i} + \hat{u}_i$.
+
+---
+# Review
+
+What is the equation for the regression model estimated below? 
+
+```{r, echo=FALSE, dev = "svg", fig.height = 5.75}
+df_earn %>% 
+  ggplot() +
+  xlim(0, 20) +
+  geom_point(aes(x = x, y = y), color = "darkslategray") +
+  geom_abline(intercept = b0_earn, slope = b1_earn, color = "#9370DB", size = 1) +
+  theme_simple + xlab("Years of Education") + ylab("Hourly Earnings")
+```
+
+---
+# Review
+
+The estimated __intercept__ is `r round(lm_earn$coefficients[1], 2)`. What does this tell us? 
+
+```{r, echo=FALSE, dev = "svg", fig.height = 5.75}
+df_earn %>% 
+  ggplot() +
+  xlim(0, 20) +
+  geom_point(aes(x = x, y = y), color = "darkslategray") +
+  geom_abline(intercept = b0_earn, slope = b1_earn, color = "#9370DB", size = 1) +
+  theme_simple + xlab("Years of Education") + ylab("Hourly Earnings")
+```
+
+---
+# Review
+
+The estimated __slope__ is `r round(lm_earn$coefficients[2], 2)`. How do we interpret it?
+
+```{r, echo=FALSE, dev = "svg", fig.height = 5.75}
+df_earn %>% 
+  ggplot() +
+  xlim(0, 20) +
+  geom_point(aes(x = x, y = y), color = "darkslategray") +
+  geom_abline(intercept = b0_earn, slope = b1_earn, color = "#9370DB", size = 1) +
+  theme_simple + xlab("Years of Education") + ylab("Hourly Earnings")
+```
+
+---
+# Today
+
+## Agenda
+
+1. Highlight important properties of OLS.
+
+2. Discuss goodness of fit: how well does one variable explain another?
+
+2. Units of measurement.
+
+---
+class: inverse, middle
+
+# OLS Properties
+
+---
+# OLS Properties
+
+The way we selected OLS estimates $\hat{\beta}_1$ and $\hat{\beta}_2$ gives us three important properties:
+
+1. Residuals sum to zero: $\sum_{i=1}^n \hat{u}_i = 0$.
+
+2. The sample covariance between the independent variable and the residuals is zero: $\sum_{i=1}^n X_i \hat{u}_i = 0$.
+
+3. The point $(\bar{X}, \bar{Y})$ is always on the regression line.
+
+---
+# OLS Residuals
+
+Residuals sum to zero: $\sum_{i=1}^n \hat{u}_i = 0$.
+
+- By extension, the sample mean of the residuals are zero.
+
+- You will prove this in Problem Set 3.
+
+---
+# OLS Residuals
+
+The sample covariance between the independent variable and the residuals is zero: $\sum_{i=1}^n X_i \hat{u}_i = 0$.
+
+- You will prove a version of this in Problem Set 3.
+
+---
+# OLS Regression Line
+
+The point $(\bar{X}, \bar{Y})$ is always on the regression line.
+
+- Start with the regression line: $\hat{Y_i} = \hat{\beta}_1 + \hat{\beta}_2X_i$.
+
+--
+
+- $\hat{Y_i} = \bar{Y} - \hat{\beta}_2 \bar{X} + \hat{\beta}_2X_i$.
+
+--
+
+- Plug $\bar{X}$ into $X_i$:
+
+$$
+\begin{aligned}
+\hat{Y_i} &= \bar{Y} - \hat{\beta}_2 \bar{X} + \hat{\beta}_2\bar{X} \\
+&= \bar{Y}.
+\end{aligned}
+$$
+
+---
+class: inverse, middle
+
+# Goodness of Fit
+
+---
+# Goodness of Fit
+
+## .hi[Regression 1] *vs.* .hi-green[Regression 2]
+
+- Same slope.
+
+- Same intercept. 
+
+**Q:** Which fitted regression line *"explains"*<sup>*</sup> the data better?
+
+.pull-left[
+
+```{R, echo = F, dev = "svg", fig.fullwidth = T}
+ggplot() +
+  xlim(-15,25) + ylim(0, 160) +
+  geom_point(data = df1, aes(x, y), color = met_slate, alpha = 0.5, size = 4) +
+  stat_smooth(data = df1, aes(x, y), method = "lm", se = F, color = red_pink, size = 3) +
+  theme_empty 
+```
+
+]
+
+.pull-right[
+
+```{R, echo = F, dev = "svg", fig.fullwidth = T}
+ggplot() +
+  xlim(-15,25) + ylim(0, 160) +
+  geom_point(data = df2, aes(x, y), color = met_slate, alpha = 0.5, size = 4) +
+  stat_smooth(data = df2, aes(x, y), method = "lm", se = F, color = "#007935", size = 3) +
+  theme_empty
+```
+
+]
+
+.footnote[
+<sup>*</sup> _Explains_ .mono[=] _fits_. 
+]
+
+---
+# Goodness of Fit
+
+## .hi[Regression 1] *vs.* .hi-green[Regression 2]
+
+The __coefficient of determination__ $R^2$ is the fraction of the variation in $Y_i$ *"explained"* by $X_i$ in a linear regression.
+
+- $R^2 = 1 \implies X_i$ explains _all_ of the variation in $Y_i$.
+- $R^2 = 0 \implies X_i$ explains _none_ of the variation in $Y_i$.
+
+.pull-left[
+
+.center[
+$R^2$ .mono[=] `r round(r2_1,2)`
+]
+
+```{R, echo = F, dev = "svg", fig.fullwidth = T}
+ggplot() +
+  xlim(-15,25) + ylim(0, 160) +
+  geom_point(data = df1, aes(x, y), color = met_slate, alpha = 0.5, size = 4) +
+  stat_smooth(data = df1, aes(x, y), method = "lm", se = F, color = red_pink, size = 3) +
+  theme_empty 
+```
+
+]
+
+.pull-right[
+
+.center[
+$R^2$ .mono[=] `r round(r2_2,2)`
+]
+
+```{R, echo = F, dev = "svg", fig.fullwidth = T}
+ggplot() +
+  xlim(-15,25) + ylim(0, 160) +
+  geom_point(data = df2, aes(x, y), color = met_slate, alpha = 0.5, size = 4) +
+  stat_smooth(data = df2, aes(x, y), method = "lm", se = F, color = "#007935", size = 3) +
+  theme_empty
+```
+
+]
+
+---
+# Goodness of Fit
+
+```{R, echo = F, dev = "svg"}
+# Colors (order: x1, y)
+venn_colors <- c(purple, orange)
+# Locations of circles
+venn_df <- tibble(
+  x  = c( 0.0,   -0.5),
+  y  = c( 0.0,   -2.5),
+  r  = c( 1.9,    1.9),
+  l  = c( "Y", "X"),
+  xl = c( 0.0,   -0.5),
+  yl = c( 0.0,   -2.5)
+)
+# Venn
+ggplot(data = venn_df, aes(x0 = x, y0 = y, r = r, fill = l, color = l)) +
+geom_circle(alpha = 0.3, size = 0.75) +
+theme_void() +
+theme(legend.position = "none") +
+scale_fill_manual(values = venn_colors) +
+scale_color_manual(values = venn_colors) +
+geom_text(aes(x = xl, y = yl, label = l), size = 12, family = "Fira Sans", parse = T) +
+xlim(-2.5, 2) +
+ylim(-4.5, 2) +
+coord_equal()
+```
+
+---
+# Goodness of Fit
+
+```{R, echo = F, dev = "svg"}
+# Colors (order: x1, y)
+venn_colors <- c(purple, orange)
+# Locations of circles
+venn_df <- tibble(
+  x  = c( 0.0,   -3),
+  y  = c( 0.0,   -2.75),
+  r  = c( 1.9,    1.9),
+  l  = c( "Y", "X"),
+  xl = c( 0.0,   -3),
+  yl = c( 0.0,   -2.75)
+)
+# Venn
+ggplot(data = venn_df, aes(x0 = x, y0 = y, r = r, fill = l, color = l)) +
+geom_circle(alpha = 0.3, size = 0.75) +
+theme_void() +
+theme(legend.position = "none") +
+scale_fill_manual(values = venn_colors) +
+scale_color_manual(values = venn_colors) +
+geom_text(aes(x = xl, y = yl, label = l), size = 12, family = "Fira Sans", parse = T) +
+xlim(-5, 2) +
+ylim(-5, 2) +
+coord_equal()
+```
+
+---
+# Goodness of Fit
+
+```{R, echo = F, dev = "svg"}
+# Colors (order: x1, y)
+venn_colors <- c(purple, orange)
+# Locations of circles
+venn_df <- tibble(
+  x  = c( 0.0,   -0.5),
+  y  = c( 0.0,   -1.5),
+  r  = c( 1.9,    1.9),
+  l  = c( "Y", "X"),
+  xl = c( 0.0,   -0.5),
+  yl = c( 1.0,   -2.5)
+)
+# Venn
+ggplot(data = venn_df, aes(x0 = x, y0 = y, r = r, fill = l, color = l)) +
+geom_circle(alpha = 0.3, size = 0.75) +
+theme_void() +
+theme(legend.position = "none") +
+scale_fill_manual(values = venn_colors) +
+scale_color_manual(values = venn_colors) +
+geom_text(aes(x = xl, y = yl, label = l), size = 12, family = "Fira Sans", parse = T) +
+xlim(-2.5, 2) +
+ylim(-5, 2) +
+coord_equal()
+```
+
+---
+# Explained and Unexplained Variation
+
+Residuals remind us that there are parts of $Y_i$ we can't explain.
+
+$$
+Y_i = \hat{Y_i} + \hat{u}_i
+$$
+
+- Sum the above, divide by $n$, and use the fact that OLS residuals sum to zero to get $\bar{\hat{u}} = 0 \implies \bar{Y} = \bar{\hat{Y}}$.
+
+--
+
+__Total Sum of Squares (TSS)__ measures variation in $Y_i$:
+
+$$
+\text{TSS} \equiv \sum_{i=1}^n (Y_i - \bar{Y})^2.
+$$
+
+- We will decompose this variation into explained and unexplained parts.
+
+---
+# Explained and Unexplained Variation
+
+__Explained Sum of Squares (ESS)__ measures the variation in $\hat{Y_i}$:
+
+$$
+\text{ESS} \equiv \sum_{i=1}^n (\hat{Y_i} - \bar{Y})^2.
+$$
+--
+
+**Residual Sum of Squares (RSS)** measures the variation in $\hat{u}_i$:
+
+$$
+\text{RSS} \equiv \sum_{i=1}^n \hat{u}_i^2.
+$$
+
+--
+
+.hi[Goal:] Show that $\text{TSS} = \text{ESS} + \text{RSS}$.
+
+---
+class: white-slide
+
+**Step 1:** Plug $Y_i = \hat{Y_i} + \hat{u}_i$ into TSS.
+
+$\text{TSS}$
+--
+<br> $\quad = \sum_{i=1}^n (Y_i - \bar{Y})^2$
+--
+<br> $\quad = \sum_{i=1}^n ([\hat{Y_i} + \hat{u}_i] - [\bar{\hat{Y}} + \bar{\hat{u}}])^2$
+
+--
+
+**Step 2:** Recall that $\bar{\hat{u}} = 0$ and $\bar{Y} = \bar{\hat{Y}}$.
+
+$\text{TSS}$
+--
+<br> $\quad = \sum_{i=1}^n \left( [\hat{Y_i} - \bar{Y}] + \hat{u}_i \right)^2$
+--
+<br> $\quad = \sum_{i=1}^n \left( [\hat{Y_i} - \bar{Y}] + \hat{u}_i \right) \left( [\hat{Y_i} - \bar{Y}] + \hat{u}_i \right)$
+--
+<br> $\quad = \sum_{i=1}^n (\hat{Y_i} - \bar{Y})^2 + \sum_{i=1}^n \hat{u}_i^2 + 2 \sum_{i=1}^n \left( (\hat{Y_i} - \bar{Y})\hat{u}_i \right)$
+
+---
+class: white-slide
+
+**Step 3:** Notice .hi-purple[ESS] and .hi[RSS].
+
+$\text{TSS}$
+--
+<br> $\quad = \color{#9370DB}{\sum_{i=1}^n (\hat{Y_i} - \bar{Y})^2} + \color{#e64173}{\sum_{i=1}^n \hat{u}_i^2} + 2 \sum_{i=1}^n \left( (\hat{Y_i} - \bar{Y})\hat{u}_i \right)$
+--
+<br> $\quad = \color{#9370DB}{\text{ESS}} + \color{#e64173}{\text{RSS}} + 2 \sum_{i=1}^n \left( (\hat{Y_i} - \bar{Y})\hat{u}_i \right)$
+
+---
+class: white-slide
+
+**Step 4:** Simplify.
+
+$\text{TSS}$
+--
+<br> $\quad = \text{ESS} + \text{RSS} + 2 \sum_{i=1}^n \left( (\hat{Y_i} - \bar{Y})\hat{u}_i \right)$
+--
+<br> $\quad = \text{ESS} + \text{RSS} + 2 \sum_{i=1}^n \hat{Y_i}\hat{u}_i - 2 \bar{Y}\sum_{i=1}^n \hat{u}_i$
+
+--
+
+**Step 5:** Shut down the last two terms. Notice that
+
+$\sum_{i=1}^n \hat{Y_i}\hat{u}_i$
+<br> $\quad = \sum_{i=1}^n (\hat{\beta}_1 + \hat{\beta}_2X_i)\hat{u}_i$
+--
+<br> $\quad = \hat{\beta}_1 \sum_{i=1}^n \hat{u}_i  + \hat{\beta}_2 \sum_{i=1}^n X_i\hat{u}_i$
+--
+<br> $\quad = 0$
+
+---
+# Goodness of Fit
+
+## Calculating $R^2$
+
+- $R^2 = \frac{\text{ESS}}{\text{TSS}}$.
+
+- $R^2 = 1 - \frac{\text{RSS}}{\text{TSS}}$.
+
+--
+
+$R^2$ is related to the correlation between the actual values of $Y$ and the fitted values of $Y$.
+
+- Can show that $R^2 = (r_{Y, \hat{Y}})^2$.
+
+---
+# Goodness of Fit
+
+## So what?
+
+In the social sciences, low $R^2$ values are common.
+
+--
+
+Low $R^2$ doesn't mean that an estimated regression is useless.
+
+- In a randomized control trial, $R^2$ is usually less than 0.1.
+
+--
+
+High $R^2$ doesn't necessarily mean you have a *"good"* regression.
+
+- Worries about selection bias and omitted variables still apply.
+
+---
+class: inverse, middle
+
+# Units of Measurement
+
+---
+# Last Time
+
+We ran a regression of crimes per 1000 students on police per 1000 students. We found that $\hat{\beta_1}$ .mono[=] `r round(lm0$coefficients[1], 2)` and $\hat{\beta_2}$ .mono[=] `r round(lm0$coefficients[2], 2)`. 
+
+```{r, echo=FALSE, dev = "svg", fig.height = 5}
+# Define a function
+y_hat <- function(x, b0, b1) {b0 + b1 * x}
+# Define line's parameters
+b0 <- lm0$coefficients[1]
+b1 <- lm0$coefficients[2]
+data %>% 
+  ggplot() +
+  geom_point(aes(x = police, y = crime), color = "darkslategray") +
+  geom_abline(intercept = b0, slope = b1, color = "#6A5ACD", size = 1) +
+  theme_simple + xlab("Police per 1000 students") + ylab("Crimes per 1000 students")
+```
+
+---
+# Last Time
+
+What if we had run a regression of crimes per student on police per 1000 students? What would happen to the slope?
+
+--
+
+```{r, echo=FALSE, dev = "svg", fig.height = 5}
+# Define a function
+y_hat <- function(x, b0, b1) {b0 + b1 * x}
+# Define line's parameters
+b0 <- lm1$coefficients[1]
+b1 <- lm1$coefficients[2]
+data2 %>% 
+  ggplot() +
+  geom_point(aes(x = police, y = crime), color = "darkslategray") +
+  geom_abline(intercept = b0, slope = b1, color = "#6A5ACD", size = 1) +
+  theme_simple + xlab("Police per 1000 students") + ylab("Crimes per student")
+```
+
+$\hat{\beta_2}$ .mono[=] `r lm1$coefficients[2]`.
+
+---
+# Demeaning
+
+## Practice problem
+
+Suppose that, before running a regression of $Y_i$ on $X_i$, you decided to _demean_ each variable by subtracting off the mean from each observation. This gave you $\tilde{Y}_i = Y_i - \bar{Y}$ and $\tilde{X}_i = X_i - \bar{X}$.
+
+Then you decide to estimate
+
+$$
+\tilde{Y}_i = \beta_1 + \beta_2 \tilde{X}_i + u_i.
+$$
+
+What will you get for your intercept estimate $\hat{\beta}_1$?
