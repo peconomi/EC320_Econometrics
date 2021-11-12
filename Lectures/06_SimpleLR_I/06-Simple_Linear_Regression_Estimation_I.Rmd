@@ -1,0 +1,906 @@
+---
+title: "Simple Linear Regression: Estimation"
+subtitle: "EC 320: Introduction to Econometrics"
+author: "Philip Economides"
+date: "Winter 2022"
+output:
+  xaringan::moon_reader:
+    css: ['default', 'metropolis', 'metropolis-fonts', 'my-css.css']
+    # self_contained: true
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r Setup, include = F}
+options(htmltools.dir.version = FALSE)
+library(pacman)
+p_load(ggthemes, viridis, knitr, extrafont, tidyverse, magrittr, wooldridge, DT)
+# Data 
+data <- get(data(campus)) %>% 
+  mutate(crime = round(crime/enroll*1000, 2),
+         police = round(police/enroll*1000, 2)) %>% 
+  filter(police < 10) %>% # remove outlier
+  select(crime, police)
+data2 <- get(data(campus)) %>% 
+  mutate(crime = round(crime/enroll*1000, 2),
+         police = round(police/enroll*1000, 2)) %>% 
+  select(crime, police)
+# Define colors
+red_pink <- "#e64173"
+met_slate <- "#272822" 
+turquoise <- "#20B2AA"
+orange <- "#FFA500"
+red <- "#fb6107"
+blue <- "#2b59c3"
+green <- "#8bb174"
+grey_light <- "grey70"
+grey_mid <- "grey50"
+grey_dark <- "grey20"
+purple <- "#6A5ACD"
+slate <- "#314f4f"
+# Notes directory
+dir_slides <- "Lectures/06-Simple_Linear_Regression_Estimation_I/"
+# Knitr options
+opts_chunk$set(
+  comment = "#>",
+  fig.align = "center",
+  fig.height = 7,
+  fig.width = 10.5,
+  #dpi = 300,
+  #cache = T,
+  warning = F,
+  message = F
+)  
+theme_simple <- theme_bw() + theme(
+  axis.line = element_line(color = met_slate),
+  panel.grid = element_blank(),
+  rect = element_blank(),
+  strip.text = element_blank(),
+  text = element_text(family = "Fira Sans", color = met_slate, size = 14),
+  axis.text.x = element_text(size = 12),
+  axis.text.y = element_text(size = 12),
+  axis.ticks = element_blank(),
+  plot.title = element_blank(),
+  legend.position = "none"
+)
+lm0 <- lm(crime ~ police, data = data)
+lm1 <- lm(crime ~ police, data = data2)
+```
+
+class: inverse, middle
+
+# Prologue
+
+---
+
+# Housekeeping
+
+<br>
+
+**Problem Set 3** to be released in a week! (Jan 31st)
+
+- Will be focused on simple linear regressions and underlying assumptions
+
+- Will not be due until **after** your midterm exam (Feb 7th)
+
+- Computational component will be using recent lab knowledge
+
+---
+# Navigating Metrics
+
+<br>
+
+### Where are we?
+
+- Reviewed core ideas from statistics
+
+- Developed a framework for thinking about causality
+
+- Dabbled in regression analysis.
+
+Also, .mono[**R**].
+
+---
+# Navigating Metrics
+
+### Where we're going
+
+- Learn the mechanics of *how* OLS works
+
+--
+
+- Interpret regression results (mechanically and critically)
+
+--
+
+- Extend ideas about causality to a regression context
+
+--
+
+- Think more deeply about statistical inference
+
+--
+
+- Lay a foundation for more-sophisticated regression techniques.
+
+--
+
+Also, **more** .mono[**R**].
+
+---
+class: inverse, middle
+
+# Simple Linear Regression
+
+---
+
+# Addressing Questions
+
+### Example: Effect of police on crime
+
+__Policy Question:__ Do on-campus police reduce crime on campus?
+
+--
+
+- **Empirical Question:** Does the number of on-campus police officers affect campus crime rates? If so, by how much?
+
+How can we answer these questions?
+
+--
+
+- Prior beliefs.
+
+--
+
+- Theory.
+
+--
+
+- __Data!__
+
+---
+# Let's _"Look"_ at Data
+
+## Example: Effect of police on crime
+
+```{r, echo=FALSE}
+DT::datatable(
+  data,
+  colnames = c('Police per 1000 Students', 'Crimes per 1000 students'),
+  fillContainer = FALSE, options = list(pageLength = 6, lengthChange = FALSE, pagingType = "simple"), escape = FALSE)
+```
+
+---
+# Take 2
+
+## Example: Effect of police on crime
+
+*"Looking"* at data wasn't especially helpful. 
+
+--
+
+Let's try using a scatter plot.
+
+- Plot each data point in $(X,Y)$-space.
+
+- .mono[Police] on the $X$-axis.
+
+- .mono[Crime] on the $Y$-axis.
+
+---
+# Take 2
+
+## Example: Effect of police on crime
+
+```{r, echo=FALSE, dev = "svg", fig.height=5.75}
+data %>% 
+  ggplot(aes(x = police, y = crime)) +
+  geom_point(color = "darkslategray") +
+  theme_simple + xlab("Police per 1000 students") + ylab("Crimes per 1000 students")
+```
+
+---
+# Take 2
+
+## Example: Effect of police on crime
+
+The scatter plot tells us more than the spreadsheet.
+
+- Somewhat weak _positive_ relationship.
+
+--
+
+- Sample correlation coefficient of `r cor(data)[1,2] %>% as.double %>% round(.,2)` confirms this.
+
+But our question was 
+
+> Does the number of on-campus police officers affect campus crime rates? If so, by how much?
+
+- The scatter plot and correlation coefficient provide only a partial answer.
+
+---
+# Take 3
+
+## Example: Effect of police on crime
+
+Our next step is to estimate a __statistical model.__
+
+To keep it simple, we will relate an __explained variable__ $Y$ to an __explanatory variable__ $X$ in a linear model.
+
+---
+# Simple Linear Regression Model
+
+We express the relationship between a .hi-purple[explained variable] and an .hi-green[explanatory variable] as linear:
+
+$$
+ \color{#9370DB}{Y_i} = \beta_1 + \beta_2\color{#007935}{X_i} + u_i.
+$$
+
+- $\beta_1$ is the __intercept__ or constant.
+
+- $\beta_2$ is the __slope coefficient__.
+
+- $u_i$ is an __error term__ or disturbance term.
+
+.footnote[
+_Simple_ .mono[=] Only one explanatory variable.
+]
+
+---
+# Simple Linear Regression Model
+
+The .hi[intercept] tells us the expected value of $Y_i$ when $X_i = 0$. 
+
+$$
+ Y_i = \color{#e64173}{\beta_1} + \beta_2X_i + u_i
+$$
+
+Usually not the focus of an analysis.
+
+---
+# Simple Linear Regression Model
+
+The .hi[slope coefficient] tells us the expected change in $Y_i$ when $X_i$ increases by one. 
+
+$$
+ Y_i = \beta_1 + \color{#e64173}{\beta_2}X_i + u_i
+$$
+
+"A one-unit increase in $X_i$ is associated with a $\color{#e64173}{\beta_2}$-unit increase in $Y_i$."
+
+--
+
+Under certain (strong) assumptions about the error term, $\color{#e64173}{\beta_2}$ is the _effect of_ $X_i$ _on_ $Y_i$.
+
+- Otherwise, it's the _association of_ $X_i$ _with_ $Y_i$.
+
+---
+# Simple Linear Regression Model
+
+The .hi[error term] reminds us that $X_i$ does not perfectly explain $Y_i$. 
+
+$$
+ Y_i = \beta_1 + \beta_2X_i + \color{#e64173}{u_i}
+$$
+
+Represents all other factors that explain $Y_i$.
+
+- Useful mnemonic: pretend that $u$ stands for *"unobserved"* or *"unexplained."*
+
+---
+# Take 3, continued
+
+## Example: Effect of police on crime
+
+How might we apply the simple linear regression model to our question about the effect of on-campus police on campus crime?
+
+- Which variable is $X$? Which is $Y$?
+
+--
+
+$$
+ \text{Crime}_i = \beta_1 + \beta_2\text{Police}_i + u_i.
+$$
+
+- $\beta_1$ is the crime rate for colleges without police.
+- $\beta_2$ is the increase in the crime rate for an additional police officer per 1000 students.
+
+---
+# Take 3, continued
+
+## Example: Effect of police on crime
+
+How might we apply the simple linear regression model to our question?
+
+$$
+ \text{Crime}_i = \beta_1 + \beta_2\text{Police}_i + u_i
+$$
+
+$\beta_1$ and $\beta_2$ are the population parameters we want, but we cannot observe them.
+
+--
+
+Instead, we must estimate the population parameters.
+
+- $\hat{\beta_1}$ and $\hat{\beta_2}$ generate predictions of $\text{Crime}_i$ called $\hat{\text{Crime}_i}$. 
+
+- We call the predictions of the dependent variable __fitted values.__
+
+--
+
+- Together, these trace a line: $\hat{\text{Crime}_i} = \hat{\beta_1} + \hat{\beta_2}\text{Police}_i$.
+
+---
+# Take 3, attempted
+
+## Example: Effect of police on crime
+
+Guess: $\hat{\beta_1} = 60$ and $\hat{\beta_2} = -7$.
+
+--
+
+```{r, echo=FALSE, dev = "svg", fig.height = 5.25}
+# Define a function
+y_hat <- function(x, b0, b1) {b0 + b1 * x}
+# Define line's parameters
+b0 <- 60
+b1 <- -7
+ggplot() +
+  geom_point(data = data, aes(x = police, y = crime), color = "darkslategray") +
+  geom_abline(intercept = b0, slope = b1, color = "#9370DB", size = 1) +
+  theme_simple + xlab("Police per 1000 students") + ylab("Crimes per 1000 students")
+```
+
+---
+# Take 4
+
+## Example: Effect of police on crime
+
+Guess: $\hat{\beta_1} = 30$ and $\hat{\beta_2} = 0$.
+
+--
+
+```{r, echo=FALSE, dev = "svg", fig.height = 5.25}
+# Define a function
+y_hat <- function(x, b0, b1) {b0 + b1 * x}
+# Define line's parameters
+b0 <- 30
+b1 <- 0
+ggplot() +
+  geom_point(data = data, aes(x = police, y = crime), color = "darkslategray") +
+  geom_abline(intercept = b0, slope = b1, color = "#9370DB", size = 1) +
+  theme_simple + xlab("Police per 1000 students") + ylab("Crimes per 1000 students")
+```
+
+
+---
+# Take 5
+
+## Example: Effect of police on crime
+
+Guess: $\hat{\beta_1} = 15.6$ and $\hat{\beta_2} = 7.94$.
+
+--
+
+```{r, echo=FALSE, dev = "svg", fig.height = 5.25}
+# Define a function
+y_hat <- function(x, b0, b1) {b0 + b1 * x}
+# Define line's parameters
+b0 <- 15.6
+b1 <- 7.94
+ggplot() +
+  geom_point(data = data, aes(x = police, y = crime), color = "darkslategray") +
+  geom_abline(intercept = b0, slope = b1, color = "#9370DB", size = 1) +
+  theme_simple + xlab("Police per 1000 students") + ylab("Crimes per 1000 students")
+```
+
+---
+# Residuals
+
+Using $\hat{\beta_1}$ and $\hat{\beta_2}$ to make $\hat{Y_i}$ generates misses called .hi[residuals]:
+
+$$
+\color{#e64173}{\hat{u}_i} = \color{#e64173}{Y_i - \hat{Y_i}}.
+$$
+
+- Sometimes called $\color{#e64173}{e_i}$.
+
+---
+# Residuals
+
+## Example: Effect of police on crime
+
+Using $\hat{\beta_1} = 15.6$ and $\hat{\beta_2} = 7.94$ to make $\color{#9370DB}{\hat{\text{Crime}_i}}$ generates .hi[residuals].
+
+```{r, echo=FALSE, dev = "svg", fig.height = 5.25}
+# Define a function
+y_hat <- function(x, b0, b1) {b0 + b1 * x}
+# Define line's parameters
+b0 <- 15.6
+b1 <- 7.94
+data %>% 
+  ggplot() +
+  geom_point(aes(x = police, y = crime), color = "darkslategray") +
+  geom_segment(aes(x = police, xend = police, y = crime, yend = y_hat(police, b0, b1)), color = red_pink, 
+               size = 0.5, alpha = 1) +
+  geom_abline(intercept = b0, slope = b1, color = "#9370DB", size = 1) +
+  #geom_line(data = bad_reg, aes(x = police, y = crime), color = "#9370DB", size = 1) +
+  theme_simple + xlab("Police per 1000 students") + ylab("Crimes per 1000 students")
+```
+
+---
+# Residuals
+
+We want an estimator that makes fewer big misses.
+
+Why not minimize $\sum_{i=1}^n \hat{u}_i$?
+
+--
+
+- There are positive _and_ negative residuals $\implies$ no solution (can always find a line with more negative residuals).
+
+__Alternative:__ Minimize the sum of squared residuals a.k.a. the .hi[residual sum of squares (RSS)].
+
+- Squared numbers are never negative.
+
+---
+# Residuals
+
+## Example: Effect of police on crime
+
+.hi-blue[RSS] gives bigger penalties to bigger residuals.
+
+```{r, echo=FALSE, dev = "svg", fig.height = 5.25}
+# Define a function
+y_hat <- function(x, b0, b1) {b0 + b1 * x}
+# Define line's parameters
+b0 <- 15.6
+b1 <- 7.94
+data %>% 
+  ggplot() +
+  geom_point(aes(x = police, y = crime), color = "darkslategray") +
+  geom_segment(aes(x = police, xend = police, y = crime, yend = y_hat(police, b0, b1), color = (crime - y_hat(police, b0, b1))^2),
+               size = 0.5, alpha = 1) +
+  geom_abline(intercept = b0, slope = b1, color = "#9370DB", size = 1) +
+  theme_simple + xlab("Police per 1000 students") + ylab("Crimes per 1000 students")
+```
+
+---
+count: false
+
+# Residuals
+
+## Example: Effect of police on crime
+
+.hi-blue[RSS] gives bigger penalties to bigger residuals.
+
+```{r, echo=FALSE, dev = "svg", fig.height = 5.25}
+# Define a function
+y_hat <- function(x, b0, b1) {b0 + b1 * x}
+# Define line's parameters
+b0 <- 30
+b1 <- 0
+data %>% 
+  ggplot() +
+  geom_point(aes(x = police, y = crime), color = "darkslategray") +
+  geom_segment(aes(x = police, xend = police, y = crime, yend = y_hat(police, b0, b1), color = (crime - y_hat(police, b0, b1))^2),
+               size = 0.5, alpha = 1) +
+  geom_abline(intercept = b0, slope = b1, color = "#9370DB", size = 1) +
+  theme_simple + xlab("Police per 1000 students") + ylab("Crimes per 1000 students")
+```
+
+---
+count: false
+
+# Residuals
+
+## Example: Effect of police on crime
+
+.hi-blue[RSS] gives bigger penalties to bigger residuals.
+
+```{r, echo=FALSE, dev = "svg", fig.height = 5.25}
+# Define a function
+y_hat <- function(x, b0, b1) {b0 + b1 * x}
+# Define line's parameters
+b0 <- 60
+b1 <- -7
+data %>% 
+  ggplot() +
+  geom_point(aes(x = police, y = crime), color = "darkslategray") +
+  geom_segment(aes(x = police, xend = police, y = crime, yend = y_hat(police, b0, b1), color = (crime - y_hat(police, b0, b1))^2),
+               size = 0.5, alpha = 1) +
+  geom_abline(intercept = b0, slope = b1, color = "#9370DB", size = 1) +
+  theme_simple + xlab("Police per 1000 students") + ylab("Crimes per 1000 students")
+```
+
+---
+# Residuals
+
+## Minimizing RSS
+
+We could test thousands of guesses of $\hat{\beta_1}$ and $\hat{\beta_2}$ and pick the pair that minimizes RSS.
+
+- Or we just do a little math and derive some useful formulas that give us RSS-minimizing coefficients without the guesswork.
+
+---
+class: inverse, middle
+
+# Ordinary Least Squares (OLS)
+
+---
+# OLS
+
+<br>
+
+The __OLS estimator__ chooses the parameters $\hat{\beta_1}$ and $\hat{\beta_2}$ that minimize the .hi[residual sum of squares (RSS)]:
+
+$$\min_{\hat{\beta}_1,\, \hat{\beta}_2} \quad \color{#e64173}{\sum_{i=1}^n \hat{u}_i^2}$$
+
+This is why we call the estimator ordinary __least squares.__
+
+---
+# OLS Formulas
+
+<br>
+
+For details, see the [handout](https://raw.githack.com/kyleraze/EC320_Econometrics/master/Lectures/07-Simple_Linear_Regression_Estimation/07-SLR_Estimation_handout.pdf) posted on Canvas.
+
+__Slope coefficient__
+
+$$\hat{\beta}_2 = \dfrac{\sum_{i=1}^n (Y_i - \bar{Y})(X_i - \bar{X})}{\sum_{i=1}^n  (X_i - \bar{X})^2}$$
+
+__Intercept__
+
+$$ \hat{\beta}_1 = \bar{Y} - \hat{\beta}_2 \bar{X} $$
+
+---
+# Slope coefficient
+
+The slope estimator is equal to the sample covariance divided by the sample variance of $X$:
+
+$$
+\begin{aligned}
+\hat{\beta}_2 &= \dfrac{\sum_{i=1}^n (Y_i - \bar{Y})(X_i - \bar{X})}{\sum_{i=1}^n  (X_i - \bar{X})^2} \\ \\
+              &= \dfrac{ \frac{1}{n-1} \sum_{i=1}^n (Y_i - \bar{Y})(X_i - \bar{X})}{ \frac{1}{n-1} \sum_{i=1}^n  (X_i - \bar{X})^2} \\ \\
+              &= \dfrac{S_{XY}}{S^2_X}.
+\end{aligned}
+$$
+
+---
+# Take 6
+
+## Example: Effect of police on crime
+
+Using the OLS formulas, we get $\hat{\beta_1}$ .mono[=] `r round(lm0$coefficients[1], 2)` and $\hat{\beta_2}$ .mono[=] `r round(lm0$coefficients[2], 2)`.
+
+```{r, echo=FALSE, dev = "svg", fig.height = 5.25}
+# Define a function
+y_hat <- function(x, b0, b1) {b0 + b1 * x}
+# Define line's parameters
+b0 <- lm0$coefficients[1]
+b1 <- lm0$coefficients[2]
+data %>% 
+  ggplot() +
+  geom_point(aes(x = police, y = crime), color = "darkslategray") +
+  geom_segment(aes(x = police, xend = police, y = crime, yend = y_hat(police, b0, b1), color = (crime - y_hat(police, b0, b1))^2),
+               size = 0.5, alpha = 1) +
+  geom_abline(intercept = b0, slope = b1, color = "#9370DB", size = 1) +
+  theme_simple + xlab("Police per 1000 students") + ylab("Crimes per 1000 students")
+```
+
+---
+count: false
+
+# Take 6
+
+## Example: Effect of police on crime
+
+Using the OLS formulas, we get $\hat{\beta_1}$ .mono[=] `r round(lm0$coefficients[1], 2)` and $\hat{\beta_2}$ .mono[=] `r round(lm0$coefficients[2], 2)`.
+
+```{r, echo=FALSE, dev = "svg", fig.height = 5.25}
+# Define a function
+y_hat <- function(x, b0, b1) {b0 + b1 * x}
+# Define line's parameters
+b0 <- lm0$coefficients[1]
+b1 <- lm0$coefficients[2]
+data %>% 
+  ggplot() +
+  geom_point(aes(x = police, y = crime), color = "darkslategray") +
+  geom_abline(intercept = b0, slope = b1, color = "#9370DB", size = 1) +
+  theme_simple + xlab("Police per 1000 students") + ylab("Crimes per 1000 students")
+```
+
+---
+# Coefficient Interpretation
+
+## Example: Effect of police on crime
+
+Using OLS gives us the fitted line
+
+$$
+ \hat{\text{Crime}_i} = \hat{\beta}_1 + \hat{\beta}_2\text{Police}_i.
+$$
+
+What does $\hat{\beta_1}$ .mono[=] `r round(lm0$coefficients[1], 2)` tell us?
+
+--
+
+What does $\hat{\beta_2}$ .mono[=] `r round(lm0$coefficients[2], 2)` tell us?
+
+--
+
+__Gut check:__ Does this mean that police _cause_ crime? 
+
+--
+
+- Probably not. __Why?__ 
+
+---
+# Outliers
+
+## Example: Association of police with crime
+
+```{r, echo=FALSE, dev = "svg", fig.height = 5.75}
+# Define a function
+y_hat <- function(x, b0, b1) {b0 + b1 * x}
+# Define line's parameters
+b0 <- lm0$coefficients[1]
+b1 <- lm0$coefficients[2]
+data2 %>% 
+  ggplot() +
+  geom_point(aes(x = police, y = crime), color = "darkslategray") +
+  # geom_segment(aes(x = police, xend = police, y = crime, yend = y_hat(police, b0, b1), color = (crime - y_hat(police, b0, b1))^2),
+  #              size = 0.5, alpha = 1) +
+  #geom_abline(intercept = b0, slope = b1, color = "#9370DB", size = 1) +
+  theme_simple + xlab("Police per 1000 students") + ylab("Crimes per 1000 students")
+```
+
+---
+# Outliers
+
+## Example: Association of police with crime
+
+.hi-purple[Fitted line] without outlier.
+
+```{r, echo=FALSE, dev = "svg", fig.height = 5.25}
+# Define a function
+y_hat <- function(x, b0, b1) {b0 + b1 * x}
+# Define line's parameters
+b0 <- lm0$coefficients[1]
+b1 <- lm0$coefficients[2]
+b0_1 <- lm1$coefficients[1]
+b1_1 <- lm1$coefficients[2]
+data2 %>% 
+  ggplot() +
+  geom_point(aes(x = police, y = crime), color = "darkslategray") +
+  # geom_segment(aes(x = police, xend = police, y = crime, yend = y_hat(police, b0, b1), color = (crime - y_hat(police, b0, b1))^2),
+  #              size = 0.5, alpha = 1) +
+  geom_abline(intercept = b0, slope = b1, color = "#9370DB", size = 1) +
+  theme_simple + xlab("Police per 1000 students") + ylab("Crimes per 1000 students")
+```
+
+---
+count: false
+
+# Outliers
+
+## Example: Association of police with crime
+
+.hi-purple[Fitted line] without outlier. .hi[Fitted line] with outlier.
+
+```{r, echo=FALSE, dev = "svg", fig.height = 5.25}
+# Define a function
+y_hat <- function(x, b0, b1) {b0 + b1 * x}
+# Define line's parameters
+b0 <- lm0$coefficients[1]
+b1 <- lm0$coefficients[2]
+b0_1 <- lm1$coefficients[1]
+b1_1 <- lm1$coefficients[2]
+data2 %>% 
+  ggplot() +
+  geom_point(aes(x = police, y = crime), color = "darkslategray") +
+  # geom_segment(aes(x = police, xend = police, y = crime, yend = y_hat(police, b0, b1), color = (crime - y_hat(police, b0, b1))^2),
+  #              size = 0.5, alpha = 1) +
+  geom_abline(intercept = b0, slope = b1, color = "#9370DB", size = 1) +
+  geom_abline(intercept = b0_1, slope = b1_1, color = red_pink, size = 1) +
+  theme_simple + xlab("Police per 1000 students") + ylab("Crimes per 1000 students")
+```
+
+---
+
+# OLS Application
+
+Suppose we do not yet have an .hi-met_slate[empirical question], but wish to observe the mechanics involved in generating parameter estimates.
+
+Consider the following .hi-pink[mini sample] $\{X,Y\}$ data points:
+
+--
+
+.pull-left[
+
+```{r, echo=FALSE, include=TRUE, results="asis"}
+df <- data.frame(
+  i = 1:4,
+  x = c(1,2,3,4),
+  y = c(4,3,5,8)
+)
+
+colnames(df) <- c("\\(i\\)", "\\(x_i\\)", "\\(y_i\\)")
+
+df %>% DT::datatable(caption = "Example: \\(n = 4\\)", options = list(dom = "t", ordering = FALSE, columnDefs = list(list(className = 'dt-center', targets = "_all"))), rownames = FALSE)
+```
+]
+
+.pull-right[
+Regression Model: $Y_i = \beta_1 + \beta_2 X_i + u_i$<br>
+Fitted Line: $\hat{Y_i}= b_1 + b_2 X_i$
+
+Lets calculate the estimated parameters $b_1$ and $b_2$ using the OLS estimator
+]
+
+---
+# OLS Application
+
+Recall that OLS focuses on minimizing the RSS. We will take four steps.
+
+1. Calculate the residuals, $\hat{u}_i = Y_i - \hat{Y_i}$
+2. Summate the squared residuals, $RSS = \sum_{i=1}^n \hat{u}_i$
+3. Differentiate for $\frac{\partial RSS}{\partial b_j}$ such that our number of unknown parameters is equal to the number of partial differentiation equations
+4. Solve for the unknown parameters
+
+--
+
+We'll use the .hi-pink[mini sample] to get an idea of the mechanics involved. 
+Given larger datasets and more covariates, **R** comes to the rescue.
+
+.hi-pink[Warning:] Check the second derivatives to ensure minimization of the functions, where all the second-order partial derivatives are greater than zero. 
+
+---
+# OLS Application
+
+### Step 1: Calculate the residuals
+
+$$
+\begin{aligned}
+\hat{u}_1 &= Y_1 - \hat{Y_1} = Y_1 - b_1 -b_2 X_1 \\
+\hat{u}_2 &= Y_2 - \hat{Y_2} = Y_2 - b_1 -b_2 X_2\\
+\hat{u}_3 &= Y_3 - \hat{Y_3} = Y_3 - b_1 -b_2 X_3\\
+\hat{u}_4 &= Y_4 - \hat{Y_4} = Y_4 - b_1 -b_2 X_4
+\end{aligned}
+$$
+
+Plug in values from our given data for $\{X,Y\}$
+$$
+\begin{aligned}
+\hat{u}_1 &= 4 - b_1 -1*b_2 \\
+\hat{u}_2 &= 3 - b_1 -2*b_2\\
+\hat{u}_3 &= 5 - b_1 -3*b_2\\
+\hat{u}_4 &= 8 - b_1 -4*b_2
+\end{aligned}
+$$
+
+Next we'll square each of these terms and summate for RSS
+
+---
+# OLS Application
+
+### Step 2: Calculate the RSS
+
+$$
+\begin{aligned}
+RSS &= \sum_{i=1}^{n} \hat{u_i}^2 =  \hat{u_1}^2 + \hat{u_2}^2 + \hat{u_3}^2 + \hat{u_4}^2\\
+&= (4 - b_1 - b_2)^2 + (3 - b_1 -2b_2)^2 + (5 - b_1 -3b_2)^2 + (8 - b_1 -4b_2)^2\\
+& = 114 + 4b_1^2 + 30b_2^2 - 40b_1 - 114b_2 + 20b_1 b_2 
+\end{aligned}
+$$
+
+--
+
+Recall that OLS minimizes the RSS expression with respect to the specific parameters involved. 
+
+To find the values that minimize a particular expression, we need to apply differentiation. 
+
+
+---
+# OLS Application
+
+### Step 3: Differentiate RSS by parameters
+
+To differentiate by a particular variable, multiply each term by its power value and subtract $1$ from the power of each of its terms.
+
+e.g. for $y=2x^3, \partial y / \partial x = 2*3x^{3-1} = 6x^2$
+
+--
+
+$$
+\begin{align}
+\frac{\partial RSS}{\partial b_1} = 0 &\implies  (4*2)b_1^{2-1} -(40*1)b_1^{1-1} + (20*1) b_1^{1-1} b_2 = 0 \notag \\
+&\implies 8b_1 - 40 + 20 b_2 = 0  \ \ \ \ \ \ \  \ \ \ \ \ \ Eq(1)
+\end{align}
+$$
+
+--
+
+$$
+\begin{align}
+\frac{\partial RSS}{\partial b_2} = 0 &\implies  (30*2)b_2^{2-1} -(114*1)b_2^{1-1} + (20*1) b_1 b_2^{1-1} = 0 \notag\\
+&\implies 60b_2 - 114 + 20 b_1 = 0  \ \ \ \ \ \ \  \ \ \ \ \ \ Eq(2)
+\end{align}
+$$
+
+---
+
+# OLS Application
+
+### Step 4: Solve for parameters
+
+With two unknowns $\{b_1, b_2\}$ and two equations in which these unknowns satisfied the first order conditions $\left\{\frac{\partial RSS}{\partial b_1}, \frac{\partial RSS}{\partial b_2}\right\}$, we can solve for our parameters.
+
+How? Substitute one expression into the other. 
+
+$$
+\begin{aligned}
+20 b_2 &= 40 - 8b_1  \implies 60b_2 = 120 - 24b_1\\
+&\text{substitute into second equation}\\
+ Eq(2): \  & 120 - 24b_1 -114 + 20b_1 = 0\\
+& 6 = 4b_1 \implies b_1 = 1.5\\
+Eq(1): \  & 20b_2 = 40 - 8\times 1.5 = 28 \implies b_2 = 1.4
+\end{aligned}
+$$
+
+OLS would prescribe $\{1.5, 1.4\}$ for our set of parameter estimates. 
+
+
+---
+
+# OLS Application
+
+<br>
+
+.pull-left[
+```{r, echo=FALSE, message=FALSE, fig.align='center', out.width="95%"}
+ggplot(df, aes(x=`\\(x_i\\)`, y=`\\(y_i\\)`))+
+  geom_point(size=4)+
+  scale_y_continuous(expand=c(0,0), limits=c(0,10))+
+  scale_x_continuous(expand=c(0,0), limits=c(0,5))+
+  geom_smooth(method = lm, se=FALSE) + #This line performs an OLS fit
+  ylab("Y, dependent variable")  + xlab("X, explanatory variable")+
+  theme_bw() +#+ coord_fixed() + 
+  theme(axis.title.x = element_text(size = 26),
+        axis.text.x = element_text(size = 18),
+        axis.title.y = element_text(size = 26),
+        axis.text.y = element_text(size = 18))
+```
+]
+
+.pull-right[
+
+<br> 
+
+ Fitting a line through the data points, with the aim of minimizing the RSS, results in the same implied parameters
+
+
+]
+
+--
+
+- Such parameters will always be estimated computationally
+
+- We will perform an exercise by hand in **PBS3** to understand the mechanics underlying the values we hang our hats on
+
+
+
+---
+
+exclude: true
+
+```{R generate pdfs, include = F, eval = F}
+#remotes::install_github('rstudio/pagedown')
+library(pagedown)
+pagedown::chrome_print("06-Simple_Linear_Regression_Estimation_I.html", output = "06-Simple_Linear_Regression_Estimation_I.pdf")
+```
+
+
+
