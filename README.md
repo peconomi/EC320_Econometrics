@@ -47,16 +47,13 @@ The HTML versions of the lecture slides allow you to view animations and interac
 
 ## Problem Sets
 
-Posted every week 
+Posted every week and made available on Canvas. 
 
 **Problem Set 1**: Review Content <br> 
-[Assignment](https://raw.githack.com/peconomi/EC320_Econometrics/main/Problem-Sets/01/PBS1.pdf) <br>
-[Solutions](https://i.imgur.com/767Ks9Q.gif)<br>
 Available:  01/03/2022 | Due: 01/10/2022
 
 **Problem Set 2**: Fundamentals and Regressions <br>
-Available:  01/10/2022 |
-Due: 01/24/2022
+Available:  01/10/2022 | Due: 01/24/2022
 
 **Problem Set 3**: Simple Linear and Assumptions <br>
 Available: 01/31/2022 |
