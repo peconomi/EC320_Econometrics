@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Simple Linear Regression: Estimation</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Philip Economides" />
+    <script src="06-Simple_Linear_Regression_Estimation_I_files/header-attrs/header-attrs.js"></script>
+    <link href="06-Simple_Linear_Regression_Estimation_I_files/remark-css/default.css" rel="stylesheet" />
+    <link href="06-Simple_Linear_Regression_Estimation_I_files/remark-css/metropolis.css" rel="stylesheet" />
+    <link href="06-Simple_Linear_Regression_Estimation_I_files/remark-css/metropolis-fonts.css" rel="stylesheet" />
+    <script src="06-Simple_Linear_Regression_Estimation_I_files/htmlwidgets/htmlwidgets.js"></script>
+    <link href="06-Simple_Linear_Regression_Estimation_I_files/datatables-css/datatables-crosstalk.css" rel="stylesheet" />
+    <script src="06-Simple_Linear_Regression_Estimation_I_files/datatables-binding/datatables.js"></script>
+    <script src="06-Simple_Linear_Regression_Estimation_I_files/jquery/jquery-3.6.0.min.js"></script>
+    <link href="06-Simple_Linear_Regression_Estimation_I_files/dt-core/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="06-Simple_Linear_Regression_Estimation_I_files/dt-core/css/jquery.dataTables.extra.css" rel="stylesheet" />
+    <script src="06-Simple_Linear_Regression_Estimation_I_files/dt-core/js/jquery.dataTables.min.js"></script>
+    <link href="06-Simple_Linear_Regression_Estimation_I_files/crosstalk/css/crosstalk.min.css" rel="stylesheet" />
+    <script src="06-Simple_Linear_Regression_Estimation_I_files/crosstalk/js/crosstalk.min.js"></script>
+    <link rel="stylesheet" href="my-css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Simple Linear Regression: Estimation
+## EC 320: Introduction to Econometrics
+### Philip Economides
+### Winter 2022
+
+---
+
+
+
+
+class: inverse, middle
+
+# Prologue
+
+---
+
+# Housekeeping
+
+&lt;br&gt;
+
+**Problem Set 3** to be released in a week! (Jan 31st)
+
+- Will be focused on simple linear regressions and underlying assumptions
+
+- Will not be due until **after** your midterm exam (Feb 7th)
+
+- Computational component will be using recent lab knowledge
+
+---
+# Navigating Metrics
+
+&lt;br&gt;
+
+### Where are we?
+
+- Reviewed core ideas from statistics
+
+- Developed a framework for thinking about causality
+
+- Dabbled in regression analysis.
+
+Also, .mono[**R**].
+
+---
+# Navigating Metrics
+
+### Where we're going
+
+- Learn the mechanics of *how* OLS works
+
+--
+
+- Interpret regression results (mechanically and critically)
+
+--
+
+- Extend ideas about causality to a regression context
+
+--
+
+- Think more deeply about statistical inference
+
+--
+
+- Lay a foundation for more-sophisticated regression techniques.
+
+--
+
+Also, **more** .mono[**R**].
+
+---
+class: inverse, middle
+
+# Simple Linear Regression
+
+---
+
+# Addressing Questions
+
+### Example: Effect of police on crime
+
+__Policy Question:__ Do on-campus police reduce crime on campus?
+
+--
+
+- **Empirical Question:** Does the number of on-campus police officers affect campus crime rates? If so, by how much?
+
+How can we answer these questions?
+
+--
+
+- Prior beliefs.
+
+--
+
+- Theory.
+
+--
+
+- __Data!__
+
+---
+# Let's _"Look"_ at Data
+
+## Example: Effect of police on crime
+
+<div id="htmlwidget-4bd1f59699fc11915ce8" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-4bd1f59699fc11915ce8">{"x":{"filter":"none","vertical":false,"fillContainer":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59","60","61","62","63","64","65","66","67","68","69","70","71","72","73","74","75","76","77","78","79","80","81","82","83","84","85","86","87","88","89","90","91","92","93","94","95","96"],[20.42,0.15,0.47,14.68,23.75,7.68,5.59,31.14,8.41,27.36,5.84,32.52,12.05,6.04,24.93,27.94,31.85,17.96,34.51,7.95,41.21,55.59,57.64,46.22,22.18,11.08,23.71,17.16,11.28,57.17,6.98,5.35,45.85,25.72,22.42,8.46,14.35,58.06,20.79,24.35,24.25,37.98,7.44,2.39,5.41,7.07,26.24,30.72,26.85,18.06,13.14,28.1,22.25,20.18,4.25,27.21,33.86,19.32,40,11.78,9.56,8.62,17.75,39.22,12.21,32.52,19,12.61,24.46,16.35,30.82,15.62,19.45,17.58,12.93,24.85,24.05,27.72,18.14,19.66,8.02,15,10.72,21.87,9.38,12.51,28.54,13.33,14.42,22.17,16.07,17.63,17.01,2.98,55.25,29.77],[1.1,2,1.41,2.06,1.52,2.76,1.67,1.03,1.37,1.02,0.72,0.91,1.12,0.44,0.64,0.63,0.64,1.16,0.81,0.24,2.15,2.4,1.96,1.42,0.9,0.72,0.88,0.58,0.64,1.82,0.41,0.69,1.12,6.94,1.62,1.2,1.28,0.74,0.9,0.64,5.54,1.02,0.92,2.67,1.55,1.7,2.92,2.85,1.8,2.68,1.48,1.02,1.72,1.1,0.56,2.14,0.94,1.28,1.66,1.08,1.38,1.03,1.37,3.69,1.82,1.22,1.61,1.71,5,1.3,2.14,2.16,3.34,2.04,1.46,1.23,2.24,1.83,0.99,1.3,1,0.89,0.89,0.84,0.17,0.77,0.95,1.23,1.02,1.95,1.25,1.26,0.82,1.39,0.65,1.55]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Police per 1000 Students<\/th>\n      <th>Crimes per 1000 students<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":6,"lengthChange":false,"pagingType":"simple","columnDefs":[{"className":"dt-right","targets":[1,2]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+
+---
+# Take 2
+
+## Example: Effect of police on crime
+
+*"Looking"* at data wasn't especially helpful. 
+
+--
+
+Let's try using a scatter plot.
+
+- Plot each data point in `\((X,Y)\)`-space.
+
+- .mono[Police] on the `\(X\)`-axis.
+
+- .mono[Crime] on the `\(Y\)`-axis.
+
+---
+# Take 2
+
+## Example: Effect of police on crime
+
+&lt;img src="06-Simple_Linear_Regression_Estimation_I_files/figure-html/unnamed-chunk-2-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Take 2
+
+## Example: Effect of police on crime
+
+The scatter plot tells us more than the spreadsheet.
+
+- Somewhat weak _positive_ relationship.
+
+--
+
+- Sample correlation coefficient of 0.14 confirms this.
+
+But our question was 
+
+&gt; Does the number of on-campus police officers affect campus crime rates? If so, by how much?
+
+- The scatter plot and correlation coefficient provide only a partial answer.
+
+---
+# Take 3
+
+## Example: Effect of police on crime
+
+Our next step is to estimate a __statistical model.__
+
+To keep it simple, we will relate an __explained variable__ `\(Y\)` to an __explanatory variable__ `\(X\)` in a linear model.
+
+---
+# Simple Linear Regression Model
+
+We express the relationship between a .hi-purple[explained variable] and an .hi-green[explanatory variable] as linear:
+
+$$
+ \color{#9370DB}{Y_i} = \beta_1 + \beta_2\color{#007935}{X_i} + u_i.
+$$
+
+- `\(\beta_1\)` is the __intercept__ or constant.
+
+- `\(\beta_2\)` is the __slope coefficient__.
+
+- `\(u_i\)` is an __error term__ or disturbance term.
+
+.footnote[
+_Simple_ .mono[=] Only one explanatory variable.
+]
+
+---
+# Simple Linear Regression Model
+
+The .hi[intercept] tells us the expected value of `\(Y_i\)` when `\(X_i = 0\)`. 
+
+$$
+ Y_i = \color{#e64173}{\beta_1} + \beta_2X_i + u_i
+$$
+
+Usually not the focus of an analysis.
+
+---
+# Simple Linear Regression Model
+
+The .hi[slope coefficient] tells us the expected change in `\(Y_i\)` when `\(X_i\)` increases by one. 
+
+$$
+ Y_i = \beta_1 + \color{#e64173}{\beta_2}X_i + u_i
+$$
+
+"A one-unit increase in `\(X_i\)` is associated with a `\(\color{#e64173}{\beta_2}\)`-unit increase in `\(Y_i\)`."
+
+--
+
+Under certain (strong) assumptions about the error term, `\(\color{#e64173}{\beta_2}\)` is the _effect of_ `\(X_i\)` _on_ `\(Y_i\)`.
+
+- Otherwise, it's the _association of_ `\(X_i\)` _with_ `\(Y_i\)`.
+
+---
+# Simple Linear Regression Model
+
+The .hi[error term] reminds us that `\(X_i\)` does not perfectly explain `\(Y_i\)`. 
+
+$$
+ Y_i = \beta_1 + \beta_2X_i + \color{#e64173}{u_i}
+$$
+
+Represents all other factors that explain `\(Y_i\)`.
+
+- Useful mnemonic: pretend that `\(u\)` stands for *"unobserved"* or *"unexplained."*
+
+---
+# Take 3, continued
+
+## Example: Effect of police on crime
+
+How might we apply the simple linear regression model to our question about the effect of on-campus police on campus crime?
+
+- Which variable is `\(X\)`? Which is `\(Y\)`?
+
+--
+
+$$
+ \text{Crime}_i = \beta_1 + \beta_2\text{Police}_i + u_i.
+$$
+
+- `\(\beta_1\)` is the crime rate for colleges without police.
+- `\(\beta_2\)` is the increase in the crime rate for an additional police officer per 1000 students.
+
+---
+# Take 3, continued
+
+## Example: Effect of police on crime
+
+How might we apply the simple linear regression model to our question?
+
+$$
+ \text{Crime}_i = \beta_1 + \beta_2\text{Police}_i + u_i
+$$
+
+`\(\beta_1\)` and `\(\beta_2\)` are the population parameters we want, but we cannot observe them.
+
+--
+
+Instead, we must estimate the population parameters.
+
+- `\(\hat{\beta_1}\)` and `\(\hat{\beta_2}\)` generate predictions of `\(\text{Crime}_i\)` called `\(\hat{\text{Crime}_i}\)`. 
+
+- We call the predictions of the dependent variable __fitted values.__
+
+--
+
+- Together, these trace a line: `\(\hat{\text{Crime}_i} = \hat{\beta_1} + \hat{\beta_2}\text{Police}_i\)`.
+
+---
+# Take 3, attempted
+
+## Example: Effect of police on crime
+
+Guess: `\(\hat{\beta_1} = 60\)` and `\(\hat{\beta_2} = -7\)`.
+
+--
+
+&lt;img src="06-Simple_Linear_Regression_Estimation_I_files/figure-html/unnamed-chunk-3-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Take 4
+
+## Example: Effect of police on crime
+
+Guess: `\(\hat{\beta_1} = 30\)` and `\(\hat{\beta_2} = 0\)`.
+
+--
+
+&lt;img src="06-Simple_Linear_Regression_Estimation_I_files/figure-html/unnamed-chunk-4-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Take 5
+
+## Example: Effect of police on crime
+
+Guess: `\(\hat{\beta_1} = 15.6\)` and `\(\hat{\beta_2} = 7.94\)`.
+
+--
+
+&lt;img src="06-Simple_Linear_Regression_Estimation_I_files/figure-html/unnamed-chunk-5-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Residuals
+
+Using `\(\hat{\beta_1}\)` and `\(\hat{\beta_2}\)` to make `\(\hat{Y_i}\)` generates misses called .hi[residuals]:
+
+$$
+\color{#e64173}{\hat{u}_i} = \color{#e64173}{Y_i - \hat{Y_i}}.
+$$
+
+- Sometimes called `\(\color{#e64173}{e_i}\)`.
+
+---
+# Residuals
+
+## Example: Effect of police on crime
+
+Using `\(\hat{\beta_1} = 15.6\)` and `\(\hat{\beta_2} = 7.94\)` to make `\(\color{#9370DB}{\hat{\text{Crime}_i}}\)` generates .hi[residuals].
+
+&lt;img src="06-Simple_Linear_Regression_Estimation_I_files/figure-html/unnamed-chunk-6-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Residuals
+
+We want an estimator that makes fewer big misses.
+
+Why not minimize `\(\sum_{i=1}^n \hat{u}_i\)`?
+
+--
+
+- There are positive _and_ negative residuals `\(\implies\)` no solution (can always find a line with more negative residuals).
+
+__Alternative:__ Minimize the sum of squared residuals a.k.a. the .hi[residual sum of squares (RSS)].
+
+- Squared numbers are never negative.
+
+---
+# Residuals
+
+## Example: Effect of police on crime
+
+.hi-blue[RSS] gives bigger penalties to bigger residuals.
+
+&lt;img src="06-Simple_Linear_Regression_Estimation_I_files/figure-html/unnamed-chunk-7-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+count: false
+
+# Residuals
+
+## Example: Effect of police on crime
+
+.hi-blue[RSS] gives bigger penalties to bigger residuals.
+
+&lt;img src="06-Simple_Linear_Regression_Estimation_I_files/figure-html/unnamed-chunk-8-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+count: false
+
+# Residuals
+
+## Example: Effect of police on crime
+
+.hi-blue[RSS] gives bigger penalties to bigger residuals.
+
+&lt;img src="06-Simple_Linear_Regression_Estimation_I_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Residuals
+
+## Minimizing RSS
+
+We could test thousands of guesses of `\(\hat{\beta_1}\)` and `\(\hat{\beta_2}\)` and pick the pair that minimizes RSS.
+
+- Or we just do a little math and derive some useful formulas that give us RSS-minimizing coefficients without the guesswork.
+
+---
+class: inverse, middle
+
+# Ordinary Least Squares (OLS)
+
+---
+# OLS
+
+&lt;br&gt;
+
+The __OLS estimator__ chooses the parameters `\(\hat{\beta_1}\)` and `\(\hat{\beta_2}\)` that minimize the .hi[residual sum of squares (RSS)]:
+
+`$$\min_{\hat{\beta}_1,\, \hat{\beta}_2} \quad \color{#e64173}{\sum_{i=1}^n \hat{u}_i^2}$$`
+
+This is why we call the estimator ordinary __least squares.__
+
+---
+# OLS Formulas
+
+&lt;br&gt;
+
+For details, see the [handout](https://raw.githack.com/kyleraze/EC320_Econometrics/master/Lectures/07-Simple_Linear_Regression_Estimation/07-SLR_Estimation_handout.pdf) posted on Canvas.
+
+__Slope coefficient__
+
+`$$\hat{\beta}_2 = \dfrac{\sum_{i=1}^n (Y_i - \bar{Y})(X_i - \bar{X})}{\sum_{i=1}^n  (X_i - \bar{X})^2}$$`
+
+__Intercept__
+
+$$ \hat{\beta}_1 = \bar{Y} - \hat{\beta}_2 \bar{X} $$
+
+---
+# Slope coefficient
+
+The slope estimator is equal to the sample covariance divided by the sample variance of `\(X\)`:
+
+$$
+`\begin{aligned}
+\hat{\beta}_2 &amp;= \dfrac{\sum_{i=1}^n (Y_i - \bar{Y})(X_i - \bar{X})}{\sum_{i=1}^n  (X_i - \bar{X})^2} \\ \\
+              &amp;= \dfrac{ \frac{1}{n-1} \sum_{i=1}^n (Y_i - \bar{Y})(X_i - \bar{X})}{ \frac{1}{n-1} \sum_{i=1}^n  (X_i - \bar{X})^2} \\ \\
+              &amp;= \dfrac{S_{XY}}{S^2_X}.
+\end{aligned}`
+$$
+
+---
+# Take 6
+
+## Example: Effect of police on crime
+
+Using the OLS formulas, we get `\(\hat{\beta_1}\)` .mono[=] 18.41 and `\(\hat{\beta_2}\)` .mono[=] 1.76.
+
+&lt;img src="06-Simple_Linear_Regression_Estimation_I_files/figure-html/unnamed-chunk-10-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+count: false
+
+# Take 6
+
+## Example: Effect of police on crime
+
+Using the OLS formulas, we get `\(\hat{\beta_1}\)` .mono[=] 18.41 and `\(\hat{\beta_2}\)` .mono[=] 1.76.
+
+&lt;img src="06-Simple_Linear_Regression_Estimation_I_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Coefficient Interpretation
+
+## Example: Effect of police on crime
+
+Using OLS gives us the fitted line
+
+$$
+ \hat{\text{Crime}_i} = \hat{\beta}_1 + \hat{\beta}_2\text{Police}_i.
+$$
+
+What does `\(\hat{\beta_1}\)` .mono[=] 18.41 tell us?
+
+--
+
+What does `\(\hat{\beta_2}\)` .mono[=] 1.76 tell us?
+
+--
+
+__Gut check:__ Does this mean that police _cause_ crime? 
+
+--
+
+- Probably not. __Why?__ 
+
+---
+# Outliers
+
+## Example: Association of police with crime
+
+&lt;img src="06-Simple_Linear_Regression_Estimation_I_files/figure-html/unnamed-chunk-12-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Outliers
+
+## Example: Association of police with crime
+
+.hi-purple[Fitted line] without outlier.
+
+&lt;img src="06-Simple_Linear_Regression_Estimation_I_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+count: false
+
+# Outliers
+
+## Example: Association of police with crime
+
+.hi-purple[Fitted line] without outlier. .hi[Fitted line] with outlier.
+
+&lt;img src="06-Simple_Linear_Regression_Estimation_I_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+# OLS Application
+
+Suppose we do not yet have an .hi-met_slate[empirical question], but wish to observe the mechanics involved in generating parameter estimates.
+
+Consider the following .hi-pink[mini sample] `\(\{X,Y\}\)` data points:
+
+--
+
+.pull-left[
+
+<div id="htmlwidget-0c270e04aa2bc5cb29ef" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-0c270e04aa2bc5cb29ef">{"x":{"filter":"none","vertical":false,"caption":"<caption>Example: \\(n = 4\\)<\/caption>","data":[[1,2,3,4],[1,2,3,4],[4,3,5,8]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>\\(i\\)<\/th>\n      <th>\\(x_i\\)<\/th>\n      <th>\\(y_i\\)<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","ordering":false,"columnDefs":[{"className":"dt-center","targets":"_all"}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+]
+
+.pull-right[
+Regression Model: `\(Y_i = \beta_1 + \beta_2 X_i + u_i\)`&lt;br&gt;
+Fitted Line: `\(\hat{Y_i}= b_1 + b_2 X_i\)`
+
+Lets calculate the estimated parameters `\(b_1\)` and `\(b_2\)` using the OLS estimator
+]
+
+---
+# OLS Application
+
+Recall that OLS focuses on minimizing the RSS. We will take four steps.
+
+1. Calculate the residuals, `\(\hat{u}_i = Y_i - \hat{Y_i}\)`
+2. Summate the squared residuals, `\(RSS = \sum_{i=1}^n \hat{u}_i\)`
+3. Differentiate for `\(\frac{\partial RSS}{\partial b_j}\)` such that our number of unknown parameters is equal to the number of partial differentiation equations
+4. Solve for the unknown parameters
+
+--
+
+We'll use the .hi-pink[mini sample] to get an idea of the mechanics involved. 
+Given larger datasets and more covariates, **R** comes to the rescue.
+
+.hi-pink[Warning:] Check the second derivatives to ensure minimization of the functions, where all the second-order partial derivatives are greater than zero. 
+
+---
+# OLS Application
+
+### Step 1: Calculate the residuals
+
+$$
+`\begin{aligned}
+\hat{u}_1 &amp;= Y_1 - \hat{Y_1} = Y_1 - b_1 -b_2 X_1 \\
+\hat{u}_2 &amp;= Y_2 - \hat{Y_2} = Y_2 - b_1 -b_2 X_2\\
+\hat{u}_3 &amp;= Y_3 - \hat{Y_3} = Y_3 - b_1 -b_2 X_3\\
+\hat{u}_4 &amp;= Y_4 - \hat{Y_4} = Y_4 - b_1 -b_2 X_4
+\end{aligned}`
+$$
+
+Plug in values from our given data for `\(\{X,Y\}\)`
+$$
+`\begin{aligned}
+\hat{u}_1 &amp;= 4 - b_1 -1*b_2 \\
+\hat{u}_2 &amp;= 3 - b_1 -2*b_2\\
+\hat{u}_3 &amp;= 5 - b_1 -3*b_2\\
+\hat{u}_4 &amp;= 8 - b_1 -4*b_2
+\end{aligned}`
+$$
+
+Next we'll square each of these terms and summate for RSS
+
+---
+# OLS Application
+
+### Step 2: Calculate the RSS
+
+$$
+`\begin{aligned}
+RSS &amp;= \sum_{i=1}^{n} \hat{u_i}^2 =  \hat{u_1}^2 + \hat{u_2}^2 + \hat{u_3}^2 + \hat{u_4}^2\\
+&amp;= (4 - b_1 - b_2)^2 + (3 - b_1 -2b_2)^2 + (5 - b_1 -3b_2)^2 + (8 - b_1 -4b_2)^2\\
+&amp; = 114 + 4b_1^2 + 30b_2^2 - 40b_1 - 114b_2 + 20b_1 b_2 
+\end{aligned}`
+$$
+
+--
+
+Recall that OLS minimizes the RSS expression with respect to the specific parameters involved. 
+
+To find the values that minimize a particular expression, we need to apply differentiation. 
+
+
+---
+# OLS Application
+
+### Step 3: Differentiate RSS by parameters
+
+To differentiate by a particular variable, multiply each term by its power value and subtract `\(1\)` from the power of each of its terms.
+
+e.g. for `\(y=2x^3, \partial y / \partial x = 2*3x^{3-1} = 6x^2\)`
+
+--
+
+$$
+`\begin{align}
+\frac{\partial RSS}{\partial b_1} = 0 &amp;\implies  (4*2)b_1^{2-1} -(40*1)b_1^{1-1} + (20*1) b_1^{1-1} b_2 = 0 \notag \\
+&amp;\implies 8b_1 - 40 + 20 b_2 = 0  \ \ \ \ \ \ \  \ \ \ \ \ \ Eq(1)
+\end{align}`
+$$
+
+--
+
+$$
+`\begin{align}
+\frac{\partial RSS}{\partial b_2} = 0 &amp;\implies  (30*2)b_2^{2-1} -(114*1)b_2^{1-1} + (20*1) b_1 b_2^{1-1} = 0 \notag\\
+&amp;\implies 60b_2 - 114 + 20 b_1 = 0  \ \ \ \ \ \ \  \ \ \ \ \ \ Eq(2)
+\end{align}`
+$$
+
+---
+
+# OLS Application
+
+### Step 4: Solve for parameters
+
+With two unknowns `\(\{b_1, b_2\}\)` and two equations in which these unknowns satisfied the first order conditions `\(\left\{\frac{\partial RSS}{\partial b_1}, \frac{\partial RSS}{\partial b_2}\right\}\)`, we can solve for our parameters.
+
+How? Substitute one expression into the other. 
+
+$$
+`\begin{aligned}
+20 b_2 &amp;= 40 - 8b_1  \implies 60b_2 = 120 - 24b_1\\
+&amp;\text{substitute into second equation}\\
+ Eq(2): \  &amp; 120 - 24b_1 -114 + 20b_1 = 0\\
+&amp; 6 = 4b_1 \implies b_1 = 1.5\\
+Eq(1): \  &amp; 20b_2 = 40 - 8\times 1.5 = 28 \implies b_2 = 1.4
+\end{aligned}`
+$$
+
+OLS would prescribe `\(\{1.5, 1.4\}\)` for our set of parameter estimates. 
+
+
+---
+
+# OLS Application
+
+&lt;br&gt;
+
+.pull-left[
+&lt;img src="06-Simple_Linear_Regression_Estimation_I_files/figure-html/unnamed-chunk-16-1.png" width="95%" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+
+&lt;br&gt; 
+
+ Fitting a line through the data points, with the aim of minimizing the RSS, results in the same implied parameters
+
+
+]
+
+--
+
+- Such parameters will always be estimated computationally
+
+- We will perform an exercise by hand in **PBS3** to understand the mechanics underlying the values we hang our hats on
+
+
+
+---
+
+exclude: true
+
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
