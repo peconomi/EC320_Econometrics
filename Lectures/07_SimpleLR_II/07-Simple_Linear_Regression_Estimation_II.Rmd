@@ -1,8 +1,8 @@
 ---
 title: "Simple Linear Regression: Estimation"
 subtitle: "EC 320: Introduction to Econometrics"
-author: "Kyle Raze"
-date: "Fall 2019"
+author: "Philip Economides"
+date: "Winter 2022"
 output:
   xaringan::moon_reader:
     css: ['default', 'metropolis', 'metropolis-fonts', 'my-css.css']
@@ -189,6 +189,8 @@ df_earn %>%
 ---
 # Today
 
+<br>
+
 ## Agenda
 
 1. Highlight important properties of OLS.
@@ -205,6 +207,8 @@ class: inverse, middle
 ---
 # OLS Properties
 
+<br>
+
 The way we selected OLS estimates $\hat{\beta}_1$ and $\hat{\beta}_2$ gives us three important properties:
 
 1. Residuals sum to zero: $\sum_{i=1}^n \hat{u}_i = 0$.
@@ -213,21 +217,11 @@ The way we selected OLS estimates $\hat{\beta}_1$ and $\hat{\beta}_2$ gives us t
 
 3. The point $(\bar{X}, \bar{Y})$ is always on the regression line.
 
----
-# OLS Residuals
+--
 
-Residuals sum to zero: $\sum_{i=1}^n \hat{u}_i = 0$.
+<br>
 
-- By extension, the sample mean of the residuals are zero.
-
-- You will prove this in Problem Set 3.
-
----
-# OLS Residuals
-
-The sample covariance between the independent variable and the residuals is zero: $\sum_{i=1}^n X_i \hat{u}_i = 0$.
-
-- You will prove a version of this in Problem Set 3.
+You will **prove** (i) and (ii) in the upcoming problem set. 
 
 ---
 # OLS Regression Line
@@ -424,6 +418,8 @@ coord_equal()
 ---
 # Explained and Unexplained Variation
 
+<br>
+
 Residuals remind us that there are parts of $Y_i$ we can't explain.
 
 $$
@@ -444,6 +440,8 @@ $$
 
 ---
 # Explained and Unexplained Variation
+
+<br>
 
 __Explained Sum of Squares (ESS)__ measures the variation in $\hat{Y_i}$:
 
@@ -518,20 +516,26 @@ $\sum_{i=1}^n \hat{Y_i}\hat{u}_i$
 --
 <br> $\quad = 0$
 
+<br>
+
+As previously highlighted, these two terms will be equal to zero, as you will all prove in the upcoming assignment. 
+
 ---
 # Goodness of Fit
 
-## Calculating $R^2$
+What percentage of the variation in our $Y_i$ is *apparently* explained by our model? The $R^2$ term represents this percentage.
 
-- $R^2 = \frac{\text{ESS}}{\text{TSS}}$.
+Total variation is represented by .hi-blue[TSS] and our model is capturing the 'explained' sum of squares, .hi-blue[ESS].
 
-- $R^2 = 1 - \frac{\text{RSS}}{\text{TSS}}$.
+Taking a simple ratio reveals how much variation our model explains. 
+
+- $R^2 = \frac{\text{ESS}}{\text{TSS}}$ varies between 0 and 1
+
+- $R^2 = 1 - \frac{\text{RSS}}{\text{TSS}}$, 100% less the unexplained variation 
 
 --
 
-$R^2$ is related to the correlation between the actual values of $Y$ and the fitted values of $Y$.
-
-- Can show that $R^2 = (r_{Y, \hat{Y}})^2$.
+$R^2$ is related to the correlation between the actual values of $Y$ and the fitted values of $Y$. Can show that $R^2 = (r_{Y, \hat{Y}})^2$.
 
 ---
 # Goodness of Fit
@@ -544,13 +548,15 @@ In the social sciences, low $R^2$ values are common.
 
 Low $R^2$ doesn't mean that an estimated regression is useless.
 
-- In a randomized control trial, $R^2$ is usually less than 0.1.
+- In a randomized control trial, $R^2$ is usually less than 0.1
 
 --
 
 High $R^2$ doesn't necessarily mean you have a *"good"* regression.
 
-- Worries about selection bias and omitted variables still apply.
+- Worries about selection bias and omitted variables still apply
+
+- Some 'powerfully high' $R^2$ values are the result of simple accounting exercises, and tell us nothing about causality<br> (e.g. $Y = C + I + G + X-M$)
 
 ---
 class: inverse, middle

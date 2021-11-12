@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Simple Linear Regression: Estimation</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Philip Economides" />
+    <script src="07-Simple_Linear_Regression_Estimation_II_files/header-attrs/header-attrs.js"></script>
+    <link href="07-Simple_Linear_Regression_Estimation_II_files/remark-css/default.css" rel="stylesheet" />
+    <link href="07-Simple_Linear_Regression_Estimation_II_files/remark-css/metropolis.css" rel="stylesheet" />
+    <link href="07-Simple_Linear_Regression_Estimation_II_files/remark-css/metropolis-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="my-css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Simple Linear Regression: Estimation
+## EC 320: Introduction to Econometrics
+### Philip Economides
+### Winter 2022
+
+---
+
+class: inverse, middle
+
+
+
+# Prologue
+
+---
+# Last Time
+
+We considered a simple linear regression of `\(Y_i\)` on `\(X_i\)`:
+
+$$
+ Y_i = \beta_1 + \beta_2X_i + u_i.
+$$
+
+--
+
+- `\(\beta_1\)` and `\(\beta_2\)` are __population parameters__ that describe the *"true"* relationship between `\(X_i\)` and `\(Y_i\)`.
+
+- __Problem:__ We don't know the population parameters. The best we can do is to estimate them.
+
+---
+# Last Time
+
+We derived the OLS estimator by picking estimates that minimize `\(\sum_{i=1}^n \hat{u}_i^2\)`.
+
+- __Intercept:__
+
+$$ \hat{\beta}_1 = \bar{Y} - \hat{\beta}_2 \bar{X}. $$
+
+- __Slope:__
+
+$$
+`\begin{aligned}
+\hat{\beta}_2 &amp;= \dfrac{\sum_{i=1}^n (Y_i - \bar{Y})(X_i - \bar{X})}{\sum_{i=1}^n  (X_i - \bar{X})^2}.
+\end{aligned}`
+$$
+
+We used these formulas to obtain estimates of the parameters `\(\beta_1\)` and `\(\beta_2\)` in a regression of `\(Y_i\)` on `\(X_i\)`.
+
+---
+# Last Time
+
+With the OLS estimates of the population parameters, we constructed a regression line: 
+
+$$
+ \hat{Y_i} = \hat{\beta}_1 + \hat{\beta}_2X_i.
+$$
+
+- `\(\hat{Y_i}\)` are predicted or __fitted__ values of `\(Y_i\)`. 
+
+- You can think of `\(\hat{Y_i}\)` as an estimate of the average value of `\(Y_i\)` given a particular of `\(X_i\)`. 
+
+--
+
+OLS still produces prediction errors: `\(\hat{u}_i = Y_i - \hat{Y_i}\)`.
+
+- Put differently, there is a part of `\(Y_i\)` we can explain and a part we cannot: `\(Y_i = \hat{Y_i} + \hat{u}_i\)`.
+
+---
+# Review
+
+What is the equation for the regression model estimated below? 
+
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-1-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Review
+
+The estimated __intercept__ is -9.19. What does this tell us? 
+
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-2-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Review
+
+The estimated __slope__ is 2.2. How do we interpret it?
+
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-3-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Today
+
+&lt;br&gt;
+
+## Agenda
+
+1. Highlight important properties of OLS.
+
+2. Discuss goodness of fit: how well does one variable explain another?
+
+2. Units of measurement.
+
+---
+class: inverse, middle
+
+# OLS Properties
+
+---
+# OLS Properties
+
+&lt;br&gt;
+
+The way we selected OLS estimates `\(\hat{\beta}_1\)` and `\(\hat{\beta}_2\)` gives us three important properties:
+
+1. Residuals sum to zero: `\(\sum_{i=1}^n \hat{u}_i = 0\)`.
+
+2. The sample covariance between the independent variable and the residuals is zero: `\(\sum_{i=1}^n X_i \hat{u}_i = 0\)`.
+
+3. The point `\((\bar{X}, \bar{Y})\)` is always on the regression line.
+
+--
+
+&lt;br&gt;
+
+You will **prove** (i) and (ii) in the upcoming problem set. 
+
+---
+# OLS Regression Line
+
+The point `\((\bar{X}, \bar{Y})\)` is always on the regression line.
+
+- Start with the regression line: `\(\hat{Y_i} = \hat{\beta}_1 + \hat{\beta}_2X_i\)`.
+
+--
+
+- `\(\hat{Y_i} = \bar{Y} - \hat{\beta}_2 \bar{X} + \hat{\beta}_2X_i\)`.
+
+--
+
+- Plug `\(\bar{X}\)` into `\(X_i\)`:
+
+$$
+`\begin{aligned}
+\hat{Y_i} &amp;= \bar{Y} - \hat{\beta}_2 \bar{X} + \hat{\beta}_2\bar{X} \\
+&amp;= \bar{Y}.
+\end{aligned}`
+$$
+
+---
+class: inverse, middle
+
+# Goodness of Fit
+
+---
+# Goodness of Fit
+
+## .hi[Regression 1] *vs.* .hi-green[Regression 2]
+
+- Same slope.
+
+- Same intercept. 
+
+**Q:** Which fitted regression line *"explains"*&lt;sup&gt;*&lt;/sup&gt; the data better?
+
+.pull-left[
+
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-4-1.svg" style="display: block; margin: auto;" /&gt;
+
+]
+
+.pull-right[
+
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-5-1.svg" style="display: block; margin: auto;" /&gt;
+
+]
+
+.footnote[
+&lt;sup&gt;*&lt;/sup&gt; _Explains_ .mono[=] _fits_. 
+]
+
+---
+# Goodness of Fit
+
+## .hi[Regression 1] *vs.* .hi-green[Regression 2]
+
+The __coefficient of determination__ `\(R^2\)` is the fraction of the variation in `\(Y_i\)` *"explained"* by `\(X_i\)` in a linear regression.
+
+- `\(R^2 = 1 \implies X_i\)` explains _all_ of the variation in `\(Y_i\)`.
+- `\(R^2 = 0 \implies X_i\)` explains _none_ of the variation in `\(Y_i\)`.
+
+.pull-left[
+
+.center[
+`\(R^2\)` .mono[=] 0.73
+]
+
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-6-1.svg" style="display: block; margin: auto;" /&gt;
+
+]
+
+.pull-right[
+
+.center[
+`\(R^2\)` .mono[=] 0.05
+]
+
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-7-1.svg" style="display: block; margin: auto;" /&gt;
+
+]
+
+---
+# Goodness of Fit
+
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-8-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Goodness of Fit
+
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Goodness of Fit
+
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-10-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Explained and Unexplained Variation
+
+&lt;br&gt;
+
+Residuals remind us that there are parts of `\(Y_i\)` we can't explain.
+
+$$
+Y_i = \hat{Y_i} + \hat{u}_i
+$$
+
+- Sum the above, divide by `\(n\)`, and use the fact that OLS residuals sum to zero to get `\(\bar{\hat{u}} = 0 \implies \bar{Y} = \bar{\hat{Y}}\)`.
+
+--
+
+__Total Sum of Squares (TSS)__ measures variation in `\(Y_i\)`:
+
+$$
+\text{TSS} \equiv \sum_{i=1}^n (Y_i - \bar{Y})^2.
+$$
+
+- We will decompose this variation into explained and unexplained parts.
+
+---
+# Explained and Unexplained Variation
+
+&lt;br&gt;
+
+__Explained Sum of Squares (ESS)__ measures the variation in `\(\hat{Y_i}\)`:
+
+$$
+\text{ESS} \equiv \sum_{i=1}^n (\hat{Y_i} - \bar{Y})^2.
+$$
+--
+
+**Residual Sum of Squares (RSS)** measures the variation in `\(\hat{u}_i\)`:
+
+$$
+\text{RSS} \equiv \sum_{i=1}^n \hat{u}_i^2.
+$$
+
+--
+
+.hi[Goal:] Show that `\(\text{TSS} = \text{ESS} + \text{RSS}\)`.
+
+---
+class: white-slide
+
+**Step 1:** Plug `\(Y_i = \hat{Y_i} + \hat{u}_i\)` into TSS.
+
+`\(\text{TSS}\)`
+--
+&lt;br&gt; `\(\quad = \sum_{i=1}^n (Y_i - \bar{Y})^2\)`
+--
+&lt;br&gt; `\(\quad = \sum_{i=1}^n ([\hat{Y_i} + \hat{u}_i] - [\bar{\hat{Y}} + \bar{\hat{u}}])^2\)`
+
+--
+
+**Step 2:** Recall that `\(\bar{\hat{u}} = 0\)` and `\(\bar{Y} = \bar{\hat{Y}}\)`.
+
+`\(\text{TSS}\)`
+--
+&lt;br&gt; `\(\quad = \sum_{i=1}^n \left( [\hat{Y_i} - \bar{Y}] + \hat{u}_i \right)^2\)`
+--
+&lt;br&gt; `\(\quad = \sum_{i=1}^n \left( [\hat{Y_i} - \bar{Y}] + \hat{u}_i \right) \left( [\hat{Y_i} - \bar{Y}] + \hat{u}_i \right)\)`
+--
+&lt;br&gt; `\(\quad = \sum_{i=1}^n (\hat{Y_i} - \bar{Y})^2 + \sum_{i=1}^n \hat{u}_i^2 + 2 \sum_{i=1}^n \left( (\hat{Y_i} - \bar{Y})\hat{u}_i \right)\)`
+
+---
+class: white-slide
+
+**Step 3:** Notice .hi-purple[ESS] and .hi[RSS].
+
+`\(\text{TSS}\)`
+--
+&lt;br&gt; `\(\quad = \color{#9370DB}{\sum_{i=1}^n (\hat{Y_i} - \bar{Y})^2} + \color{#e64173}{\sum_{i=1}^n \hat{u}_i^2} + 2 \sum_{i=1}^n \left( (\hat{Y_i} - \bar{Y})\hat{u}_i \right)\)`
+--
+&lt;br&gt; `\(\quad = \color{#9370DB}{\text{ESS}} + \color{#e64173}{\text{RSS}} + 2 \sum_{i=1}^n \left( (\hat{Y_i} - \bar{Y})\hat{u}_i \right)\)`
+
+---
+class: white-slide
+
+**Step 4:** Simplify.
+
+`\(\text{TSS}\)`
+--
+&lt;br&gt; `\(\quad = \text{ESS} + \text{RSS} + 2 \sum_{i=1}^n \left( (\hat{Y_i} - \bar{Y})\hat{u}_i \right)\)`
+--
+&lt;br&gt; `\(\quad = \text{ESS} + \text{RSS} + 2 \sum_{i=1}^n \hat{Y_i}\hat{u}_i - 2 \bar{Y}\sum_{i=1}^n \hat{u}_i\)`
+
+--
+
+**Step 5:** Shut down the last two terms. Notice that
+
+`\(\sum_{i=1}^n \hat{Y_i}\hat{u}_i\)`
+&lt;br&gt; `\(\quad = \sum_{i=1}^n (\hat{\beta}_1 + \hat{\beta}_2X_i)\hat{u}_i\)`
+--
+&lt;br&gt; `\(\quad = \hat{\beta}_1 \sum_{i=1}^n \hat{u}_i  + \hat{\beta}_2 \sum_{i=1}^n X_i\hat{u}_i\)`
+--
+&lt;br&gt; `\(\quad = 0\)`
+
+&lt;br&gt;
+
+As previously highlighted, these two terms will be equal to zero, as you will all prove in the upcoming assignment. 
+
+---
+# Goodness of Fit
+
+What percentage of the variation in our `\(Y_i\)` is *apparently* explained by our model? The `\(R^2\)` term represents this percentage.
+
+Total variation is represented by .hi-blue[TSS] and our model is capturing the 'explained' sum of squares, .hi-blue[ESS].
+
+Taking a simple ratio reveals how much variation our model explains. 
+
+- `\(R^2 = \frac{\text{ESS}}{\text{TSS}}\)` varies between 0 and 1
+
+- `\(R^2 = 1 - \frac{\text{RSS}}{\text{TSS}}\)`, 100% less the unexplained variation 
+
+--
+
+`\(R^2\)` is related to the correlation between the actual values of `\(Y\)` and the fitted values of `\(Y\)`. Can show that `\(R^2 = (r_{Y, \hat{Y}})^2\)`.
+
+---
+# Goodness of Fit
+
+## So what?
+
+In the social sciences, low `\(R^2\)` values are common.
+
+--
+
+Low `\(R^2\)` doesn't mean that an estimated regression is useless.
+
+- In a randomized control trial, `\(R^2\)` is usually less than 0.1
+
+--
+
+High `\(R^2\)` doesn't necessarily mean you have a *"good"* regression.
+
+- Worries about selection bias and omitted variables still apply
+
+- Some 'powerfully high' `\(R^2\)` values are the result of simple accounting exercises, and tell us nothing about causality&lt;br&gt; (e.g. `\(Y = C + I + G + X-M\)`)
+
+---
+class: inverse, middle
+
+# Units of Measurement
+
+---
+# Last Time
+
+We ran a regression of crimes per 1000 students on police per 1000 students. We found that `\(\hat{\beta_1}\)` .mono[=] 18.41 and `\(\hat{\beta_2}\)` .mono[=] 1.76. 
+
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Last Time
+
+What if we had run a regression of crimes per student on police per 1000 students? What would happen to the slope?
+
+--
+
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-12-1.svg" style="display: block; margin: auto;" /&gt;
+
+`\(\hat{\beta_2}\)` .mono[=] 0.001756.
+
+---
+# Demeaning
+
+## Practice problem
+
+Suppose that, before running a regression of `\(Y_i\)` on `\(X_i\)`, you decided to _demean_ each variable by subtracting off the mean from each observation. This gave you `\(\tilde{Y}_i = Y_i - \bar{Y}\)` and `\(\tilde{X}_i = X_i - \bar{X}\)`.
+
+Then you decide to estimate
+
+$$
+\tilde{Y}_i = \beta_1 + \beta_2 \tilde{X}_i + u_i.
+$$
+
+What will you get for your intercept estimate `\(\hat{\beta}_1\)`?
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
