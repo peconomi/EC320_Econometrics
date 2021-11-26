@@ -25,9 +25,9 @@ The HTML versions of the lecture slides allow you to view animations and interac
 
 6. **Simple Linear Regression: Estimation I** <br> [.html](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/06_SimpleLR_I/06-Simple_Linear_Regression_Estimation_I.html) | [.pdf](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/06_SimpleLR_I/06-Simple_Linear_Regression_Estimation_I.pdf) | [Handout]()
 
-7. **Simple Linear Regression: Estimation II** <br> [.html](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/07_SimpleLR_II/07-Simple_Linear_Regression_Estimation_II.html) | [.pdf]()
+7. **Simple Linear Regression: Estimation II** <br> [.html](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/07_SimpleLR_II/07-Simple_Linear_Regression_Estimation_II.html) | [.pdf](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/07_SimpleLR_II/07-Simple_Linear_Regression_Estimation_II.pdf)
 
-8. **Classical Assumptions** <br> [.html]() | [.pdf]()
+8. **Classical Assumptions** <br> [.html](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/08_Classical_Assumptions/08-Classical_Assumptions.html) | [.pdf](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/08_Classical_Assumptions/08-Classical_Assumptions.pdf)
 
 9. **Midterm Review** <br> [.html]() | [.pdf]()
 
