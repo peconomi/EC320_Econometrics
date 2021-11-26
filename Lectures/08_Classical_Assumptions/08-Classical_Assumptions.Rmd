@@ -1115,3 +1115,14 @@ We can't tell if we have a "good" sample (similar to the population) or a "bad s
 --
 
 Next time, we will leverage all six classical assumptions, including **normality**, to conduct hypothesis tests.
+
+
+---
+
+exclude: true
+
+```{R generate pdfs, include = F, eval = F}
+#remotes::install_github('rstudio/pagedown')
+library(pagedown)
+pagedown::chrome_print("08-Classical_Assumptions.html", output = "08-Classical_Assumptions.pdf")
+```
