@@ -21,11 +21,11 @@ The HTML versions of the lecture slides allow you to view animations and interac
 
 4. **The Fundamental Problem of Econometrics** <br> [.html](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/04_Fundamental_Problem/04-Fun_Problem.html) | [.pdf](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/04_Fundamental_Problem/04-Fun_Problem.pdf)
 
-5. **Regression Logic** <br> [.html]() | [.pdf]()
+5. **Regression Logic** <br> [.html](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/05_Regression/05-Regression.html) | [.pdf](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/05_Regression/05-Regression.pdf)
 
-6. **Simple Linear Regression: Estimation I** <br> [.html]() | [.pdf]() | [Handout]()
+6. **Simple Linear Regression: Estimation I** <br> [.html](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/06_SimpleLR_I/06-Simple_Linear_Regression_Estimation_I.html) | [.pdf](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/06_SimpleLR_I/06-Simple_Linear_Regression_Estimation_I.pdf) | [Handout]()
 
-7. **Simple Linear Regression: Estimation II** <br> [.html]() | [.pdf]()
+7. **Simple Linear Regression: Estimation II** <br> [.html](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/07_SimpleLR_II/07-Simple_Linear_Regression_Estimation_II.html) | [.pdf]()
 
 8. **Classical Assumptions** <br> [.html]() | [.pdf]()
 
