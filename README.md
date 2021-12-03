@@ -70,7 +70,7 @@ Available: 02/14/2022 | Due: 02/21/2022
 **Quiz 2 - Regressions**<br> 
 Available:  02/21/2022 | Due: 02/23/2022
 
-**Data Project** 
+**Data Project** <br> 
 Available: 01/03/2022 | Due: 03/01/2022
 
 **Problem Set 5**: Deeper Topics <br>
