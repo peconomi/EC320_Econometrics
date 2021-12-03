@@ -45,27 +45,40 @@ The HTML versions of the lecture slides allow you to view animations and interac
 
 16. **Final Review** <br> [.html]() | [.pdf]()
 
-## Problem Sets
+## Assignment Due Dates
 
 Posted every week and made available on Canvas. 
 
 **Problem Set 1**: Review Content <br> 
 Available:  01/03/2022 | Due: 01/10/2022
 
+**Quiz 1 - Basics**<br> 
+Available:  01/13/2022 | Due: 01/17/2022
+
 **Problem Set 2**: Fundamentals and Regressions <br>
 Available:  01/10/2022 | Due: 01/24/2022
 
+**Midterm Exam**<br>
+Date: 02/07/2022
+
 **Problem Set 3**: Simple Linear and Assumptions <br>
-Available: 01/31/2022 |
-Due: 02/14/2022
+Available: 01/31/2022 | Due: 02/14/2022
 
 **Problem Set 4**: Multiple Linear and Non-Linear <br>
-Available: 02/14/2022 |
-Due: 02/23/2022
+Available: 02/14/2022 | Due: 02/21/2022
+
+**Quiz 2 - Regressions**<br> 
+Available:  02/21/2022 | Due: 02/23/2022
+
+**Data Project** 
+Available: 01/03/2022 | Due: 03/01/2022
 
 **Problem Set 5**: Deeper Topics <br>
-Available: 02/23/2022 |
-Due: 03/07/2022
+Available: 02/23/2022 | Due: 03/07/2022
+
+**Final Exam**<br>
+Date: 03/14/2022
+ 
 
 ## Labs
 
