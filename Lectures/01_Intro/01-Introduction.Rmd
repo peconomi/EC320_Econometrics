@@ -137,7 +137,7 @@ Content will be available on Canvas. If you wish to download them faster, see th
 
 * 20% - Midterm Exam
 
-* 10% - Data Assignment
+* 10% - Data Project
 
 * 35% - Final Exam
 
@@ -151,7 +151,7 @@ Develop practical skills based on the material we cover.
 
 Lab sessions will teach you how to conduct data cleaning, visualize data and produce regression analysis based on simulations and empirical questions. 
 
-Crucial for computational portions of assignments.
+Crucial for computational portions of assignments and data project.
 
 ---
 
