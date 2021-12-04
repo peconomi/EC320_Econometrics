@@ -65,7 +65,7 @@ Available: 01/24/2022 | Due: 01/31/2022
 Date: 02/07/2022
 
 **Problem Set 4**: Inference and Multiple Linear Regressions<br>
-Available: 02/14/2022 | Due: 02/21/2022
+Available: 02/09/2022 | Due: 02/18/2022
 
 **Quiz 2 - Regressions**<br> 
 Available:  02/21/2022 | Due: 02/23/2022
