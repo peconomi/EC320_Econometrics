@@ -55,16 +55,16 @@ Available:  01/03/2022 | Due: 01/10/2022
 **Quiz 1 - Basics**<br> 
 Available:  01/13/2022 | Due: 01/17/2022
 
-**Problem Set 2**: Fundamentals and Regressions <br>
-Available:  01/21/2022 | Due: 01/28/2022
+**Problem Set 2**: Fundamentals and Regressions<br>
+Available:  01/17/2022 | Due: 01/24/2022
+
+**Problem Set 3**: Simple Linear Regressions<br>
+Available: 01/24/2022 | Due: 01/31/2022
 
 **Midterm Exam**<br>
 Date: 02/07/2022
 
-**Problem Set 3**: Simple Linear and Assumptions <br>
-Available: 01/31/2022 | Due: 02/14/2022
-
-**Problem Set 4**: Multiple Linear and Non-Linear <br>
+**Problem Set 4**: Inference and Multiple Linear Regressions<br>
 Available: 02/14/2022 | Due: 02/21/2022
 
 **Quiz 2 - Regressions**<br> 
