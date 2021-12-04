@@ -56,7 +56,7 @@ Available:  01/03/2022 | Due: 01/10/2022
 Available:  01/13/2022 | Due: 01/17/2022
 
 **Problem Set 2**: Fundamentals and Regressions <br>
-Available:  01/10/2022 | Due: 01/24/2022
+Available:  01/21/2022 | Due: 01/28/2022
 
 **Midterm Exam**<br>
 Date: 02/07/2022
