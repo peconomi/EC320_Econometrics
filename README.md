@@ -3,8 +3,7 @@
 Welcome to EC 320: Introduction to Econometrics (Winter 2022) at the University of Oregon.
 
 - Instructor: [Philip Economides](https://philip-economides.com/)
-- GE (): 
-- GE (): 
+- GE: Micaela Wood
 - [Syllabus](https://rawcdn.githack.com/peconomi/EC320_Econometrics/aec72ddc06e9fd0bbd8e9c4ea435067e899a4ed4/Syllabus/syllabus.pdf)
 
 This course introduces the statistical techniques that help economists learn about the world using data. Using calculus and introductory statistics, students will cultivate a working understanding of the theory underpinning regression analysis&mdash;*how* it works, *why* it works, and *when it can lead us astray*. As the course progresses, students will apply the insights of theory to work with and learn from actual data using `R`, a statistical programming language. My goal is for students to leave the course with marketable skills in data analysis and&mdash;most importantly&mdash;a more sophisticated understanding of the notion that correlation does not necessarily imply causation.
@@ -82,19 +81,27 @@ Date: 03/14/2022
 
 ## Labs
 
-1. **Introduction to `R` and `R Markdown`** <br> [.html]()
+Each bullet point represents a given week  
+
+1. **Introduction to `R` and `R Markdown`** 
 
 2. **Data wrangling using `tidyverse`** <br> [.html]() | [Data]()
 
 3. **Visualization using `ggplot2`**
 
-4. **Non-Experimental Data** <br> [.html]() | [Data]()
+4. **Regression Analysis & Hypothesis Testing**
 
-5. **Regression Analysis & Hypothesis Testing**
+5. No lab
 
-6. **Hypothesis Testing and Omitted-Variable Bias**
+6. **Hypothesis Testing and Confidence Intervals**
 
-7. **Maps with `ggplot2`!** <br> [.html]() | [Data]()
+7. **Omitted Variable Bias Simulation**
+
+8. **Maps with `ggplot2`!**
+
+9. **Interaction Terms and Non-Linear Relationships**
+
+10. **Heteroskedasticity and Autocorrelation*
 
 ## Other course content
 
