@@ -85,14 +85,14 @@ anchorcolor = black]{hyperref}
 	\end{tabular}
 \end{table}
 
+
 \begin{table}[!h]
 	\ra{1.1}
-	\begin{tabular}{l @{\hspace{1.25\tabcolsep}} l l l @{\hspace{1.25\tabcolsep}} l @{}}
-		& \textbf{{GE}} & & & \textbf{{GE}} \\
-		\faUser & TA 1 Name & & \faUser & TA 2 Name \\
-		\faPaperPlaneO & \href{mailto:ta1@uoregon.edu}{ta1@uoregon.edu} & & \faPaperPlaneO & \href{mailto:ta2@uoregon.edu}{ta2@uoregon.edu} \\
-		\faMapMarker & \href{https://map.uoregon.edu/e99ccec73}{PLC 520} & & \faMapMarker & \href{https://map.uoregon.edu/e99ccec73}{PLC 520} \\
-		\faClockO & M 1400--1600 & & \faClockO & T 1200-1400
+	\begin{tabular}{l @{\hspace{1.25\tabcolsep}} l @{}}
+		& \textbf{{GE}}\\
+		\faUser & Micaela Wood \\
+		\faPaperPlaneO & \href{mailto:mwood13@uoregon.edu}{mwood13@uoregon.edu} \\
+		\faMapMarker & \href{https://map.uoregon.edu/e062b003c}{PLC 827} 
 	\end{tabular}
 \end{table}
 
@@ -195,15 +195,17 @@ Upon completion your data assignment should include the following sections;
 	\item Introduction: Describe the data source type (panel, cross-sectional, etc.), its frequency (hourly, annual, etc.), and a bit of flavor about how representative the sample is relative to the population.
 	\item Cleaning: Ultimately, you want to present this data in a clear and legible manner for its intended audience. If you are going to be performing regressions, this may require identifying outliers and treating for missing observations. 
 	List the challenges you encountered when preparing this data for its intended audience. Outline some of the limitations the data may face upon tackling these challenges. 
-	\item Summary Statistics: This is the most creative portion of the assignment. While you are not addressing causal inference in this assignment, your presentation of the data may still hint at potential research questions underlying the material. 
+	\item Summary Statistics: This is the most creative portion of the assignment. While you are not addressing causal inference in this portion of the assignment, your presentation of the data may still hint at potential research questions underlying the material. 
 	Present a series of interesting facts about the data. Infer potential causal relationships and describe how you may go about testing those relationships.
+	\item Regression: Provide inference based on a series of regressions carried out to explore your causal question of interest. Keep in mind that multiple stages of a regression are highly informative with respect to issues such as omitted variable bias.
+	Discuss the key assumptions necessary in order for your results to be considered unbiased and inference with respect to standard errors to be apt. 
 	\item Conclusion: For the more time-constraint reader, perhaps a future employer, you always want to be concise with your statements. Use this section to provide concluding remarks about the data, detailing how rich it appears to be and the potential uses it may provide in terms of empirical analysis.
 \end{itemize}
 
 \subsection*{Exams} 
 
 For each exam, I will generate a randomized seating chart. 
-During the exams, you may use a writing utensil, a non-programmable calculator, and a 3-by-5-inch notecard. 
+During the exams, you may use a set of writing utensils, a non-programmable calculator, and a blank 3-by-5-inch notecard. 
 I will have spare calculators and scrap paper available for anyone in need of additional resources. 
 As you turn in your exam, I will ask you to present your student ID. 
 I do not give makeup exams. 
@@ -216,10 +218,11 @@ This otherwise becomes a major distraction for all other individuals taking thei
 
 \subsection*{Lab} 
 
-In your weekly lab section, you will learn to apply the concepts discussed in lecture using \texttt{R}. 
+In your weekly Thursday lab section, you will learn to apply the concepts discussed in lecture using \texttt{R}. 
 While the lab may include some general econometrics instruction, the main focus is on the practical application of statistical techniques and working through the computational components of the bi-weekly problem sets. 
 Attending lab is crucial for learning the material and passing the course. 
-Due to space constraints, \textbf{you must attend the lab for which you registered}.
+Everyone will have the option of either attending the {\bf 1600-1720} time slot at {\bf INSERT LAB SITE}. Sessions will be recorded for those unable to attend. 
+No lab will be ran for the {\bf 1730-1850} time slot. 
 
 \newpage
 
@@ -320,24 +323,24 @@ If you do have any concerns regarding these policies and my enforcement of them,
 	\begin{tabular}{@{\extracolsep{0.5cm}} c c l @{}}
 		\toprule
 		\textbf{Week} & \textbf{Date} & \textbf{Topic}  \\ \toprule
-		01 & 01/07 & Lab: Introduction to \texttt{R} and \texttt{RStudio} \\ 
+		01 & 01/06 & Lab: Introduction to \texttt{R} and \texttt{RStudio} \\ 
 		02 & 01/10 & \textbf{Problem Set 1} (due on Canvas by 5pm)  \\
-		02 & 01/14 & Lab: Introduction to the \texttt{tidyverse} \\ \midrule 
+		02 & 01/13 & Lab: Introduction to the \texttt{tidyverse} \\ \midrule 
 		03 & 01/17 & \textbf{Quiz 1}: \textit{Basics} (due on Canvas by 11:59pm) \\
-		03 & 01/21 & Lab: Visualization using \texttt{ggplot2} \\
+		03 & 01/20 & Lab: Visualization using \texttt{ggplot2} \\
 		04 & 01/24 & \textbf{Problem Set 2} (due on Canvas by 5pm)  \\ 
-		04 & 01/28 & Lab: Regression Analysis \\ 
+		04 & 01/27 & Lab: Regression Analysis \\ 
 		05 & 01/31 & \textbf{Problem Set 3} (due on Canvas by 5pm) \\ 
-		05 & 02/04 & {\it No Lab}, focus on midterm prep \\  \midrule
-		06 & 02/11 & Lab: Hypothesis Testing and Confidence Intervals \\
+		05 & 02/03 & {\it No Lab}, focus on midterm prep \\  \midrule
+		06 & 02/10 & Lab: Hypothesis Testing and Confidence Intervals \\
 		07 & 02/18 & \textbf{Problem Set 4} (due on Canvas by 5pm)  \\ 
-		07 & 02/18 & Lab: Omitted-Variable Bias and Hypothesis Testing \\
+		07 & 02/17 & Lab: Omitted-Variable Bias Simulation \\
 		08 & 02/23 & \textbf{Quiz 2}: \textit{Regressions} (due on Canvas by 11:59pm) \\ 
-		08 & 02/25 & Lab: Maps on \texttt{R} + [taking requests] \\ \midrule
+		08 & 02/24 & Lab: Maps on \texttt{R} + [taking requests] \\ \midrule
 		09 & 03/01 & {\bf Data project}  \\  
-		09 & 03/04 & Lab: Interaction terms and non-linear relationships \\
+		09 & 03/03 & Lab: Interaction terms and non-linear relationships \\
 		10 & 03/07 & \textbf{Problem Set 5} (due on Canvas by 5pm) \\
-		10 & 03/11 & Lab: Accounting for heteroskedasticity and autocorrelation \\ \bottomrule
+		10 & 03/10 & Lab: Accounting for heteroskedasticity and autocorrelation \\ \bottomrule
 	\end{tabular}
 \end{table}
 

@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999993 (MiKTeX 21.10) (preloaded format=xelatex 2021.10.26)  3 DEC 2021 17:04
+This is XeTeX, Version 3.141592653-2.6-0.999993 (MiKTeX 21.10) (preloaded format=xelatex 2021.10.26)  30 DEC 2021 09:50
 entering extended mode
 **./syllabus.tex
 (syllabus.tex
@@ -779,7 +779,7 @@ Package rerunfilecheck Info: File `syllabus.out' has not changed.
 Here is how much of TeX's memory you used:
  19230 strings out of 411243
  384924 string characters out of 2829363
- 728613 words of memory out of 3000000
+ 726613 words of memory out of 3000000
  39451 multiletter control sequences out of 15000+600000
  428435 words of font info for 91 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
