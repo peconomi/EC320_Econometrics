@@ -101,7 +101,7 @@ Each bullet point represents a given week
 
 9. **Interaction Terms and Non-Linear Relationships**
 
-10. **Heteroskedasticity and Autocorrelation*
+10. **Heteroskedasticity and Autocorrelation**
 
 ## Other course content
 
