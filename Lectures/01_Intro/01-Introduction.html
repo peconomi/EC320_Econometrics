@@ -4,6 +4,7 @@
     <title>What is Econometrics?</title>
     <meta charset="utf-8" />
     <meta name="author" content="Philip Economides" />
+    <script src="01-Introduction_files/header-attrs/header-attrs.js"></script>
     <link href="01-Introduction_files/remark-css/default.css" rel="stylesheet" />
     <link href="01-Introduction_files/remark-css/metropolis.css" rel="stylesheet" />
     <link href="01-Introduction_files/remark-css/metropolis-fonts.css" rel="stylesheet" />
@@ -55,14 +56,8 @@ class: inverse, middle
 Where can you find me?
 
 - Office: 520 PLC
-- Office hours: Tuesday 15:00-16:00, Friday 10:30-11:30, or by appointment
+- Office hours: Tuesday 15:00-16:00, Thursday 10:00-11:00, or by appointment
 - Email: [.mono[peconomi@uoregon.edu]](mailto:peconomi@uoregon.edu) **(use EC 320 in the subject line)**
-
----
-
-### Teaching Assistants
-
-
 
 ---
 
@@ -97,7 +92,7 @@ Read through the prescribed readings listed in the Tentative Schedule of the syl
 * .hi-slate[W6:] .hi-pink[Midterm], SLR - Inference
 * .hi-slate[W7:] MLR - Estimation &amp; Inferece
 * .hi-slate[W8:] Non-linear &amp; Qualitative variables
-* .hi-slate[W9:] Interation terms &amp; Model Specifications
+* .hi-slate[W9:] Interaction terms &amp; Model Specifications
 * .hi-slate[W10:] Heteroskedasticity &amp; .hi-pink[Finals] Review
 
 Content will be available on Canvas. If you wish to download them faster, see the course [Github](https://github.com/peconomi/EC320_Econometrics) page.
@@ -120,9 +115,12 @@ Content will be available on Canvas. If you wish to download them faster, see th
 
 ---
 
+.pull-left[TA: .hi-pink[Micaela Wood]] .pull-right[Venue:  .hi-slate[442 MCK], Thurs 16:00-17:20&lt;br&gt; [Click here to see location](https://map.uoregon.edu/9975e5afc)]
+
+&lt;br&gt;
 &lt;br&gt;
 
-## Labs
+## Labs - Learning R
 
 Develop practical skills based on the material we cover.
 
@@ -516,13 +514,12 @@ theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
 
 ```r
 p_load(leaflet)
-leaflet() %&gt;%
-  addTiles() %&gt;% 
-  addMarkers(lng = -122.6793, lat = 45.51887, popup = "Pioneer Courthouse Square")
+leaflet() %&gt;% addTiles() %&gt;% addMarkers(lng = -122.6793, lat = 45.51887, 
+                            popup = "Pioneer Courthouse Square")
 ```
 
-<div id="htmlwidget-d6514e39562e448bf3e8" style="width:756px;height:432px;" class="leaflet html-widget"></div>
-<script type="application/json" data-for="htmlwidget-d6514e39562e448bf3e8">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addMarkers","args":[45.51887,-122.6793,null,null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},"Pioneer Courthouse Square",null,null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[45.51887,45.51887],"lng":[-122.6793,-122.6793]}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-cc0f0245777be8fbb35b" style="width:756px;height:432px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-cc0f0245777be8fbb35b">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addMarkers","args":[45.51887,-122.6793,null,null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},"Pioneer Courthouse Square",null,null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[45.51887,45.51887],"lng":[-122.6793,-122.6793]}},"evals":[],"jsHooks":[]}</script>
 
 ---
 
@@ -594,6 +591,8 @@ layout: true
 ---
 
 exclude: true
+
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

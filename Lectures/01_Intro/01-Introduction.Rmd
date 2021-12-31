@@ -78,14 +78,8 @@ options(knitr.table.format = "html")
 Where can you find me?
 
 - Office: 520 PLC
-- Office hours: Tuesday 15:00-16:00, Friday 10:30-11:30, or by appointment
+- Office hours: Tuesday 15:00-16:00, Thursday 10:00-11:00, or by appointment
 - Email: [.mono[peconomi@uoregon.edu]](mailto:peconomi@uoregon.edu) **(use EC 320 in the subject line)**
-
----
-
-### Teaching Assistants
-
-
 
 ---
 
@@ -120,7 +114,7 @@ Read through the prescribed readings listed in the Tentative Schedule of the syl
 * .hi-slate[W6:] .hi-pink[Midterm], SLR - Inference
 * .hi-slate[W7:] MLR - Estimation & Inferece
 * .hi-slate[W8:] Non-linear & Qualitative variables
-* .hi-slate[W9:] Interation terms & Model Specifications
+* .hi-slate[W9:] Interaction terms & Model Specifications
 * .hi-slate[W10:] Heteroskedasticity & .hi-pink[Finals] Review
 
 Content will be available on Canvas. If you wish to download them faster, see the course [Github](https://github.com/peconomi/EC320_Econometrics) page.
@@ -143,9 +137,12 @@ Content will be available on Canvas. If you wish to download them faster, see th
 
 ---
 
+.pull-left[TA: .hi-pink[Micaela Wood]] .pull-right[Venue:  .hi-slate[442 MCK], Thurs 16:00-17:20<br> [Click here to see location](https://map.uoregon.edu/9975e5afc)]
+
+<br>
 <br>
 
-## Labs
+## Labs - Learning R
 
 Develop practical skills based on the material we cover.
 
@@ -492,7 +489,7 @@ tidy(fit)
 
 ```{r, echo = F, dev = "svg"}
 # Load packages with dataset
-p_load(gapminder)
+p_load(gapminder,tidyverse)
 # Create dataset
 plot(
   x = gapminder$gdpPercap, y = gapminder$lifeExp,
@@ -594,9 +591,8 @@ theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
 
 ```{R, example: leaflet, fig.height = 6, dev = "svg"}
 p_load(leaflet)
-leaflet() %>%
-  addTiles() %>% 
-  addMarkers(lng = -122.6793, lat = 45.51887, popup = "Pioneer Courthouse Square")
+leaflet() %>% addTiles() %>% addMarkers(lng = -122.6793, lat = 45.51887, 
+                            popup = "Pioneer Courthouse Square")
 ```
 
 ---
