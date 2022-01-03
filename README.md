@@ -76,7 +76,7 @@ Available: 01/03/2022 | Due: 03/01/2022
 Available: 02/23/2022 | Due: 03/07/2022
 
 **Final Exam**<br>
-Date: 03/14/2022
+Date: 03/16/2022
  
 
 ## Labs
