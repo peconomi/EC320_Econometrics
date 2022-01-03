@@ -112,7 +112,7 @@ Read through the prescribed readings listed in the Tentative Schedule of the syl
 * .hi-slate[W4:] SLR - Estimation
 * .hi-slate[W5:] SLR - Classical Assumptions
 * .hi-slate[W6:] .hi-pink[Midterm], SLR - Inference
-* .hi-slate[W7:] MLR - Estimation & Inferece
+* .hi-slate[W7:] MLR - Estimation & Inference
 * .hi-slate[W8:] Non-linear & Qualitative variables
 * .hi-slate[W9:] Interaction terms & Model Specifications
 * .hi-slate[W10:] Heteroskedasticity & .hi-pink[Finals] Review
