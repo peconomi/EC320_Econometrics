@@ -69,12 +69,12 @@ Problem set 1 posted. Will post next one upon deadline of the previous.
 This will allow folks more time/flexibility to get homework(s) organized. 
 
 - Due next Monday on Canvas by 1pm.
-- Analytical and computational components (turned in separately).
-- Each homework due every 2 weeks, Monday 1pm, last homework graded within week 10.
+- Going forward, Analytical and Computational components expected (turned in separately).
+- Homework due every 2 weeks, Monday 5pm.
 
 Any issues with .mono[R]?
 
-- I'll host more office hours Thursday morning at 10am, otherwise give Micaela a shout once she's introduced you all to it in the lab session. 
+- Next office hours are Thursday 10am, otherwise give Micaela a shout. 
 
 ---
 # Motivation

@@ -1,0 +1,293 @@
+---
+title: "Intro. to Econometrics"
+author: Philip Economides
+date: "Winter 2022"
+#date: "<br>`r format(Sys.time(), '%d %B %Y')`"
+header-includes:
+  - \usepackage{mathtools}
+  - \DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+  - \usepackage{amssymb}
+output: 
+  html_document:
+    toc: false
+    toc_depth: 3  
+    number_sections: false
+    theme: flatly
+    highlight: tango  
+    toc_float:
+      collapsed: true
+      smooth_scroll: true
+---
+
+```{r Setup, include = F}
+knitr::opts_chunk$set(echo = TRUE, cache=TRUE)
+
+options(htmltools.dir.version = FALSE)
+library(pacman)
+p_load(broom, latex2exp, leaflet, ggplot2, ggthemes, viridis, dplyr, magrittr, knitr, parallel, rddtools, readxl, emoGG, dslabs, gapminder, extrafont, Ecdat, wooldridge, tidyverse, janitor, kableExtra, gridExtra, estimatr)
+# Define pink color
+red_pink <- "#e64173"
+turquoise <- "#20B2AA"
+orange <- "#FFA500"
+red <- "#fb6107"
+blue <- "#3b3b9a"
+green <- "#8bb174"
+grey_light <- "grey70"
+grey_mid <- "grey50"
+grey_dark <- "grey20"
+purple <- "#6A5ACD"
+slate <- "#314f4f"
+# Dark slate grey: #314f4f
+# Notes directory
+dir_slides <- "~/Dropbox/Courses/"
+# Knitr options
+opts_chunk$set(
+  comment = "#>",
+  fig.align = "center",
+  fig.height = 4,
+  fig.width = 6,
+  # dpi = 300,
+  # cache = T,
+  warning = F,
+  message = F
+)
+# A blank theme for ggplot
+theme_empty <- theme_bw() + theme(
+  line = element_blank(),
+  rect = element_blank(),
+  strip.text = element_blank(),
+  axis.text = element_blank(),
+  plot.title = element_blank(),
+  axis.title = element_blank(),
+  plot.margin = structure(c(0, 0, -1, -1), unit = "lines", valid.unit = 3L, class = "unit"),
+  legend.position = "none"
+)
+theme_simple <- theme_bw() + theme(
+  line = element_blank(),
+  panel.grid = element_blank(),
+  rect = element_blank(),
+  axis.text.x = element_text(size = 10),
+  axis.text.y = element_text(size = 10),
+  axis.ticks = element_blank(),
+  plot.title = element_blank(),
+  axis.title.x = element_text(angle = 0, vjust = 0.5),
+  axis.title.y = element_text(angle = 90, vjust = 0.5),
+  legend.position = "none",
+  axis.line = element_line(color="black", size = .5)
+)
+```
+
+
+> This masterfile is intended to keep track of ideas, assignments etc.
+
+
+
+# {.tabset .tabset-fade .tabset-pills}
+
+
+## A2 - Using tidyverse and ggplot2
+
+> Due date: 10 January 2022
+>
+> The objective here is to get you comfortable with mutating dataframes, while applying some of the theory and have a little fun with your new visualization skills.
+
+I will provide the intial portion of the code in which I generate a set of series for the class.
+Your job is to put these items into a dataframe object, then conduct some transformations of the random variables before unleashing your new visualization skills.
+
+The last portion of these exercises will be far more free-form and let you get creative with your submissions. 
+Ideally it will be good practice for fleshing out potential data project ideas.
+
+
+
+### Q1. Simulation (20. pts)
+
+In this simulation of data, our variables can be defined as follows;
+
+---
+
+#### The data-generating process
+
+$$
+\begin{align}
+  \text{X}\sim&\mathop{\text{Uniform}}(0, 10), \\
+  \text{Y} =& \ \ 2 + 3\text{X} + \varepsilon, \ \\
+  \text{Z} =& 20 - 2\text{Y} + \nu\\
+\end{align}
+$$
+
+where $\varepsilon\sim\mathop{N}(0,15)$ and $\nu\sim\mathop{N}(0,10)$.
+
+```{r, ssim_dgp}
+library(pacman)
+p_load(dplyr, ggplot2)
+# Choose an observation count (number of rows)
+n <- 100
+set.seed(12345)
+# Generate data in a tibble
+  e = rnorm(n, sd = 30)
+  v = rnorm(n, sd = 20)
+  x = runif(n, min = 0, max = 10)
+  y = 8 - 3*x + e
+  z = 20 - 2*y + v
+```
+
+#### Questions
+
+&nbsp;
+&nbsp;
+
+i. Run the code above to get started. Set up a dataframe in which you include random variables X, Y and Z. __(4. pts)__
+
+&nbsp;
+
+```{r, Q1-1}
+
+
+```
+
+&nbsp;
+
+ii. 'Standardize' the X & Y variables. Include these two new random variables in your existing dataframe from question 1 (Hint: use the `mutate` function). Why would one normally choose to standarize a variable? __(8. pts)__
+
+&nbsp;
+
+```{r, Q1-2}
+
+```
+
+&nbsp;
+
+iii. Present a density plot of X using `ggplot2`. Do the same for the standarized random variable based on X. What differences are most notable to you about the two series? __(8. pts)__
+
+&nbsp;
+
+```{r, Q1-3, warning=F}
+
+```
+
+&nbsp;
+
+---
+
+### Q2. Identifying Outliers (20. pts)
+
+_This experience will have you identify mild and extreme outliers in a given dataset. To avoid doubt with respect to cherry picking specific outliers in order to curve a particular strong fitted relationship between variables, I often rely on a standardized rule of thumb, the IQR rule._
+
+_IQR stands for interquartile range. Any values below the lower bound and greater than the higher bound of these two IQR-based amounts would be purged from the data._
+
+$$
+\begin{aligned}
+\text{IQR } =& 3\text{rd} \text{ Quartile} - 1\text{st} \text{ Quartile}\\
+\text{Lower Bound} \ =&  1\text{st} \text{ Quartile} - \lambda*IQR\\
+\text{Upper Bound} \ =&  3\text{rd} \text{ Quartile} + \lambda*IQR
+\end{aligned}
+$$ 
+
+_So what is $\lambda$? Consider it a scalar that determines how much we wish to rid the data of outliers. The lower its value, the stronger a purge we would commit. If you want to sacrifice more variation in your data and be more strict towards outliers, you would set $\lambda=1.5$ and purge mild outliers. If you wish to only focus on extreme outliers, you would instead use $\lambda=3$_
+
+Let's try this new tool out! Download the data (dirty_deputies_v2.csv) provided on Canvas and follow the given steps below to clean the data of its __mild__ outliers.
+
+&nbsp;
+&nbsp;
+
+#### Procedure
+
+Step 1. Store your summary statistics for the 'refund_value' variable. __(5. pts)__
+
+&nbsp;
+
+```{r, 2-1}
+
+# Enter in the directory to your csv file. If saved in the same folder just type dirty_deputies_v2.csv
+# dirty_deputies_v2 <- read_csv(" ")
+
+```
+
+&nbsp;
+
+Step 2. Identify your key lower and upper bounds for the given random variable in a mild setting. __(5. pts)__
+
+&nbsp;
+
+```{r, 2-2}
+
+
+```
+
+&nbsp;
+
+Step 3. Filter out any outliers from the dataframe and save this dataframe as a separate new one. How many observations were dropped and what percentage was that of the original observation count? __(5. pts)__
+
+&nbsp;
+
+```{r, 2-3}
+
+
+```
+
+&nbsp;
+
+Step 4. Visualize the random variable of interest from both datasets. What percentage of observations were dropped in this process? __(5. pts)__
+
+&nbsp;
+
+```{r, 2-4}
+
+
+```
+
+&nbsp;
+
+__Extra Credit:__ Are there potential issues with this approach for identifying outliers? List them below and provide supportive code.
+
+```{r, 2-5}
+
+
+```
+
+Present your findings and comment repeat them in an extreme outlier case.
+You may be wondering when is best to exclude outliers.
+The general rule of thumb is more variation is better variation, hence outliers can be extremely informative.
+At the same time, this leads to outliers often driving the significance of particularly strong results.
+If a data set suffers from data entry error, outlier detection can be a very quick way to identify values that would realistically be considered impossible.
+If you cannot correct the value, the next best step is to remove it.
+Additionally, if the observed value is not part of the population you are studying (i.e. farmland properties cropping up in a residential data exercise), you can legitimately remove the outliers.
+However, if your outliers are a natural part of the population of interest, then you should make every effort possible to keep the observation contained in your analysis. 
+Prepare results including and excluding outliers to see how sensitive your findings are to variation in these potentially key observations. 
+
+
+---
+
+### Q3. Visualization (10. pts)
+
+Find some interesting data online and attempt to visualize it in such a manner that you can draw out one interesting fact.
+For example, supposing you had savings data across US households, you could comment on how the percentage of income saved doubled during the initial COVID period through a bar chart or line plot. 
+
+Have fun with this one, it does not need to be perfect but it will be good practice for the data project. 
+
+&nbsp;
+
+```{r, 3-1}
+
+```
+
+
+
+## A3 - Regressions
+
+> Due date: 31 January 2022
+
+---
+
+
+## A4 - Inference and Confidence Intervals
+
+> Due date: 18 February 2022
+
+---
+
+
+## A5 - Simulating Endogeneity Problems
+
+> Due date: 7 March 2022
+
