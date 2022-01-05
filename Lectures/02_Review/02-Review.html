@@ -4,7 +4,6 @@
     <title>Statistics Review I</title>
     <meta charset="utf-8" />
     <meta name="author" content="Philip Economides" />
-    <script src="02-Review_files/header-attrs/header-attrs.js"></script>
     <link href="02-Review_files/remark-css/default.css" rel="stylesheet" />
     <link href="02-Review_files/remark-css/metropolis.css" rel="stylesheet" />
     <link href="02-Review_files/remark-css/metropolis-fonts.css" rel="stylesheet" />
@@ -15,7 +14,7 @@
     <link href="02-Review_files/dt-core/css/jquery.dataTables.min.css" rel="stylesheet" />
     <link href="02-Review_files/dt-core/css/jquery.dataTables.extra.css" rel="stylesheet" />
     <script src="02-Review_files/dt-core/js/jquery.dataTables.min.js"></script>
-    <link href="02-Review_files/crosstalk/css/crosstalk.min.css" rel="stylesheet" />
+    <link href="02-Review_files/crosstalk/css/crosstalk.css" rel="stylesheet" />
     <script src="02-Review_files/crosstalk/js/crosstalk.min.js"></script>
     <link rel="stylesheet" href="my-css.css" type="text/css" />
   </head>
@@ -48,9 +47,9 @@ This will allow folks more time/flexibility to get homework(s) organized.
 - Analytical and computational components (turned in separately).
 - Each homework due every 2 weeks, Monday 1pm, last homework graded within week 10.
 
-Issues with .mono[R]?
+Any issues with .mono[R]?
 
-- Office hours times included here.
+- I'll host more office hours Thursday morning at 10am, otherwise give Micaela a shout once she's introduced you all to it in the lab session. 
 
 ---
 # Motivation
@@ -313,7 +312,7 @@ __Notation:__ capital letters for random variables (_e.g._, `\(X\)`, `\(Y\)`, or
 __Example 1:__ Flipping a coin.
 
 - .hi-green[Events:] heads or tails.
-- Random Variable X: Win 1USD if heads ($x_i=$), pay 1USD if tails ($x_i=-1$)
+- Random Variable X: Win 1USD if heads ($x_i=1$), pay 1USD if tails ($x_i=-1$)
 - .hi-purple[Sample Space:] `\(\{-1,1\}\)`
 
 --
@@ -603,7 +602,7 @@ Suppose that a coffee shop sells `\(X_1\)` small, `\(X_2\)` medium, and `\(X_3\)
 
 $$
 `\begin{aligned}
-\color{#FD5F00}{\mathop{\mathbb{E}}(1.75 X_1 + 2.50 X_2 + 3.35 X_n)} &amp;= \color{#007935}{1.75 \mathop{\mathbb{E}}(X_1) + 2.50 \mathop{\mathbb{E}}(X_2) + 3.25 \mathop{\mathbb{E}}(X_3)} \\
+\color{#FD5F00}{\mathop{\mathbb{E}}(1.75 X_1 + 2.50 X_2 + 3.35 X_3)} &amp;= \color{#007935}{1.75 \mathop{\mathbb{E}}(X_1) + 2.50 \mathop{\mathbb{E}}(X_2) + 3.25 \mathop{\mathbb{E}}(X_3)} \\
 &amp;= \color{#9370DB}{1.75(43) + 2.50(56) + 3.25(21)} \\
 &amp;= \color{#9370DB}{283.5}
 \end{aligned}`
@@ -858,8 +857,6 @@ $$
 ---
 
 exclude: true
-
-
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

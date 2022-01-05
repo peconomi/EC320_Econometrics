@@ -72,9 +72,9 @@ This will allow folks more time/flexibility to get homework(s) organized.
 - Analytical and computational components (turned in separately).
 - Each homework due every 2 weeks, Monday 1pm, last homework graded within week 10.
 
-Issues with .mono[R]?
+Any issues with .mono[R]?
 
-- Office hours times included here.
+- I'll host more office hours Thursday morning at 10am, otherwise give Micaela a shout once she's introduced you all to it in the lab session. 
 
 ---
 # Motivation
@@ -400,7 +400,7 @@ __Notation:__ capital letters for random variables (_e.g._, $X$, $Y$, or $Z$) an
 __Example 1:__ Flipping a coin.
 
 - .hi-green[Events:] heads or tails.
-- Random Variable X: Win 1USD if heads ($x_i=$), pay 1USD if tails ($x_i=-1$)
+- Random Variable X: Win 1USD if heads ($x_i=1$), pay 1USD if tails ($x_i=-1$)
 - .hi-purple[Sample Space:] $\{-1,1\}$
 
 --
@@ -757,7 +757,7 @@ Suppose that a coffee shop sells $X_1$ small, $X_2$ medium, and $X_3$ large caff
 
 $$
 \begin{aligned}
-\color{#FD5F00}{\mathop{\mathbb{E}}(1.75 X_1 + 2.50 X_2 + 3.35 X_n)} &= \color{#007935}{1.75 \mathop{\mathbb{E}}(X_1) + 2.50 \mathop{\mathbb{E}}(X_2) + 3.25 \mathop{\mathbb{E}}(X_3)} \\
+\color{#FD5F00}{\mathop{\mathbb{E}}(1.75 X_1 + 2.50 X_2 + 3.35 X_3)} &= \color{#007935}{1.75 \mathop{\mathbb{E}}(X_1) + 2.50 \mathop{\mathbb{E}}(X_2) + 3.25 \mathop{\mathbb{E}}(X_3)} \\
 &= \color{#9370DB}{1.75(43) + 2.50(56) + 3.25(21)} \\
 &= \color{#9370DB}{283.5}
 \end{aligned}
