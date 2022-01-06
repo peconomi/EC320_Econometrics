@@ -87,7 +87,7 @@ theme_simple <- theme_bw() + theme(
 
 ## A2 - Using tidyverse and ggplot2
 
-> Due date: 10 January 2022
+> Due date: 24 January 2022
 >
 > The objective here is to get you comfortable with mutating dataframes, while applying some of the theory and have a little fun with your new visualization skills.
 
