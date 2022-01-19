@@ -83,13 +83,25 @@ theme_gif <- theme_bw() + theme(
 ---
 # Housekeeping
 
-**Problem Set 2 due 01/24**, which will address review content, fundamental thoughts and today's content. 
+.hi-pink[Problem Set 2 due 01/24 at 5pm], which will address review content, fundamental thoughts and today's content. 
 
-First computational portion of problem sets, so make sure you've got **R** working **before Monday**.
+Do not forget the computational portion of problem sets, so make sure you've got **R** working **before Monday**.
 
 --
 
-.hi-pink[So far] we've identified the fundamental problem econometricians face. How do we proceed? **Regressions**
+Please do not hesitate to reach out if you are having trouble, Zoom office hours:
+
+* Tuesday 3pm
+
+* Thursday 10am
+
+If these times do not suit, email me at peconomi@uoregon.edu
+
+---
+
+<br>
+
+.hi-pink[So far] we've identified the fundamental problem econometricians face. How do we proceed? **Regressions!**
 
 --
 
@@ -117,7 +129,7 @@ Economists often rely on .hi-pink[(linear) regression] for statistical compariso
 
 - Describes the relationship between a dependent (endogenous) variable and one or more explanatory (exogenous) variable(s)
 
-We will focus on the .hi-slate[simple univariate] case today.
+We will focus on the .hi-pink[simple univariate] case today.
 
 ---
 
@@ -127,8 +139,8 @@ We will focus on the .hi-slate[simple univariate] case today.
 
 Regression analysis helps us make *all else equal* comparisons.
 
-- We can model the effect of $X$ on $Y$ while .hi[controlling] .pink[for potential confounders].
-- Forces us to be explicit about the potential sources of selection bias.
+- We can model the effect of $X$ on $Y$ while .hi[controlling] .pink[for potential confounders]
+- Forces us to be explicit about the potential sources of selection bias
 - Failure to control for confounding variables leads to .hi[omitted-variable bias], a close cousin of selection bias
 - Why? The omitted variable, correlated with our covariate of interest, is sitting inside the error term causing chaos
 
@@ -217,9 +229,36 @@ $u_i$ is quite special. If we consider the data generating process of variable $
 
 - Always some error to our models, we just aim for it to be small relative to the challenge we face
 
-- Some aspects of the observed data that was collected may also have been inputted correctly (measurement error)
+- Some aspects of the observed data that was collected may also have been inputted incorrectly (measurement error)
 
 The error term is the price we are willing to accept for a more simplified model. 
+
+---
+
+# The Error Term
+
+To be explicit, there are five items that contribute to the existence of this disturbance term.
+
+--
+
+* Omission of Explanatory Variables
+
+--
+
+* Aggregation of Variables
+
+--
+
+* Model Misspecificiation
+
+--
+
+* Functional Misspecification
+
+--
+
+* Measurement Error
+
 
 ---
 
@@ -229,7 +268,7 @@ The intercept and slope are population parameters.
 
 Using an estimator with data on $X_i$ and $Y_i$, we can estimate a .hi[fitted regression line]:
 
-$$\hat{Y_i} = \hat{\beta}_0 + \hat{\beta}_1 X_i$$
+$$\hat{Y_i} = \hat{\beta}_0 + \hat{\beta}_1 X_i = b_0 + b_1 X_i$$
 
 - $\hat{Y_i}$ is the **fitted value** of $Y_i$.
 
