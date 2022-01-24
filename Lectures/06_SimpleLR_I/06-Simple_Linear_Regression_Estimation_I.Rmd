@@ -79,13 +79,24 @@ class: inverse, middle
 
 <br>
 
-**Problem Set 3** to be released in a week! (Jan 31st)
+**Problem Set 3** released tonight (due Jan 31st)
 
-- Will be focused on simple linear regressions and underlying assumptions
+- Will be focused on simple linear regressions
 
-- Will not be due until **after** your midterm exam (Feb 7th)
+- This will leave you with ample time for Midterm revision
 
-- Computational component will be using recent lab knowledge
+--
+
+**Late Submissions**
+
+- Accepting until Wednesday 11:59pm
+
+- Come to office hours for any help with work
+
+--
+
+**Labs**
+
 
 ---
 # Navigating Metrics
