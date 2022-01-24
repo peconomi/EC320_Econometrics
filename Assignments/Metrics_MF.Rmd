@@ -277,6 +277,121 @@ Have fun with this one, it does not need to be perfect but it will be good pract
 
 > Due date: 31 January 2022
 
+
+### Q1. Regression and Curvature (20. pts)
+
+1. Load your packages and import the data
+```{r, 2-1-1, echo=FALSE, message=FALSE}
+
+# Echo=FALSE allows you to hide the code while showing its resulting output. In this case it will evaluate the code without showing this portion of the code in your resulting html file. 
+# If you wanted to prevent an item of code from running, use EVAL=F or EVAL=FALSE (same effect).
+
+# Packages
+library(pacman)
+p_load(tidyverse,ggplot2, stargazer)
+
+# Here is how I do it through a work directory
+#nlsy79 <- read_csv("C:/Users/phili/Desktop/Teaching/Problem-Sets/03/nlsy79.csv")
+
+# Import yours but make sure the file is already in the correct work directory rather than using the guady location I've listed
+
+###
+###
+###
+
+```
+
+
+The data could be described as follows:
+
+```{r,  echo=FALSE}
+Name = c("CASEID", "earn2009", "hgc", "race", "sex", "bmonth", "byear",
+         "afqt", "region_1979", "faminc1978", "nsibs79")
+
+Description = c("Unique identifier", "Earnings in 2009", "Years of education", "Race and Ethnicity", "Gender", "Birth Month", "Birth Year", "Armed Forces Qualifying Test Percentile",
+                "Region", "Family Income in 1978", "Number of Siblings")
+
+data_descrip = cbind(Name, Description)
+
+as_tibble(data_descrip)
+```
+2. Regress earnings in 2009 on years of education. How much do earnings increase (Level & %) on average for every additional year of schooling? (Note: To place a variable into a % interpretation, you need to log transform your data. First start by filling out zero and missing values.)
+
+
+```{r, 2-1-2}
+
+```
+
+3. Present your regression outputs using `stargazer()` or `export_summs()`.
+
+```{r, 2-1-3}
+
+```
+
+4. Use ggplot2 to plot the conditional expectation of earnings with respect to years of education. In other words, solve for the average earnings conditional on a given year of earnings across all your discrete values. (Y-axis = Earnings, X-axis=Years of Education).
+
+Do you think it is reasonable to assume earnings increase linearly with years of schooling?
+
+```{r, 2-1-4}
+
+```
+
+
+5. Generate a variable that equals years of education squared. Regress earnings (level, %) on years of education and years of education squared.  **Bonus:** How much do earnings increase for someone who gets 10 instead of 9 years of schooling? What about someone who gets 17 instead of 16?
+
+6.Generate a new variable that equals years of education but coded as a factor variable (Note: Using mutate, the function for transforming this numeric vector of values into a vector of factors is simply `factor().
+
+Now regress earnings on this factor variable without a constant. To remove the constant, type “-1” after specifying the variables in the regression (e.g. lm(Y ~ X - 1, data=best_data_ever)). **Bonus**:Comment on the results. Have we seen these results before?
+
+
+
+### Q2. Visualizing Residuals (20. pts)
+
+
+```{r, 2-2-1}
+
+```
+
+
+### Q3. Visualization (10. pts)
+
+Using data of interest, assess the relationship between $X$ and $Y$ for any given pair of variables. What kind of inferences you can draw out from observing the coefficient of interest?
+
+This may be good opportunity to test out your thoughts on how two particular variables may covary.
+
+&nbsp;
+
+```{r, 2-3-1}
+
+```
+
+
+Given your regression above, what inferences can be drawn from the intercept and $R^2$ estimates?
+
+
+######################################################
+
+library(pacman)
+p_load(tidyverse, ggplot2, ggthemes)
+
+Ohio <- read_csv("C:/Users/phili/Downloads/Ohio.CSV")
+
+
+Ohio_filt <- Ohio %>% filter(location_name=="Ohio" & sex=="Both")
+
+totals <- aggregate(Ohio_filt$mx, by=list(Ohio_filt$year_id), sum)
+colnames(totals) = c("year_id","mx_total")
+
+
+Ohio_filt <- left_join(Ohio_filt, totals)
+Ohio_filt <- Ohio_filt %>% mutate(death_share = 100*(mx/mx_total))
+
+ggplot(Ohio_filt %>% filter(cause_name=="Drug use disorders"))+
+  geom_line(aes(x=year_id, y=death_share), color="red") +
+  ylab("Share of Deaths - Drug-Related") + xlab("Year")+
+  ggtitle("Ohio Death Rate") +
+  theme_pander()
+
 ---
 
 

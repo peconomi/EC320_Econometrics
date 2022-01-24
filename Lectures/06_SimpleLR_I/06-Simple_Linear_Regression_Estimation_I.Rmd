@@ -89,7 +89,7 @@ class: inverse, middle
 
 **Late Submissions**
 
-- Accepting until Wednesday 11:59pm
+- Accepting until Wednesday 11:59pm, 5pp penalty per day
 
 - Come to office hours for any help with work
 
