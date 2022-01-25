@@ -360,7 +360,103 @@ pre code {
 <blockquote>
 <p>Due date: 31 January 2022</p>
 </blockquote>
+<div id="q1.-regression-and-curvature-20.-pts" class="section level3">
+<h3>Q1. Regression and Curvature (20. pts)</h3>
+<ol style="list-style-type: decimal">
+<li>Load your packages and import the “nlsy79.csv” data.</li>
+</ol>
+<p>The data could be described as follows:</p>
+<pre><code>#&gt; # A tibble: 11 x 2
+#&gt;    Name        Description                            
+#&gt;    &lt;chr&gt;       &lt;chr&gt;                                  
+#&gt;  1 CASEID      Unique identifier                      
+#&gt;  2 earn2009    Earnings in 2009                       
+#&gt;  3 hgc         Years of education                     
+#&gt;  4 race        Race and Ethnicity                     
+#&gt;  5 sex         Gender                                 
+#&gt;  6 bmonth      Birth Month                            
+#&gt;  7 byear       Birth Year                             
+#&gt;  8 afqt        Armed Forces Qualifying Test Percentile
+#&gt;  9 region_1979 Region                                 
+#&gt; 10 faminc1978  Family Income in 1978                  
+#&gt; 11 nsibs79     Number of Siblings</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li><p>Regress earnings in 2009 on years of education. How much do earnings increase (Level &amp; %) on average for every additional year of schooling? (Note: To place a variable into a % interpretation, you need to log transform your data. First start by filling out zero and missing values.)</p></li>
+<li><p>Present your regression outputs using <code>stargazer()</code> or <code>export_summs()</code>.</p></li>
+<li><p>Use ggplot2 to plot the conditional expectation of earnings with respect to years of education. In other words, solve for the average earnings conditional on a given year of earnings across all your discrete values. (Y-axis = Earnings, X-axis=Years of Education).</p></li>
+</ol>
+<p>Do you think it is reasonable to assume earnings increase linearly with years of schooling?</p>
+<ol start="5" style="list-style-type: decimal">
+<li><p>Generate a variable that equals years of education squared. Regress earnings (level, %) on years of education and years of education squared. <strong>Bonus:</strong> How much do earnings increase for someone who gets 10 instead of 9 years of schooling? What about someone who gets 17 instead of 16?</p></li>
+<li><p>Generate a new variable that equals years of education but coded as a factor variable (Note: Using mutate, the function for transforming this numeric vector of values into a vector of factors is simply `factor().</p></li>
+</ol>
+<p>Now regress earnings on this factor variable without a constant. To remove the constant, type “-1” after specifying the variables in the regression (e.g. lm(Y ~ X - 1, data=best_data_ever)). <strong>Bonus</strong>:Comment on the results. Have we seen these results before?</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Here is another example of some piping of functions. In this case we&#39;ve log transformed a variable. To do two, just include a comma and work away</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="do">### dataframe &lt;- dataframe %&gt;% mutate(random_variable_logged = log(random_variable),</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">#                                      double_variable        = 2*random_variable,</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">#                                      half_variable          = 0.5*random_variable,</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">#                                      combo             = ran_var_1 + ran_var_2)</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Feel free to delete the above when you answer, just a reminder/shortcut for making multiple variables. </span></span></code></pre></div>
 <hr />
+</div>
+<div id="q2.-working-with-residuals-20.-pts" class="section level3">
+<h3>Q2. Working with Residuals (20. pts)</h3>
+<p>Consider the data we simulated last week. In this case, I’ve changed the sample size <span class="math inline">\(n\)</span> from 100 to 1000.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pacman)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">p_load</span>(dplyr, ggplot2)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Choose an observation count (number of rows)</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1245</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate data in a tibble</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>data_sim <span class="ot">=</span> <span class="fu">tibble</span>(</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">e =</span> <span class="fu">rnorm</span>(n, <span class="at">sd =</span> <span class="dv">30</span>),</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">v =</span> <span class="fu">rnorm</span>(n, <span class="at">sd =</span> <span class="dv">20</span>),</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">runif</span>(n, <span class="at">min =</span> <span class="dv">0</span>, <span class="at">max =</span> <span class="dv">10</span>),</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="dv">8</span> <span class="sc">-</span> <span class="dv">3</span><span class="sc">*</span>x <span class="sc">+</span> e,</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">z =</span> <span class="dv">20</span> <span class="sc">-</span> <span class="fl">0.3</span><span class="sc">*</span>y <span class="sc">+</span> <span class="dv">3</span><span class="sc">*</span>x <span class="sc">+</span> v</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>We know all the important parameters of interest since we defined them. Pretend for a moment that we did not know them and drew this provided sample of the three simulated random variables, <span class="math inline">\({X,Y,Z}\)</span>, to generate regression estimates.</p>
+<ol style="list-style-type: decimal">
+<li>Notice in this case that <span class="math inline">\(x\)</span> is correlated both with <span class="math inline">\(y\)</span> and <span class="math inline">\(z\)</span>. What would happen if we omitted <span class="math inline">\(x\)</span> and used only <span class="math inline">\(y\)</span> to explain the variation in <span class="math inline">\(z\)</span>?</li>
+</ol>
+<p>Prepare a regression of the following models and discuss the impact of omitting <span class="math inline">\(X_i\)</span>.</p>
+<p><span class="math display">\[
+\begin{aligned}
+\text{Model 1:} \ \ Z_i =&amp; \  \beta_1 + \beta_2 Y_i + u_i\\
+\text{Model 2:} \ \ Z_i =&amp; \ \gamma_1 + \gamma_2 Y_i + \gamma_3 X_i + \mu_i
+\end{aligned}
+\]</span></p>
+<ol start="2" style="list-style-type: decimal">
+<li>Using summary() to store your regression outputs, each object contains a vector of the corresponding ‘errors’ or ‘residuals’ associated with each respective regression.</li>
+</ol>
+<p>Create a pair of objects, each being a vector of the residual values. Use cbind() or tibble() to combine these two variables into a single dataframe.</p>
+<p>Find the corresponding RSS by squaring each column of residuals and then take the colSums() of the dataframe. Print the two <span class="math inline">\(RSS_j = \sum_{i=1}^n \hat{u}_{ij}^2\)</span> values, where <span class="math inline">\(j\)</span> is a subscript to denote which model we are considering.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To store your residuals, first obtain them from the regression output using resid(), then use unname() to generate a series without the unnecessary row number across each item. </span></span></code></pre></div>
+<p><span class="math inline">\(RSS_1=\)</span> and <span class="math inline">\(RSS_2=\)</span>. Given that RSS ____ is _____, this must be the model that best represents the explanatory variation in <span class="math inline">\(Z_i\)</span>.</p>
+<ol start="3" style="list-style-type: decimal">
+<li>Use <code>geom_errorbar()</code> to compare your point estimates for <span class="math inline">\(\beta_2\)</span> and <span class="math inline">\(\gamma_2\)</span> described by models 1 and 2. You will need to store them and the ymax, ymin values in a single dataframe with two rows.</li>
+</ol>
+<p>Which one seems more confident? Which one is biased?</p>
+<hr />
+</div>
+<div id="q3.-regression-of-interest-10.-pts" class="section level3">
+<h3>Q3. Regression of Interest (10. pts)</h3>
+<p>Using your own set of data, describe the relationship between any two random variables, <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>s, using a regression model equation.</p>
+<p>Next, run the associated regression using your sample of data. Present the results using your preferred function for regression outputs (try to avoid sing the <code>summary()</code> function. It is quite detracting from otherwise professional looking work).</p>
+<p> </p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load data/packages</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare data</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Run your regression of interest</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the variables on a scatterplot (geom_point) and add another layer using + geom_smooth() to include a fitted line. ?geom_smooth to see its required arguments. </span></span></code></pre></div>
+<p>What kind of inferences you can draw out from observing the coefficient of interest?</p>
+<p>Given your regression above, what inferences can be drawn from the intercept and <span class="math inline">\(R^2\)</span> estimates?</p>
+<p>Could you suggest any confounding variables that may be biasing your results? They must be variables correlated with both of your choices of <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>.</p>
+<hr />
+</div>
 </div>
 <div id="a4---inference-and-confidence-intervals" class="section level2">
 <h2>A4 - Inference and Confidence Intervals</h2>

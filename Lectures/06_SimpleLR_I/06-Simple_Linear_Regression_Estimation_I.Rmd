@@ -757,7 +757,7 @@ Lets calculate the estimated parameters $b_1$ and $b_2$ using the OLS estimator
 Recall that OLS focuses on minimizing the RSS. We will take four steps.
 
 1. Calculate the residuals, $\hat{u}_i = Y_i - \hat{Y_i}$
-2. Summate the squared residuals, $RSS = \sum_{i=1}^n \hat{u}_i$
+2. Summate the squared residuals, $RSS = \sum_{i=1}^n \hat{u}_i^2$
 3. Differentiate for $\frac{\partial RSS}{\partial b_j}$ such that our number of unknown parameters is equal to the number of partial differentiation equations
 4. Solve for the unknown parameters
 

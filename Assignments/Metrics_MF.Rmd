@@ -280,8 +280,8 @@ Have fun with this one, it does not need to be perfect but it will be good pract
 
 ### Q1. Regression and Curvature (20. pts)
 
-1. Load your packages and import the data
-```{r, 2-1-1, echo=FALSE, message=FALSE}
+1. Load your packages and import the "nlsy79.csv" data. 
+```{r, 3-1-1, echo=FALSE, message=FALSE}
 
 # Echo=FALSE allows you to hide the code while showing its resulting output. In this case it will evaluate the code without showing this portion of the code in your resulting html file. 
 # If you wanted to prevent an item of code from running, use EVAL=F or EVAL=FALSE (same effect).
@@ -318,13 +318,13 @@ as_tibble(data_descrip)
 2. Regress earnings in 2009 on years of education. How much do earnings increase (Level & %) on average for every additional year of schooling? (Note: To place a variable into a % interpretation, you need to log transform your data. First start by filling out zero and missing values.)
 
 
-```{r, 2-1-2}
+```{r, 3-1-2}
 
 ```
 
 3. Present your regression outputs using `stargazer()` or `export_summs()`.
 
-```{r, 2-1-3}
+```{r, 3-1-3}
 
 ```
 
@@ -332,65 +332,121 @@ as_tibble(data_descrip)
 
 Do you think it is reasonable to assume earnings increase linearly with years of schooling?
 
-```{r, 2-1-4}
+```{r, 3-1-4}
 
 ```
 
 
 5. Generate a variable that equals years of education squared. Regress earnings (level, %) on years of education and years of education squared.  **Bonus:** How much do earnings increase for someone who gets 10 instead of 9 years of schooling? What about someone who gets 17 instead of 16?
 
-6.Generate a new variable that equals years of education but coded as a factor variable (Note: Using mutate, the function for transforming this numeric vector of values into a vector of factors is simply `factor().
+6. Generate a new variable that equals years of education but coded as a factor variable (Note: Using mutate, the function for transforming this numeric vector of values into a vector of factors is simply `factor().
 
 Now regress earnings on this factor variable without a constant. To remove the constant, type “-1” after specifying the variables in the regression (e.g. lm(Y ~ X - 1, data=best_data_ever)). **Bonus**:Comment on the results. Have we seen these results before?
 
+```{r, 3-1-5}
 
+## Here is another example of some piping of functions. In this case we've log transformed a variable. To do two, just include a comma and work away
+### dataframe <- dataframe %>% mutate(random_variable_logged = log(random_variable),
+#                                      double_variable        = 2*random_variable,
+#                                      half_variable          = 0.5*random_variable,
+#                                      combo             = ran_var_1 + ran_var_2)
 
-### Q2. Visualizing Residuals (20. pts)
+# Feel free to delete the above when you answer, just a reminder/shortcut for making multiple variables. 
 
+```
 
-```{r, 2-2-1}
+---
+
+### Q2. Working with Residuals (20. pts)
+
+Consider the data we simulated last week. In this case, I've changed the sample size $n$ from 100 to 1000. 
+
+```{r, ssim_dgp_II}
+library(pacman)
+p_load(dplyr, ggplot2)
+# Choose an observation count (number of rows)
+n <- 1000
+set.seed(1245)
+# Generate data in a tibble
+data_sim = tibble(
+  e = rnorm(n, sd = 30),
+  v = rnorm(n, sd = 20),
+  x = runif(n, min = 0, max = 10),
+  y = 8 - 3*x + e,
+  z = 20 - 0.3*y + 3*x + v
+)
+```
+
+We know all the important parameters of interest since we defined them. 
+Pretend for a moment that we did not know them and drew this provided sample of the three simulated random variables, ${X,Y,Z}$, to generate regression estimates. 
+
+1. Notice in this case that $x$ is correlated both with $y$ and $z$. What would happen if we omitted $x$ and used only $y$ to explain the variation in $z$?
+
+Prepare a regression of the following models and discuss the impact of omitting $X_i$.
+
+$$
+\begin{aligned}
+\text{Model 1:} \ \ Z_i =& \  \beta_1 + \beta_2 Y_i + u_i\\
+\text{Model 2:} \ \ Z_i =& \ \gamma_1 + \gamma_2 Y_i + \gamma_3 X_i + \mu_i
+\end{aligned}
+$$
+
+```{r, 3-2-1}
 
 ```
 
 
-### Q3. Visualization (10. pts)
+2. Using summary() to store your regression outputs, each object contains a vector of the corresponding 'errors' or 'residuals' associated with each respective regression.
 
-Using data of interest, assess the relationship between $X$ and $Y$ for any given pair of variables. What kind of inferences you can draw out from observing the coefficient of interest?
+Create a pair of objects, each being a vector of the residual values. Use cbind() or tibble() to combine these two variables into a single dataframe. 
 
-This may be good opportunity to test out your thoughts on how two particular variables may covary.
+Find the corresponding RSS by squaring each column of residuals and then take the colSums() of the dataframe. Print the two $RSS_j = \sum_{i=1}^n \hat{u}_{ij}^2$ values, where $j$ is a subscript to denote which model we are considering. 
+
+```{r, 3-2-2}
+# To store your residuals, first obtain them from the regression output using resid(), then use unname() to generate a series without the unnecessary row number across each item. 
+
+
+```
+
+$RSS_1=$ and $RSS_2=$. Given that RSS ____ is  _____, this must be the model that best represents the explanatory variation in $Z_i$. 
+
+
+3. Use `geom_errorbar()` to compare your point estimates for $\beta_2$ and $\gamma_2$ described by models 1 and 2. You will need to store them and the ymax, ymin values in a single dataframe with two rows. 
+
+```{r, 3-2-3}
+
+```
+
+Which one seems more confident? Which one is biased?
+
+---
+
+### Q3. Regression of Interest (10. pts)
+
+Using your own set of data, describe the relationship between any two random variables, $X$ and $Y$s, using a regression model equation. 
+
+Next, run the associated regression using your sample of data. Present the results using your preferred function for regression outputs (try to avoid sing the `summary()` function. It is quite detracting from otherwise professional looking work).
 
 &nbsp;
 
 ```{r, 2-3-1}
 
+# Load data/packages
+
+# Prepare data
+
+# Run your regression of interest
+
+# Plot the variables on a scatterplot (geom_point) and add another layer using + geom_smooth() to include a fitted line. ?geom_smooth to see its required arguments. 
+
 ```
 
 
+What kind of inferences you can draw out from observing the coefficient of interest?
+
 Given your regression above, what inferences can be drawn from the intercept and $R^2$ estimates?
 
-
-######################################################
-
-library(pacman)
-p_load(tidyverse, ggplot2, ggthemes)
-
-Ohio <- read_csv("C:/Users/phili/Downloads/Ohio.CSV")
-
-
-Ohio_filt <- Ohio %>% filter(location_name=="Ohio" & sex=="Both")
-
-totals <- aggregate(Ohio_filt$mx, by=list(Ohio_filt$year_id), sum)
-colnames(totals) = c("year_id","mx_total")
-
-
-Ohio_filt <- left_join(Ohio_filt, totals)
-Ohio_filt <- Ohio_filt %>% mutate(death_share = 100*(mx/mx_total))
-
-ggplot(Ohio_filt %>% filter(cause_name=="Drug use disorders"))+
-  geom_line(aes(x=year_id, y=death_share), color="red") +
-  ylab("Share of Deaths - Drug-Related") + xlab("Year")+
-  ggtitle("Ohio Death Rate") +
-  theme_pander()
+Could you suggest any confounding variables that may be biasing your results? They must be variables correlated with both of your choices of $X$ and $Y$. 
 
 ---
 
