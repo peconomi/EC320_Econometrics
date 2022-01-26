@@ -12,7 +12,7 @@ output:
       highlightLines: true
       countIncrementalSlides: false
 ---
-class: inverse, middle
+
 
 ```{r Setup, include = F}
 options(htmltools.dir.version = FALSE)
@@ -89,9 +89,55 @@ lm0 <- lm(crime ~ police, data = data)
 lm1 <- lm(crime ~ police, data = data2)
 ```
 
+class: inverse, middle
+
+
 # Prologue
 
 ---
+
+# Housekeeping
+
+* **Midterm Review** votes are in! Syllabus updated
+
+```{r echo=FALSE, out.width="75%"}
+knitr::include_graphics("Mid-Review.PNG")
+```
+
+--
+
+* Submissions for **PBS2**, great job overall
+
+--
+
+* Reminders: **PBS3** online (due 31st), **office hours** Thurs 10am, Friday 2pm, Midway Student Experience Survey  
+
+
+
+
+
+---
+
+# PBS2 Q6
+
+<br>
+
+
+i) Determine the average treatment effect, based on treatment assignment
+
+--
+
+ii) Determine the average treatment effect, based on choice.
+
+
+--
+
+iii) Determine the average treatment effect, based on individual differences in outcomes
+
+
+---
+
+
 # Last Time
 
 We considered a simple linear regression of $Y_i$ on $X_i$:

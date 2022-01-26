@@ -4,7 +4,6 @@
     <title>Simple Linear Regression: Estimation</title>
     <meta charset="utf-8" />
     <meta name="author" content="Philip Economides" />
-    <script src="07-Simple_Linear_Regression_Estimation_II_files/header-attrs/header-attrs.js"></script>
     <link href="07-Simple_Linear_Regression_Estimation_II_files/remark-css/default.css" rel="stylesheet" />
     <link href="07-Simple_Linear_Regression_Estimation_II_files/remark-css/metropolis.css" rel="stylesheet" />
     <link href="07-Simple_Linear_Regression_Estimation_II_files/remark-css/metropolis-fonts.css" rel="stylesheet" />
@@ -21,13 +20,57 @@ class: center, middle, inverse, title-slide
 
 ---
 
-class: inverse, middle
 
+
+
+
+class: inverse, middle
 
 
 # Prologue
 
 ---
+
+# Housekeeping
+
+* **Midterm Review** votes are in! Syllabus updated
+
+&lt;img src="Mid-Review.PNG" width="75%" style="display: block; margin: auto;" /&gt;
+
+--
+
+* Submissions for **PBS2**, great job overall
+
+--
+
+* Reminders: **PBS3** online (due 31st), **office hours** Thurs 10am, Friday 2pm, Midway Student Experience Survey  
+
+
+
+
+
+---
+
+# PBS2 Q6
+
+&lt;br&gt;
+
+
+i) Determine the average treatment effect, based on treatment assignment
+
+--
+
+ii) Determine the average treatment effect, based on choice.
+
+
+--
+
+iii) Determine the average treatment effect, based on individual differences in outcomes
+
+
+---
+
+
 # Last Time
 
 We considered a simple linear regression of `\(Y_i\)` on `\(X_i\)`:
@@ -85,21 +128,21 @@ OLS still produces prediction errors: `\(\hat{u}_i = Y_i - \hat{Y_i}\)`.
 
 What is the equation for the regression model estimated below? 
 
-&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-1-1.svg" style="display: block; margin: auto;" /&gt;
-
----
-# Review
-
-The estimated __intercept__ is -10.16. What does this tell us? 
-
 &lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-2-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 # Review
 
-The estimated __slope__ is 2.28. How do we interpret it?
+The estimated __intercept__ is -14.46. What does this tell us? 
 
 &lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-3-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Review
+
+The estimated __slope__ is 2.52. How do we interpret it?
+
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-4-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 # Today
@@ -178,13 +221,13 @@ class: inverse, middle
 
 .pull-left[
 
-&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-4-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-5-1.svg" style="display: block; margin: auto;" /&gt;
 
 ]
 
 .pull-right[
 
-&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-5-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-6-1.svg" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -205,27 +248,22 @@ The __coefficient of determination__ `\(R^2\)` is the fraction of the variation 
 .pull-left[
 
 .center[
-`\(R^2\)` .mono[=] 0.74
-]
-
-&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-6-1.svg" style="display: block; margin: auto;" /&gt;
-
-]
-
-.pull-right[
-
-.center[
-`\(R^2\)` .mono[=] 0.03
+`\(R^2\)` .mono[=] 0.73
 ]
 
 &lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-7-1.svg" style="display: block; margin: auto;" /&gt;
 
 ]
 
----
-# Goodness of Fit
+.pull-right[
+
+.center[
+`\(R^2\)` .mono[=] 0.05
+]
 
 &lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-8-1.svg" style="display: block; margin: auto;" /&gt;
+
+]
 
 ---
 # Goodness of Fit
@@ -236,6 +274,11 @@ The __coefficient of determination__ `\(R^2\)` is the fraction of the variation 
 # Goodness of Fit
 
 &lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-10-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Goodness of Fit
+
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 # Explained and Unexplained Variation
@@ -390,7 +433,7 @@ class: inverse, middle
 
 We ran a regression of crimes per 1000 students on police per 1000 students. We found that `\(\hat{\beta_1}\)` .mono[=] 18.41 and `\(\hat{\beta_2}\)` .mono[=] 1.76. 
 
-&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-12-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 # Last Time
@@ -399,7 +442,7 @@ What if we had run a regression of crimes per student on police per 1000 student
 
 --
 
-&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-12-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /&gt;
 
 `\(\hat{\beta_2}\)` .mono[=] 0.001756.
 
@@ -421,8 +464,6 @@ What will you get for your intercept estimate `\(\hat{\beta}_1\)`?
 ---
 
 exclude: true
-
-
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
