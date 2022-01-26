@@ -4,6 +4,7 @@
     <title>Simple Linear Regression: Estimation</title>
     <meta charset="utf-8" />
     <meta name="author" content="Philip Economides" />
+    <script src="07-Simple_Linear_Regression_Estimation_II_files/header-attrs/header-attrs.js"></script>
     <link href="07-Simple_Linear_Regression_Estimation_II_files/remark-css/default.css" rel="stylesheet" />
     <link href="07-Simple_Linear_Regression_Estimation_II_files/remark-css/metropolis.css" rel="stylesheet" />
     <link href="07-Simple_Linear_Regression_Estimation_II_files/remark-css/metropolis-fonts.css" rel="stylesheet" />
@@ -55,17 +56,135 @@ class: inverse, middle
 
 &lt;br&gt;
 
+The fully manual version can be tedious.
+
+
+```r
+df_1 = tibble(
+  D   =c(rep(0,6), rep(1,6)),
+  Y_1 =c(4,9,3,10,11,14,12,7,15,2,8,19),
+  Y_0 =c(8,6,7, 8,12,19,15,9,16,1,6,12),
+  Y   =c(8,6,7, 8,12,19,15,9,16,1,6,12),
+  Y_c =c(8,9,7,10,12,19,15,9,16,2,8,19), 
+  C   =c(0,1,0,1,0,0,0,0,0,1,1,1)
+)
+```
+
+Let's automate some of the code to avoid user error. 
+
+---
+
+# PBS2 Q6
+
+&lt;br&gt;
+
+Consider the `if_else(arg1, arg2, arg3)` function. 
+`arg1` is your condition. `arg2` is the given value if condition is .hi-pink[TRUE]. `arg3` is the given value if condition is .hi-pink[FALSE].  
+
+
+```r
+df_2 &lt;- tibble(
+  D   =c(rep(0,6), rep(1,6)), 
+  C   =c(0,1,0,1,0,0,0,0,0,1,1,1),
+  Y_1 =c(4,9,3,10,11,14,12,7,15,2,8,19),
+  Y_0 =c(8,6,7, 8,12,19,15,9,16,1,6,12),
+) %&gt;% 
+  mutate(Y = if_else(D==1, Y_1, Y_0),
+         Y_c = if_else(C==1, Y_1, Y_0))
+```
+
+
+---
+
+# PBS2 Q6
+
+To go one step further, consider the fact that people are choosing whether to get treated based on their respect outcomes `\(\{Y_{1i},Y_{0i}\}\)`. 
+
+
+```r
+df_3 &lt;- tibble(
+  D   =c(rep(0,6), rep(1,6)), 
+  Y_1 =c(4,9,3,10,11,14,12,7,15,2,8,19),
+  Y_0 =c(8,6,7, 8,12,19,15,9,16,1,6,12),
+) %&gt;% 
+  mutate( C = if_else(Y_1 &gt;= Y_0, 1, 0), 
+          Y = if_else(D==1, Y_1, Y_0),
+         Y_c = if_else(C==1, Y_1, Y_0))
+```
+
+
+With only three items of data: to whom random treatment is assigned and measures of our two possible outcomes for each individual, we are able to determine who selects into treatment and identify the selection bias present. 
+
+This would be the difference between answers to (iii) &amp; (ii).
+
+---
+
+# PBS2 Q6
+
+Resulting Dataframe
+
+.pull-left[
+
+```
+#&gt; # A tibble: 12 x 6
+#&gt;        D   Y_1   Y_0     C     Y   Y_c
+#&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+#&gt;  1     0     4     8     0     8     8
+#&gt;  2     0     9     6     1     6     9
+#&gt;  3     0     3     7     0     7     7
+#&gt;  4     0    10     8     1     8    10
+#&gt;  5     0    11    12     0    12    12
+#&gt;  6     0    14    19     0    19    19
+#&gt;  7     1    12    15     0    12    15
+#&gt;  8     1     7     9     0     7     9
+#&gt;  9     1    15    16     0    15    16
+#&gt; 10     1     2     1     1     2     2
+#&gt; 11     1     8     6     1     8     8
+#&gt; 12     1    19    12     1    19    19
+```
+]
+
+.pull-right[
+&lt;br&gt;
+
+i) ATET (Random Assignment) &lt;br&gt;
+`\(E[Y_i| D_i=1] - E[Y_i|D_i=0]\)`
+
+ii) ATET (Selection into Treatment)&lt;br&gt;
+`\(E[Y^c_i| C_i=1] - E[Y^c_i| C_i=0]\)`
+
+iii) ATE (Unobservable in practice)&lt;br&gt;
+`\(E[Y_{1i} - Y_{0i}] = \tau\)`
+]
+
+---
+
+# PBS2 Q6
+
+&lt;br&gt;
+
 
 i) Determine the average treatment effect, based on treatment assignment
 
 --
 
+`\(E\left[Y_{i} | D_i = 1\right] - E\left[Y_{i} | D_i = 0\right] = E\left[Y_{1,i} | D_i = 1\right] - E\left[Y_{0,i} | D_i = 0\right]= 0.5\)` 
+
+--
+
 ii) Determine the average treatment effect, based on choice.
 
+--
+
+`\(E\left[Y_{i}^c | C_i = 1\right] - E\left[Y_{i}^c | C_i = 0\right] = E\left[Y_{1,i} | C_i = 1\right] - E\left[Y_{0,i} | C_i = 0\right] = -2.69\)`
 
 --
 
 iii) Determine the average treatment effect, based on individual differences in outcomes
+
+--
+
+`\(E\left[Y_{1,i} - Y_{0,i}\right] = -0.42\)`
 
 
 ---
@@ -128,21 +247,21 @@ OLS still produces prediction errors: `\(\hat{u}_i = Y_i - \hat{Y_i}\)`.
 
 What is the equation for the regression model estimated below? 
 
-&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-2-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-6-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 # Review
 
-The estimated __intercept__ is -14.46. What does this tell us? 
+The estimated __intercept__ is -12.67. What does this tell us? 
 
-&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-3-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-7-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 # Review
 
-The estimated __slope__ is 2.52. How do we interpret it?
+The estimated __slope__ is 2.47. How do we interpret it?
 
-&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-4-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-8-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 # Today
@@ -221,13 +340,13 @@ class: inverse, middle
 
 .pull-left[
 
-&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-5-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto;" /&gt;
 
 ]
 
 .pull-right[
 
-&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-6-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-10-1.svg" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -248,10 +367,10 @@ The __coefficient of determination__ `\(R^2\)` is the fraction of the variation 
 .pull-left[
 
 .center[
-`\(R^2\)` .mono[=] 0.73
+`\(R^2\)` .mono[=] 0.74
 ]
 
-&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-7-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -261,24 +380,24 @@ The __coefficient of determination__ `\(R^2\)` is the fraction of the variation 
 `\(R^2\)` .mono[=] 0.05
 ]
 
-&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-8-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-12-1.svg" style="display: block; margin: auto;" /&gt;
 
 ]
 
 ---
 # Goodness of Fit
 
-&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 # Goodness of Fit
 
-&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-10-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 # Goodness of Fit
 
-&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-15-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 # Explained and Unexplained Variation
@@ -433,7 +552,7 @@ class: inverse, middle
 
 We ran a regression of crimes per 1000 students on police per 1000 students. We found that `\(\hat{\beta_1}\)` .mono[=] 18.41 and `\(\hat{\beta_2}\)` .mono[=] 1.76. 
 
-&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-12-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-16-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 # Last Time
@@ -442,7 +561,7 @@ What if we had run a regression of crimes per student on police per 1000 student
 
 --
 
-&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="07-Simple_Linear_Regression_Estimation_II_files/figure-html/unnamed-chunk-17-1.svg" style="display: block; margin: auto;" /&gt;
 
 `\(\hat{\beta_2}\)` .mono[=] 0.001756.
 
@@ -464,6 +583,8 @@ What will you get for your intercept estimate `\(\hat{\beta}_1\)`?
 ---
 
 exclude: true
+
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

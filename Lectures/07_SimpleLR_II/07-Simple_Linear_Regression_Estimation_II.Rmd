@@ -122,17 +122,120 @@ knitr::include_graphics("Mid-Review.PNG")
 
 <br>
 
+The fully manual version can be tedious.
+
+```{r}
+df_1 = tibble(
+  D   =c(rep(0,6), rep(1,6)),
+  Y_1 =c(4,9,3,10,11,14,12,7,15,2,8,19),
+  Y_0 =c(8,6,7, 8,12,19,15,9,16,1,6,12),
+  Y   =c(8,6,7, 8,12,19,15,9,16,1,6,12),
+  Y_c =c(8,9,7,10,12,19,15,9,16,2,8,19), 
+  C   =c(0,1,0,1,0,0,0,0,0,1,1,1)
+)
+
+```
+
+Let's automate some of the code to avoid user error. 
+
+---
+
+# PBS2 Q6
+
+<br>
+
+Consider the `if_else(arg1, arg2, arg3)` function. 
+`arg1` is your condition. `arg2` is the given value if condition is .hi-pink[TRUE]. `arg3` is the given value if condition is .hi-pink[FALSE].  
+
+```{r}
+df_2 <- tibble(
+  D   =c(rep(0,6), rep(1,6)), 
+  C   =c(0,1,0,1,0,0,0,0,0,1,1,1),
+  Y_1 =c(4,9,3,10,11,14,12,7,15,2,8,19),
+  Y_0 =c(8,6,7, 8,12,19,15,9,16,1,6,12),
+) %>% 
+  mutate(Y = if_else(D==1, Y_1, Y_0),
+         Y_c = if_else(C==1, Y_1, Y_0))
+
+```
+
+
+---
+
+# PBS2 Q6
+
+To go one step further, consider the fact that people are choosing whether to get treated based on their respect outcomes $\{Y_{1i},Y_{0i}\}$. 
+
+```{r}
+df_3 <- tibble(
+  D   =c(rep(0,6), rep(1,6)), 
+  Y_1 =c(4,9,3,10,11,14,12,7,15,2,8,19),
+  Y_0 =c(8,6,7, 8,12,19,15,9,16,1,6,12),
+) %>% 
+  mutate( C = if_else(Y_1 >= Y_0, 1, 0), 
+          Y = if_else(D==1, Y_1, Y_0),
+         Y_c = if_else(C==1, Y_1, Y_0))
+
+```
+
+
+With only three items of data: to whom random treatment is assigned and measures of our two possible outcomes for each individual, we are able to determine who selects into treatment and identify the selection bias present. 
+
+This would be the difference between answers to (iii) & (ii).
+
+---
+
+# PBS2 Q6
+
+Resulting Dataframe
+
+.pull-left[
+```{r, echo=FALSE}
+df_3
+```
+]
+
+.pull-right[
+<br>
+
+i) ATET (Random Assignment) <br>
+$E[Y_i| D_i=1] - E[Y_i|D_i=0]$
+
+ii) ATET (Selection into Treatment)<br>
+$E[Y^c_i| C_i=1] - E[Y^c_i| C_i=0]$
+
+iii) ATE (Unobservable in practice)<br>
+$E[Y_{1i} - Y_{0i}] = \tau$
+]
+
+---
+
+# PBS2 Q6
+
+<br>
+
 
 i) Determine the average treatment effect, based on treatment assignment
 
 --
 
+$E\left[Y_{i} | D_i = 1\right] - E\left[Y_{i} | D_i = 0\right] = E\left[Y_{1,i} | D_i = 1\right] - E\left[Y_{0,i} | D_i = 0\right]= 0.5$ 
+
+--
+
 ii) Determine the average treatment effect, based on choice.
 
+--
+
+$E\left[Y_{i}^c | C_i = 1\right] - E\left[Y_{i}^c | C_i = 0\right] = E\left[Y_{1,i} | C_i = 1\right] - E\left[Y_{0,i} | C_i = 0\right] = -2.69$
 
 --
 
 iii) Determine the average treatment effect, based on individual differences in outcomes
+
+--
+
+$E\left[Y_{1,i} - Y_{0,i}\right] = -0.42$
 
 
 ---
