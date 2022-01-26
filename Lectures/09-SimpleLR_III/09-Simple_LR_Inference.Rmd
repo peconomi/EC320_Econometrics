@@ -1,0 +1,1354 @@
+---
+title: "Simple Linear Regression: Inference"
+subtitle: "EC 320: Introduction to Econometrics"
+author: "Philip Economides"
+date: "Winter 2022"
+output:
+  xaringan::moon_reader:
+    css: ['default', 'metropolis', 'metropolis-fonts', 'my-css.css']
+    # self_contained: true
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+class: inverse, middle
+
+```{r Setup, include = F}
+options(htmltools.dir.version = FALSE)
+library(pacman)
+p_load(ggthemes, viridis, knitr, extrafont, tidyverse, magrittr, wooldridge, stargazer, latex2exp, parallel, broom, wooldridge)
+# Define colors
+red_pink <- "#e64173"
+met_slate <- "#23373b" # metropolis font color
+# Knitr options
+opts_chunk$set(
+  comment = "#>",
+  fig.align = "center",
+  fig.height = 7,
+  fig.width = 10.5,
+  #dpi = 300,
+  #cache = T,
+  warning = F,
+  message = F
+)  
+theme_simple <- theme_bw() + theme(
+  axis.line = element_line(color = met_slate),
+  panel.grid = element_blank(),
+  rect = element_blank(),
+  strip.text = element_blank(),
+  text = element_text(family = "Fira Sans", color = met_slate, size = 14),
+  axis.text.x = element_text(size = 12),
+  axis.text.y = element_text(size = 12),
+  axis.ticks = element_blank(),
+  plot.title = element_blank(),
+  legend.position = "none"
+)
+theme_empty <- theme_bw() + theme(
+  line = element_blank(),
+  rect = element_blank(),
+  strip.text = element_blank(),
+  axis.text = element_blank(),
+  plot.title = element_blank(),
+  axis.title = element_blank(),
+  plot.margin = structure(c(0, 0, -1, -1), unit = "lines", valid.unit = 3L, class = "unit"),
+  legend.position = "none"
+)
+# Neumark data
+data <- get(data(wage2))
+lm_e <- lm(lwage ~ educ, data = data)
+b0 <- lm_e$coefficients[1]
+b1 <- lm_e$coefficients[2]
+r_2 <- summary(lm(lwage ~ educ, data = data))$r.squared
+# campus crime data
+campus <- get(data(campus)) %>% 
+  mutate(crime = round(crime/enroll*1000, 2),
+         police = round(police/enroll*1000, 2)) %>% 
+  filter(police < 10) %>% # remove outlier
+  select(crime, police)
+```
+
+# Prologue
+
+---
+# Housekeeping
+
+Problem Set 3 
+
+- Due tonight by 11:59pm.
+
+Problem Set 4
+
+- Due Monday, November 18 by 11:59pm.
+- 10 points extra credit for using R Markdown to generate responses to the analytical problems (HTML or Word).
+
+---
+# Last Time
+
+We discussed the .hi-green[classical assumptions of OLS:]
+
+> 
+1. **Linearity:** The population relationship is linear in parameters with an additive error term.
+2. **Sample Variation:** There is variation in $X$.
+3. **Exogeneity:** The $X$ variable is exogenous (*i.e.,* $\mathop{\mathbb{E}}\left( u|X \right) = 0$).
+4. **Homoskedasticity:** The error term has the same variance for each value of the independent variable (*i.e.,* $\mathop{\text{Var}}(u|X) = \sigma^2$).
+5. **Non-Autocorrelation:** Any pair of error terms share zero correlation due to having been independently drawn. (*i.e.,* $\mathop{\mathbb{E}}\left( u_i u_j \right) = 0 \ \forall i \text{ s.t. } i \neq j$)
+6. **Normality:** The population error term is normally distributed with mean zero and variance $\sigma^2$ (*i.e.,* $u \sim N(0,\sigma^2)$)
+
+We restricted our attention to the first 5 assumptions.
+
+---
+count: false
+
+# Last Time
+
+We discussed the .hi-green[classical assumptions of OLS:]
+
+> 
+1. **Linearity:** The population relationship is linear in parameters with an additive error term.
+2. **Sample Variation:** There is variation in $X$.
+3. **Exogeneity:** The $X$ variable is exogenous (*i.e.,* $\mathop{\mathbb{E}}\left( u|X \right) = 0$).
+4. **Homoskedasticity:** The error term has the same variance for each value of the independent variable (*i.e.,* $\mathop{\text{Var}}(u|X) = \sigma^2$).
+5. **Non-Autocorrelation:** Any pair of error terms share zero correlation due to having been independently drawn. (*i.e.,* $\mathop{\mathbb{E}}\left( u_i u_j \right) = 0 \ \forall i \text{ s.t. } i \neq j$)
+6. .hi[Normality:] .pink[The population error term is normally distributed with mean zero and variance] $\color{#e64173}{\sigma^2}$ .pink[(*i.e.,*] $\color{#e64173}{u \sim N(0,\sigma^2)}$.pink[)]
+
+We restricted our attention to the first 5 assumptions.
+
+---
+# Classical Assumptions
+
+## Last Time
+
+1. We used the first 4 assumptions to show that OLS is unbiased: $\mathop{\mathbb{E}}\left[ \hat{\beta} \right] = \beta$
+
+2. We used the first 5 assumptions to derive a formula for the __variance__ of the OLS estimator: $\mathop{\text{Var}}(\hat{\beta}) = \frac{\sigma^2}{\sum_{i=1}^n (X_i - \bar{X})^2}$.
+
+---
+# Classical Assumptions
+
+## Today
+
+We will use the sampling distribution of $\hat{\beta}$ to conduct hypothesis tests.
+
+- Can use all 6 classical assumptions to show that OLS is normally distributed:
+
+$$\hat{\beta} \sim \mathop{N}\left( \beta, \frac{\sigma^2}{\sum_{i=1}^n (X_i - \bar{X})^2} \right)$$
+
+- We'll "prove" this using .mono[R].
+
+---
+# Simulation
+
+```{R, gen dataset, include = F, cache = T}
+# Set population and sample sizes
+n_p <- 100
+n_s <- 30
+# Set the seed
+set.seed(12468)
+# Generate data
+pop_df <- tibble(
+  i = 3,
+  x = rnorm(n_p, mean = 5, sd = 1.5),
+  e = rnorm(n_p, mean = 0, sd = 1),
+  y = i + 0.5 * x + e,
+  row = rep(1:sqrt(n_p), times = sqrt(n_p)),
+  col = rep(1:sqrt(n_p), each = sqrt(n_p)),
+  s1 = sample(x = c(rep(T, n_s), rep(F, n_p - n_s))),
+  s2 = sample(x = c(rep(T, n_s), rep(F, n_p - n_s))),
+  s3 = sample(x = c(rep(T, n_s), rep(F, n_p - n_s)))
+)
+# Regressions
+lm0 <- lm(y ~ x, data = pop_df)
+lm1 <- lm(y ~ x, data = filter(pop_df, s1 == T))
+lm2 <- lm(y ~ x, data = filter(pop_df, s2 == T))
+lm3 <- lm(y ~ x, data = filter(pop_df, s3 == T))
+# Simulation
+set.seed(12468)
+sim_df <- mclapply(mc.cores = 1, X = 1:1e4, FUN = function(x, size = n_s) {
+  lm(y ~ x, data = pop_df %>% sample_n(size = size)) %>% tidy()
+}) %>% do.call(rbind, .) %>% as_tibble()
+```
+
+.pull-left[
+
+```{R, pop1, echo = F, fig.fullwidth = T, dev = "svg"}
+ggplot(data = pop_df, aes(x = row, y = col)) +
+geom_point(color = "darkslategray", size = 10) +
+theme_empty
+```
+
+.center[**Population**]
+
+]
+
+--
+
+.pull-right[
+
+```{R, scatter1, echo = F, fig.fullwidth = T, dev = "svg"}
+ggplot(data = pop_df, aes(x = x, y = y)) +
+geom_abline(
+  intercept = lm0$coefficients[1], slope = lm0$coefficients[2],
+  color = red_pink, size = 3
+) +
+geom_point(color = "darkslategray", size = 6) +
+theme_empty
+```
+
+.center[**Population relationship**]
+
+$$ Y_i = `r round(lm0$coefficients[1], 2)` + `r round(lm0$coefficients[2], 2)` X_i + u_i $$
+
+$$ Y_i = \beta_1 + \beta_2 X_i + u_i $$
+
+
+]
+
+---
+# Simulation
+
+.pull-left[
+
+```{R, sample1, echo = F, fig.fullwidth = T, dev = "svg"}
+ggplot(data = pop_df, aes(x = row, y = col, shape = s1)) +
+geom_point(color = "darkslategray", size = 10) +
+scale_shape_manual(values = c(1, 19)) +
+theme_empty
+```
+
+.center[**Sample 1:** 30 random individuals]
+
+]
+
+--
+
+.pull-right[
+
+```{R, sample1 scatter, echo = F, fig.fullwidth = T, dev = "svg"}
+ggplot(data = pop_df, aes(x = x, y = y)) +
+geom_abline(
+  intercept = lm0$coefficients[1], slope = lm0$coefficients[2],
+  color = red_pink, size = 3, alpha = 0.3
+) +
+geom_point(aes(shape = s1), color = "darkslategray", size = 6) +
+geom_abline(
+  intercept = lm1$coefficients[1], slope = lm1$coefficients[2],
+  size = 2, linetype = 2, color = "black"
+) +
+scale_shape_manual(values = c(1, 19)) +
+theme_empty
+```
+
+.center[
+
+**Population relationship**
+<br>
+$Y_i = `r round(lm0$coefficients[1], 2)` + `r round(lm0$coefficients[2], 2)` X_i + u_i$
+
+**Sample relationship**
+<br>
+$\hat{Y}_i = `r round(lm1$coefficients[1], 2)` + `r round(lm1$coefficients[2], 2)` X_i$
+
+]
+
+]
+
+---
+# Simulation
+
+.pull-left[
+
+```{R, sample2, echo = F, fig.fullwidth = T, dev = "svg"}
+ggplot(data = pop_df, aes(x = row, y = col, shape = s2)) +
+geom_point(color = "darkslategray", size = 10) +
+scale_shape_manual(values = c(1, 19)) +
+theme_empty
+```
+
+.center[**Sample 2:** 30 random individuals]
+
+]
+
+.pull-right[
+
+```{R, sample2 scatter, echo = F, fig.fullwidth = T, dev = "svg"}
+ggplot(data = pop_df, aes(x = x, y = y)) +
+geom_abline(
+  intercept = lm0$coefficients[1], slope = lm0$coefficients[2],
+  color = red_pink, size = 3, alpha = 0.3
+) +
+geom_point(aes(shape = s2), color = "darkslategray", size = 6) +
+geom_abline(
+  intercept = lm1$coefficients[1], slope = lm1$coefficients[2],
+  size = 2, linetype = 2, color = "black", alpha = 0.3
+) +
+geom_abline(
+  intercept = lm2$coefficients[1], slope = lm2$coefficients[2],
+  size = 2, linetype = 2, color = "black"
+) +
+scale_shape_manual(values = c(1, 19)) +
+theme_empty
+```
+
+.center[
+
+**Population relationship**
+<br>
+$Y_i = `r round(lm0$coefficients[1], 2)` + `r round(lm0$coefficients[2], 2)` Y_i + u_i$
+
+**Sample relationship**
+<br>
+$\hat{Y}_i = `r round(lm2$coefficients[1], 2)` + `r round(lm2$coefficients[2], 2)` X_i$
+
+]
+
+]
+---
+# Simulation
+
+.pull-left[
+
+```{R, sample3, echo = F, fig.fullwidth = T, dev = "svg"}
+ggplot(data = pop_df, aes(x = row, y = col, shape = s3)) +
+geom_point(color = "darkslategray", size = 10) +
+scale_shape_manual(values = c(1, 19)) +
+theme_empty
+```
+
+.center[**Sample 3:** 30 random individuals]
+
+]
+
+.pull-right[
+
+```{R, sample3 scatter, echo = F, fig.fullwidth = T, dev = "svg"}
+ggplot(data = pop_df, aes(x = x, y = y)) +
+geom_abline(
+  intercept = lm0$coefficients[1], slope = lm0$coefficients[2],
+  color = red_pink, size = 3, alpha = 0.3
+) +
+geom_point(aes(shape = s3), color = "darkslategray", size = 6) +
+geom_abline(
+  intercept = lm1$coefficients[1], slope = lm1$coefficients[2],
+  size = 2, linetype = 2, color = "black", alpha = 0.3
+) +
+geom_abline(
+  intercept = lm2$coefficients[1], slope = lm2$coefficients[2],
+  size = 2, linetype = 2, color = "black", alpha = 0.3
+) +
+geom_abline(
+  intercept = lm3$coefficients[1], slope = lm3$coefficients[2],
+  size = 2, linetype = 2, color = "black"
+) +
+scale_shape_manual(values = c(1, 19)) +
+theme_empty
+```
+
+.center[
+
+**Population relationship**
+<br>
+$Y_i = `r round(lm0$coefficients[1], 2)` + `r round(lm0$coefficients[2], 2)` X_i + u_i$
+
+**Sample relationship**
+<br>
+$\hat{Y}_i = `r round(lm3$coefficients[1], 2)` + `r round(lm3$coefficients[2], 2)` X_i$
+
+]
+
+]
+
+---
+layout: false
+class: white-slide, middle
+
+Repeat **10,000 times** (Monte Carlo simulation).
+
+---
+class: white-slide
+
+```{R, simulation scatter, echo = F, dev = "png", dpi = 300, cache = T}
+# Reshape sim_df
+line_df <- tibble(
+  intercept = sim_df %>% filter(term != "x") %>% select(estimate) %>% unlist(),
+  slope = sim_df %>% filter(term == "x") %>% select(estimate) %>% unlist()
+)
+ggplot() +
+geom_abline(data = line_df, aes(intercept = intercept, slope = slope), alpha = 0.01) +
+geom_point(data = pop_df, aes(x = x, y = y), size = 3, color = "darkslategray") +
+geom_abline(
+  intercept = lm0$coefficients[1], slope = lm0$coefficients[2],
+  color = red_pink, size = 1.5
+) +
+theme_empty
+```
+
+---
+class: white-slide, middle
+
+.pull-left[
+
+.center[
+**Intercept Estimates**
+]
+```{R, simulation hist1, echo = F, dev = "png", dpi = 300, cache = T}
+# Reshape sim_df
+line_df <- tibble(
+  intercept = sim_df %>% filter(term != "x") %>% select(estimate) %>% unlist(),
+  slope = sim_df %>% filter(term == "x") %>% select(estimate) %>% unlist()
+)
+ggplot() +
+geom_histogram(data = line_df, aes(intercept), fill = red_pink, alpha = 0.75, bins = 40) +
+  geom_vline(xintercept = lm0$coefficients[1], size = 2, color = "darkslategray") +
+  scale_x_continuous(breaks = lm0$coefficients[1], labels = TeX("$\\beta_1$")) +
+  theme(axis.text.x = element_text(size = 50),
+      axis.text.y = element_blank(),
+      rect = element_blank(),
+      axis.title.y = element_blank(),
+      axis.title = element_blank(),
+      line = element_blank())
+```
+]
+
+.pull-right[
+
+.center[
+**Slope Estimates**
+]
+```{R, simulation hist2, echo = F, dev = "png", dpi = 300, cache = T}
+# Reshape sim_df
+line_df <- tibble(
+  intercept = sim_df %>% filter(term != "x") %>% select(estimate) %>% unlist(),
+  slope = sim_df %>% filter(term == "x") %>% select(estimate) %>% unlist()
+)
+ggplot() +
+geom_histogram(data = line_df, aes(slope), fill = red_pink, alpha = 0.75, bins = 40) +
+  geom_vline(xintercept = lm0$coefficients[2], size = 2, color = "darkslategray") +
+  scale_x_continuous(breaks = lm0$coefficients[2], labels = TeX("$\\beta_2$")) +
+  theme(axis.text.x = element_text(size = 50),
+      axis.text.y = element_blank(),
+      rect = element_blank(),
+      axis.title.y = element_blank(),
+      axis.title = element_blank(),
+      line = element_blank())
+```
+]
+
+---
+# Simulation
+
+Can you spot the classical assumptions?
+
+```{R, eval = F}
+# Set population and sample sizes
+n_p <- 100 
+n_s <- 30 
+# Generate population data
+pop_df <- tibble(
+  x = rnorm(n_p, mean = 5, sd = 1.5),
+  e = rnorm(n_p, mean = 0, sd = 1),
+  y = 2.53 + 0.57 * x + e
+)
+# Define simulation procedure
+sim_ols <- function(x, size = n_s) {
+  lm(y ~ x, data = pop_df %>% sample_n(size = size)) %>% 
+    tidy() %>% 
+    mutate(iteration = x)
+}
+# Run simulation
+sim_df <- map_df(1:10000, ~sim_ols(.x, size = n_s))
+```
+
+---
+count: false
+
+# Simulation
+
+Can you spot the classical assumptions?
+
+```{R, eval = F}
+# Set population and sample sizes
+n_p <- 100 #<<
+n_s <- 30 #<<
+# Generate population data
+pop_df <- tibble(
+  x = rnorm(n_p, mean = 5, sd = 1.5),
+  e = rnorm(n_p, mean = 0, sd = 1),
+  y = 2.53 + 0.57 * x + e
+)
+# Define simulation procedure
+sim_ols <- function(x, size = n_s) {
+  lm(y ~ x, data = pop_df %>% sample_n(size = size)) %>% 
+    tidy() %>% 
+    mutate(iteration = x)
+}
+# Run simulation
+sim_df <- map_df(1:10000, ~sim_ols(.x, size = n_s))
+```
+
+---
+count: false
+
+# Simulation
+
+Can you spot the classical assumptions?
+
+```{R, eval = F}
+# Set population and sample sizes
+n_p <- 100
+n_s <- 30 
+# Generate population data
+pop_df <- tibble(
+  x = rnorm(n_p, mean = 5, sd = 1.5), #<<
+  e = rnorm(n_p, mean = 0, sd = 1),
+  y = 2.53 + 0.57 * x + e
+)
+# Define simulation procedure
+sim_ols <- function(x, size = n_s) {
+  lm(y ~ x, data = pop_df %>% sample_n(size = size)) %>% 
+    tidy() %>% 
+    mutate(iteration = x)
+}
+# Run simulation
+sim_df <- map_df(1:10000, ~sim_ols(.x, size = n_s))
+```
+
+---
+count: false
+
+# Simulation
+
+Can you spot the classical assumptions?
+
+```{R, eval = F}
+# Set population and sample sizes
+n_p <- 100
+n_s <- 30 
+# Generate population data
+pop_df <- tibble(
+  x = rnorm(n_p, mean = 5, sd = 1.5), 
+  e = rnorm(n_p, mean = 0, sd = 1), #<<
+  y = 2.53 + 0.57 * x + e
+)
+# Define simulation procedure
+sim_ols <- function(x, size = n_s) {
+  lm(y ~ x, data = pop_df %>% sample_n(size = size)) %>% 
+    tidy() %>% 
+    mutate(iteration = x)
+}
+# Run simulation
+sim_df <- map_df(1:10000, ~sim_ols(.x, size = n_s))
+```
+
+---
+count: false
+
+# Simulation
+
+Can you spot the classical assumptions?
+
+```{R, eval = F}
+# Set population and sample sizes
+n_p <- 100
+n_s <- 30 
+# Generate population data
+pop_df <- tibble(
+  x = rnorm(n_p, mean = 5, sd = 1.5), 
+  e = rnorm(n_p, mean = 0, sd = 1), 
+  y = 2.53 + 0.57 * x + e #<<
+)
+# Define simulation procedure
+sim_ols <- function(x, size = n_s) {
+  lm(y ~ x, data = pop_df %>% sample_n(size = size)) %>% 
+    tidy() %>% 
+    mutate(iteration = x)
+}
+# Run simulation
+sim_df <- map_df(1:10000, ~sim_ols(.x, size = n_s))
+```
+
+---
+count: false
+
+# Simulation
+
+Can you spot the classical assumptions?
+
+```{R, eval = F}
+# Set population and sample sizes
+n_p <- 100
+n_s <- 30 
+# Generate population data
+pop_df <- tibble(
+  x = rnorm(n_p, mean = 5, sd = 1.5), 
+  e = rnorm(n_p, mean = 0, sd = 1), 
+  y = 2.53 + 0.57 * x + e 
+)
+# Define simulation procedure
+sim_ols <- function(x, size = n_s) { #<<
+  lm(y ~ x, data = pop_df %>% sample_n(size = size)) %>% #<<
+    tidy() %>% #<<
+    mutate(iteration = x) #<<
+} #<<
+# Run simulation
+sim_df <- map_df(1:10000, ~sim_ols(.x, size = n_s)) 
+```
+
+---
+count: false
+
+# Simulation
+
+Can you spot the classical assumptions?
+
+```{R, eval = F}
+# Set population and sample sizes
+n_p <- 100
+n_s <- 30 
+# Generate population data
+pop_df <- tibble(
+  x = rnorm(n_p, mean = 5, sd = 1.5), 
+  e = rnorm(n_p, mean = 0, sd = 1), 
+  y = 2.53 + 0.57 * x + e 
+)
+# Define simulation procedure
+sim_ols <- function(x, size = n_s) { 
+  lm(y ~ x, data = pop_df %>% sample_n(size = size)) %>% 
+    tidy() %>% 
+    mutate(iteration = x) 
+}
+# Run simulation
+sim_df <- map_df(1:10000, ~sim_ols(.x, size = n_s)) #<<
+```
+
+---
+class: inverse, middle
+
+# Inference
+
+---
+# Motivation
+
+What does statistical evidence say about existing theories?
+
+We want to test hypotheses posed by politicians, economists, scientists, people with foil hats, _etc._
+
+- Does building a giant wall **reduce crime**?
+- Does shutting down a government **adversely affect the economy**?
+- Does legal cannabis **reduce drunk driving** or **reduce opioid use**?
+- Do air quality standards **improve health** or **reduce jobs**?
+
+--
+
+While uncertainty exists, we can still conduct *reliable* statistical tests (rejecting or failing to reject a hypothesis).
+
+---
+# Inference
+
+We know OLS has some nice properties, and we know how to estimate an intercept and slope coefficient using OLS.
+
+Our current workflow:
+- Get data (points with $X$ and $Y$ values).
+- Regress $Y$ on $X$.
+- Plot the fitted values (*i.e.*, $\hat{Y_i} = \hat{\beta}_0 + \hat{\beta}_1X_i$) and report the estimates.
+
+--
+
+But how do we actually **learn** something from this exercise?
+
+--
+
+- Based upon our value of $\hat{\beta}_2$, can we rule out previously hypothesized values?
+- How confident should we be in the precision of our estimates?
+
+--
+
+We need to be able to deal with uncertainty. Enter: **Inference.**
+
+---
+# Inference
+
+We use the standard error of $\hat{\beta}_2$, along with $\hat{\beta}_2$ itself, to learn about the parameter $\beta_2$.
+
+After deriving the distribution of $\hat{\beta}_2$,<sup>.pink[†]</sup> we have two (related) options for formal statistical inference (learning) about our unknown parameter $\beta_2$:
+
+- **Hypothesis tests:** Determine whether there is statistically significant evidence to reject a hypothesized value or range of values.
+
+- **Confidence intervals:** Use the estimate and its standard error to create an interval that, when repeated, will generally<sup>.pink[††]</sup> contain the true parameter.
+
+.footnote[
+.pink[†] *Hint:* It's normal with mean $\beta_2$ and variance $\frac{\sigma^2}{\sum_{i=1}^n (X_i - \bar{X})^2}$.
+<br>
+.pink[††] _E.g._, similarly constructed 95% confidence intervals will contain the true parameter 95% of the time.
+]
+
+---
+# OLS Variance
+
+Hypothesis tests and confidence intervals require information about the variance of the OLS estimator:
+
+$$\mathop{\text{Var}}(\hat{\beta}_2) = \frac{\sigma^2}{\sum_{i=1}^n (X_i - \bar{X})^2}.$$
+
+--
+
+**Problem** 
+
+- The variance formula has a population parameter: $\sigma^2$ (a.k.a. error variance).
+
+- We can't observe population parameters.
+
+--
+
+- **Solution:** Estimate $\sigma^2$.
+
+---
+# Estimating Error Variance
+
+## Learning from our (prediction) errors
+
+We can estimate the variance of $u_i$ (a.k.a. $\sigma^2$) using the sum of squared residuals:
+
+$$ s^2_u = \dfrac{\sum_i \hat{u}_i^2}{n - k} $$
+
+where $k$ gives the number of regression parameters.
+
+- In a simple linear regression, $k=2$.
+
+- $s^2_u$ is an unbiased estimator of $\sigma^2$.
+
+---
+# OLS Variance, Take 2
+
+With $s^2_u = \dfrac{\sum_i \hat{u}_i^2}{n - k}$, we can calculate
+
+$$\mathop{\text{Var}}(\hat{\beta}_2) = \frac{s^2_u}{\sum_{i=1}^n (X_i - \bar{X})^2}.$$
+
+--
+
+Taking the square root, we get the __standard error__ of the OLS estimator:
+
+$$\mathop{\hat{\text{SE}}} \left( \hat{\beta}_2 \right) = \sqrt{ \frac{s^2_u}{\sum_{i=1}^n (X_i - \bar{X})^2} }.$$
+
+- Standard error .mono[=] standard deviation of an estimator.
+
+---
+# Standard Errors
+
+.mono[R]'s `lm()` function estimates standard errors out of the box:
+
+```{R, se}
+tidy(lm(y ~ x, pop_df))
+```
+
+I won't ask you to estimate standard errors by hand!
+
+---
+class: inverse, middle
+
+# Hypothesis Tests
+
+---
+# Hypothesis Tests
+
+__Null hypothesis (H.sub[0]):__ $\beta_2 = 0$
+
+__Alternative hypothesis (H.sub[a]):__ $\beta_2 \neq 0$
+
+--
+
+There are four possible outcomes of our test:
+
+1. We __fail to reject__ the null hypothesis and the null is true.
+
+2. We __reject__ the null hypothesis and the null is false.
+
+3. We __reject__ the null hypothesis, but the null is actually true (**Type I error**).
+
+4. We __fail to reject__ the null hypothesis, but the null is actually false (**Type II error**).
+
+---
+# Hypothesis Tests
+
+**Goal:** Make a statement about $\beta_2$ using information on $\hat{\beta}_2$.
+
+--
+
+$\hat{\beta}_2$ is random: it could be anything, even if $\beta_2 = 0$ is true.
+
+- But if $\beta_2 = 0$ is true, then $\hat{\beta}_2$ is unlikely to take values far from zero.
+
+- As the standard error shrinks, we are even less likely to observe "extreme" values of $\hat{\beta}_2$ (assuming $\beta_2 = 0$).
+
+--
+
+Our test should take .pink[extreme values] of $\hat{\beta}_2$ as .pink[evidence against the null hypothesis], but it should also weight them by what we know about the variance of $\hat{\beta}_2$.
+
+---
+# Hypothesis Tests
+
+.pull-left[
+__Null hypothesis__
+
+H.sub[0]: $\beta_2 = 0$
+
+]
+
+.pull-right[
+__Alternative hypothesis__
+
+H.sub[a]: $\beta_2 \neq 0$
+
+]
+
+<br>
+<br>
+
+To conduct the test, we calculate a $t$-statistic:
+
+$$t = \frac{\hat{\beta}_2 - \beta_2^0}{\mathop{\hat{\text{SE}}} \left( \hat{\beta}_2 \right)}$$
+
+- Distributed according to a $t$-distribution with $n-2$ _degrees of freedom_.
+- $\beta_2^0$ is the value of $\beta_2$ in our null hypothesis (*e.g.,* $\beta_2^0 = 0$).
+
+
+---
+# Hypothesis Tests
+
+Next, we use the $\color{#708090}{t}$.hi-slate[-statistic] to calculate a $\color{#007935}{p}$.hi-green[-value].
+
+```{r, echo = F, dev = "svg", fig.height = 3.75}
+df <- tibble(
+    x = seq(-4,4, by = 0.01),
+    y = dt(seq(-4,4, by = 0.01), 100)
+)
+t <- qt(c(.025,.8), 100)
+tail_right <- rbind(c(t[2],0), subset(df, x > t[2]), c(3,0))
+ggplot() +
+  scale_x_continuous(limits = c(-4, 4), expand=c(0,0)) +
+  scale_y_continuous(limits = c(0, 0.5), expand=c(0,0), breaks = c(0, 0.5), labels = c(0, 0.5)) +
+  geom_polygon(data = df, aes(x, y), fill = "grey85") +
+  geom_polygon(data = tail_right, aes(x=x, y=y), fill = "#007935") +
+  geom_vline(xintercept = qt(0.8, 100), size = 1, linetype = "solid", color = "#708090") +
+  theme_simple +
+  xlab("") + 
+  ylab("") + theme(axis.text.y = element_blank(), axis.line.y = element_blank())
+```
+
+Describes the probability of seeing a $t$-statistic as extreme as the one we observe _if the null hypothesis is actually true_.
+
+--
+
+But...we still need some benchmark to compare our $p$-value against.
+
+---
+# Hypothesis Tests
+
+We worry mostly about false positives, so we conduct hypothesis tests based on the probability of making a Type I error.
+
+**How?** We select a .hi[significance level] $\color{#e64173}{\alpha}$ that specifies our tolerance for false positives. This is the probability of Type I error we choose to live with.
+
+```{r, echo = F, dev = "svg", fig.height = 3.75}
+df <- tibble(
+    x = seq(-4,4, by = 0.01),
+    y = dt(seq(-4,4, by = 0.01), 100)
+)
+crit <- qt(c(.025,.975), 100)
+tail_left <- rbind(c(crit[1],0), subset(df, x < crit[1]))
+tail_right <- rbind(c(crit[2],0), subset(df, x > crit[2]), c(3,0))
+ggplot() +
+  scale_x_continuous(limits = c(-4, 4), expand=c(0,0)) +
+  scale_y_continuous(limits = c(0, 0.5), expand=c(0,0), breaks = c(0, 0.5), labels = c(0, 0.5)) +
+  geom_polygon(data = df, aes(x, y), fill = "grey85") +
+  geom_polygon(data = tail_left, aes(x=x, y=y), fill = red_pink) +
+  geom_polygon(data = tail_right, aes(x=x, y=y), fill = red_pink) +
+  geom_polygon(data = df %>% filter(x <= qt(1 - 0.975, 100) & x >= qt(0.975, 100)), aes(x, y), fill = red_pink) +
+  #geom_vline(xintercept = qt(0.975, 100), size = 0.35, linetype = "dashed", color = met_slate) +
+  #geom_vline(xintercept = qt(1 - 0.975, 100), size = 0.35, linetype = "dashed", color = met_slate) +
+  theme_simple +
+  xlab("") + 
+  ylab("") + theme(axis.text.y = element_blank(), axis.line.y = element_blank())
+```
+
+---
+# Hypothesis Tests
+
+We then compare $\alpha$ to the $p$-value of our test.
+
+- If the $p$-value is less than $\alpha$, then we __reject the null hypothesis__ at the $\alpha\cdot100$ percent level.
+
+- If the $p$-value is greater than $\alpha$, then we __fail to reject the null hypothesis__.
+
+- **Note:** _Fail to reject_ $\neq$ _accept_.
+
+---
+# Hypothesis Tests
+
+**Example:** Are campus police associated with campus crime?
+
+```{R echo = T, highlight.output = 5}
+lm(crime ~ police, data = campus) %>% tidy()
+```
+
+H.sub[0]: $\beta_\text{Police} = 0$ *v.s.* H.sub[a]: $\beta_\text{Police} \neq 0$
+
+--
+
+Significance level: $\alpha = 0.05$ (*i.e.,* 5 percent test)
+
+--
+
+Test Condition: Reject H.sub[0] if $p < \alpha$
+
+--
+
+$p = 0.18$. **Do we reject the null hypothesis?**
+
+---
+# Hypothesis Tests
+
+$p$-values are difficult to calculate by hand.
+
+__Alternative:__ Compare $\color{#708090}{t}$.hi-slate[-statistic] to .hi-purple[critical values] from the $t$-distribution.
+
+```{r, echo = F, dev = "svg", fig.height = 3.75}
+df <- tibble(
+    x = seq(-4,4, by = 0.01),
+    y = dt(seq(-4,4, by = 0.01), 100)
+)
+crit <- qt(c(.025,.975), 100)
+tail_left <- rbind(c(crit[1],0), subset(df, x < crit[1]))
+tail_right <- rbind(c(crit[2],0), subset(df, x > crit[2]), c(3,0))
+ggplot() +
+  scale_x_continuous(limits = c(-4, 4), expand=c(0,0)) +
+  scale_y_continuous(limits = c(0, 0.5), expand=c(0,0), breaks = c(0, 0.5), labels = c(0, 0.5)) +
+  geom_polygon(data = df, aes(x, y), fill = "grey85") +
+  geom_polygon(data = tail_left, aes(x=x, y=y), fill = red_pink) +
+  geom_polygon(data = tail_right, aes(x=x, y=y), fill = red_pink) +
+  geom_polygon(data = df %>% filter(x <= qt(1 - 0.975, 100) & x >= qt(0.975, 100)), aes(x, y), fill = red_pink) +
+  geom_vline(xintercept = qt(0.975, 100), size = 0.35, linetype = "dashed", color = "#9370DB") +
+  geom_vline(xintercept = qt(1 - 0.975, 100), size = 0.35, linetype = "dashed", color = "#9370DB") +
+  geom_vline(xintercept = 1, linetype = "solid", color = "#708090") +
+  theme_simple +
+  xlab("") + 
+  ylab("") + theme(axis.text.y = element_blank(), axis.line.y = element_blank())
+```
+
+---
+# Hypothesis Tests
+
+**Notation:** $t_{1-\alpha/2, n-2}$ or $t_\text{crit}$.
+
+- Find in a $t$ table using the significance level $\alpha$ and $n-2$ degrees of freedom.
+
+Compare the the critical value to your $t$-statistic:
+
+- If $|t| > |t_{1-\alpha/2, n-2}|$, then __reject the null__.
+
+- If $|t| < |t_{1-\alpha/2, n-2}|$, then __fail to reject the null__.
+
+---
+# Two-Sided Tests
+
+Based on a critical value of $t_{1-\alpha/2, n-2} = t_{0.975, 100} =$ `r round(qt(0.975, 100), 2)`, we can identify a .hi[rejection region] on the $t$-distribution. 
+
+```{r, echo = F, dev = "svg", fig.height = 3.75}
+df <- tibble(
+    x = seq(-4,4, by = 0.01),
+    y = dt(seq(-4,4, by = 0.01), 100)
+)
+crit <- qt(c(.025,.975), 100)
+tail_left <- rbind(c(crit[1],0), subset(df, x < crit[1]))
+tail_right <- rbind(c(crit[2],0), subset(df, x > crit[2]), c(3,0))
+ggplot() +
+  scale_x_continuous(limits = c(-4, 4), expand=c(0,0)) +
+  scale_y_continuous(limits = c(0, 0.5), expand=c(0,0), breaks = c(0, 0.5), labels = c(0, 0.5)) +
+  geom_polygon(data = df, aes(x, y), fill = "grey85") +
+  geom_polygon(data = tail_left, aes(x=x, y=y), fill = red_pink) +
+  geom_polygon(data = tail_right, aes(x=x, y=y), fill = red_pink) +
+  geom_polygon(data = df %>% filter(x <= qt(1 - 0.975, 100) & x >= qt(0.975, 100)), aes(x, y), fill = red_pink) +
+  geom_vline(xintercept = qt(0.975, 100), size = 0.35, linetype = "dashed", color = met_slate) +
+  geom_vline(xintercept = qt(1 - 0.975, 100), size = 0.35, linetype = "dashed", color = met_slate) +
+  theme_simple +
+  xlab("") + 
+  ylab("") + theme(axis.text.y = element_blank(), axis.line.y = element_blank())
+```
+
+--
+
+If our $t$ statistic is in the rejection region, then we reject the null hypothesis at the 5 percent level. 
+
+---
+# Two-Sided Tests
+
+.mono[R] defaults to testing hypotheses against the null hypothesis of zero.
+
+```{R hypothesis test, echo = T, highlight.output = 5}
+lm(y ~ x, data = pop_df) %>% tidy()
+```
+
+--
+
+H.sub[0]: $\beta_2 = 0$ *vs.* H.sub[a]: $\beta_2 \neq 0$
+
+--
+
+Significance level: $\alpha = 0.05$ (*i.e.,* 5 percent test)
+
+--
+
+ $t_\text{stat} = 7.15$ and $t_\text{0.975, 28} = `r qt(0.975, 28) %>% round(2)`$
+--
+ , which implies that  $p < 0.05$.
+
+--
+
+Therefore, we .hi[reject H.sub[0]] at the 5% level.
+
+---
+# Two-Sided Tests
+
+**Example:** Are campus police associated with campus crime?
+
+```{R echo = T, highlight.output = 5}
+lm(crime ~ police, data = campus) %>% tidy()
+```
+
+H.sub[0]: $\beta_\text{Police} = 0$ *v.s.* H.sub[a]: $\beta_\text{Police} \neq 0$
+
+--
+
+Significance level: $\alpha = 0.1$ (*i.e.,* 10 percent test)
+
+--
+
+Test Condition: Reject H.sub[0] if $|t| > t_\text{crit}$
+
+--
+
+$t = 1.35$ and $t_\text{crit} = `r qt(0.95, 94) %>% round(2)`$. **Do we reject the null hypothesis?**
+
+---
+# One-Sided Tests
+
+Sometimes we are confident that a parameter is non-negative or non-positive.
+
+A __one-sided__ test assumes that values on one side of the null hypothesis are impossible.
+
+- __Option 1:__ H.sub[0]: $\beta_2 = 0$ *vs.* H.sub[a]: $\beta_2 > 0$
+
+- __Option 2:__ H.sub[0]: $\beta_2 = 0$ *vs.* H.sub[a]: $\beta_2 < 0$
+
+--
+
+If this assumption is reasonable, then our rejection region changes.
+
+- Same $\alpha$.
+
+---
+# One-Sided Tests
+
+__Left-tailed:__ Based on a critical value of $t_{1-\alpha, n-2} = t_{0.95, 100} =$ `r round(qt(0.95, 100), 2)`, we can identify a .hi[rejection region] on the $t$-distribution. 
+
+```{r, echo = F, dev = "svg", fig.height = 3.75}
+df <- tibble(
+    x = seq(-4,4, by = 0.01),
+    y = dt(seq(-4,4, by = 0.01), 100)
+)
+crit <- qt(c(.05,.95), 100)
+tail_left <- rbind(c(crit[1],0), subset(df, x < crit[1]))
+tail_right <- rbind(c(crit[2],0), subset(df, x > crit[2]), c(3,0))
+ggplot() +
+  scale_x_continuous(limits = c(-4, 4), expand=c(0,0)) +
+  scale_y_continuous(limits = c(0, 0.5), expand=c(0,0), breaks = c(0, 0.5), labels = c(0, 0.5)) +
+  geom_polygon(data = df, aes(x, y), fill = "grey85") +
+  geom_polygon(data = tail_left, aes(x=x, y=y), fill = red_pink) +
+  #geom_polygon(data = tail_right, aes(x=x, y=y), fill = red_pink) +
+  #geom_vline(xintercept = qt(0.95, 100), size = 0.35, linetype = "dashed", color = met_slate) +
+  geom_vline(xintercept = qt(1 - 0.95, 100), size = 0.35, linetype = "dashed", color = met_slate) +
+  theme_simple +
+  xlab("") + 
+  ylab("") + theme(axis.text.y = element_blank(), axis.line.y = element_blank())
+```
+
+--
+
+If our $t$ statistic is in the rejection region, then we reject the null hypothesis at the 5 percent level. 
+
+---
+# One-Sided Tests
+
+__Right-tailed:__ Based on a critical value of $t_{1-\alpha, n-2} = t_{0.95, 100} =$ `r round(qt(0.95, 100), 2)`, we can identify a .hi[rejection region] on the $t$-distribution. 
+
+```{r, echo = F, dev = "svg", fig.height = 3.75}
+df <- tibble(
+    x = seq(-4,4, by = 0.01),
+    y = dt(seq(-4,4, by = 0.01), 100)
+)
+crit <- qt(c(.05,.95), 100)
+tail_left <- rbind(c(crit[1],0), subset(df, x < crit[1]))
+tail_right <- rbind(c(crit[2],0), subset(df, x > crit[2]), c(3,0))
+ggplot() +
+  scale_x_continuous(limits = c(-4, 4), expand=c(0,0)) +
+  scale_y_continuous(limits = c(0, 0.5), expand=c(0,0), breaks = c(0, 0.5), labels = c(0, 0.5)) +
+  geom_polygon(data = df, aes(x, y), fill = "grey85") +
+  #geom_polygon(data = tail_left, aes(x=x, y=y), fill = red_pink) +
+  geom_polygon(data = tail_right, aes(x=x, y=y), fill = red_pink) +
+  geom_vline(xintercept = qt(0.95, 100), size = 0.35, linetype = "dashed", color = met_slate) +
+  #geom_vline(xintercept = qt(1 - 0.95, 100), size = 0.35, linetype = "dashed", color = met_slate) +
+  theme_simple +
+  xlab("") + 
+  ylab("") + theme(axis.text.y = element_blank(), axis.line.y = element_blank())
+```
+
+--
+
+If our $t$ statistic is in the rejection region, then we reject the null hypothesis at the 5 percent level. 
+
+---
+# One-Sided Tests
+
+**Example:** Do campus police deter campus crime?
+
+```{R echo = T, highlight.output = 5}
+lm(crime ~ police, data = campus) %>% tidy()
+```
+
+H.sub[0]: $\beta_\text{Police} = 0$ *v.s.* H.sub[a]: $\beta_\text{Police} < 0$
+
+--
+
+Significance level: $\alpha = 0.1$ (*i.e.,* 10 percent test)
+
+--
+
+Test Condition: Reject H.sub[0] if $t < -t_\text{crit}$
+
+--
+
+$t = 1.35$ and $t_\text{crit} = `r qt(0.9, 94) %>% round(2)`$. **Do we reject the null hypothesis?**
+
+
+---
+class: inverse, middle
+
+# Confidence Intervals
+
+---
+# Confidence Intervals
+
+Until now, we have considered __point estimates__ of population parameters.
+
+- Sometimes a range of values is more interesting/honest.
+
+--
+
+We can construct $(1-\alpha)\cdot100$-percent level confidence intervals for $\beta_2$
+
+$$\hat{\beta}_2 \pm t_{1-\alpha/2, n-2} \, \mathop{\hat{\text{SE}}} \left( \hat{\beta}_2 \right)$$
+
+--
+
+$t_{1-\alpha/2,n-2}$ denotes the $1-\alpha/2$ quantile of a $t$ distribution with $n-2$ degrees of freedom.
+
+---
+# Confidence Intervals
+
+**Q:** Where does the confidence interval formula come from?
+
+--
+
+**A:** The confidence interval formula comes from the rejection condition of a two-sided test.
+
+> Reject H.sub[0] if $|t| > t_\text{crit}$
+
+--
+
+The test condition implies
+
+> Fail to reject H.sub[0] if $|t| \leq t_\text{crit}$
+
+which is equivalent to 
+
+> Fail to reject H.sub[0] if $-t_\text{crit} \leq t \leq t_\text{crit}$.
+
+---
+# Confidence Intervals
+
+Replacing $t$ with its formula gives 
+
+> Fail to reject H.sub[0] if $-t_\text{crit} \leq \frac{\hat{\beta}_2 - \beta_2^0}{\mathop{\hat{\text{SE}}} \left( \hat{\beta}_2 \right)} \leq t_\text{crit}$.
+
+--
+
+Standard errors are always positive, so the inequalities do not flip when we multiply by $\mathop{\hat{\text{SE}}} \left( \hat{\beta}_2 \right)$:
+
+> Fail to reject H.sub[0] if $-t_\text{crit} \mathop{\hat{\text{SE}}} \left( \hat{\beta}_2 \right) \leq \hat{\beta}_2 - \beta_2^0\leq t_\text{crit} \mathop{\hat{\text{SE}}} \left( \hat{\beta}_2 \right)$.
+
+--
+
+Subtracting $\hat{\beta}_2$ yields
+
+> Fail to reject H.sub[0] if $-\hat{\beta}_2 -t_\text{crit} \mathop{\hat{\text{SE}}} \left( \hat{\beta}_2 \right) \leq - \beta_2^0 \leq - \hat{\beta}_2 + t_\text{crit} \mathop{\hat{\text{SE}}} \left( \hat{\beta}_2 \right)$.
+
+---
+# Confidence Intervals
+
+Multiplying by -1 and rearranging gives
+
+> Fail to reject H.sub[0] if <br> $\hat{\beta}_2 - t_\text{crit} \mathop{\hat{\text{SE}}} \left( \hat{\beta}_2 \right) \leq \beta_2^0 \leq \hat{\beta}_2 + t_\text{crit} \mathop{\hat{\text{SE}}} \left( \hat{\beta}_2 \right)$.
+
+--
+
+Replacing $\beta_2^0$ with $\beta_2$ and dropping the test condition yields the interval
+
+$$\hat{\beta}_2 - t_\text{crit} \mathop{\hat{\text{SE}}} \left( \hat{\beta}_2 \right) \leq \beta_2 \leq \hat{\beta}_2 + t_\text{crit} \mathop{\hat{\text{SE}}} \left( \hat{\beta}_2 \right)$$
+
+which is equivalent to 
+
+$$\hat{\beta}_2 \pm t_\text{crit} \, \mathop{\hat{\text{SE}}} \left( \hat{\beta}_2 \right).$$
+
+---
+# Confidence Intervals
+
+**Insight:** A confidence interval is related to a two-sided hypothesis test. 
+
+- If a 95 percent confidence interval contains zero, then we fail to reject the null hypothesis at the 5 percent level.
+
+- If a 95 percent confidence interval does not contain zero, then we reject the null hypothesis at the 5 percent level.
+
+- **Generally:** A $(1- \alpha) \cdot 100$ percent confidence interval embeds a two-sided test at the $\alpha \cdot 100$ level.
+
+---
+# Confidence Intervals
+
+## Example
+
+```{R ci r output, echo = T, highlight.output = 5}
+lm(y ~ x, data = pop_df) %>% tidy()
+```
+
+--
+
+```{R, echo = T}
+# find degrees of freedom
+dof <- summary(lm(y ~ x, data = pop_df))$df[2]
+# return critical value
+qt(0.975, dof)
+```
+
+--
+
+**95% confidence interval** for $\beta_2$ is $0.567 \pm 1.98 \times 0.0793 = \left[ 0.410,\, 0.724 \right]$
+
+---
+# Confidence Intervals
+
+We have a confidence interval for $\beta_2$, *i.e.,* $\left[ 0.410,\, 0.724 \right]$. 
+
+.hi[What does it mean?]
+
+--
+
+**Informally:** The confidence interval gives us a region (interval) in which we can place some trust (confidence) for containing the parameter.
+
+--
+
+**More formally:** If we repeatedly sample from our population and construct confidence intervals for each of these samples, then $(1-\alpha) \cdot100$ percent of our intervals (*e.g.,* 95%) will contain the population parameter *somewhere in the interval*.
+
+--
+
+Now back to our simulation...
+
+---
+# Confidence Intervals
+
+We drew 10,000 samples (each of size $n = 30$) from our population and estimated our regression model for each sample:
+
+$$ Y_i = \hat{\beta}_1 + \hat{\beta}_2 X_i + \hat{u}_i $$
+<center>(repeated 10,000 times)</center>
+
+Now, let's estimate 95% confidence intervals for each of these intervals...
+
+---
+# Confidence Intervals
+
+```{R, simulation ci data, include = F}
+# Create confidence intervals for b1
+ci_df <- sim_df %>% filter(term == "x") %>%
+  mutate(
+    lb = estimate - std.error * qt(.975, 28),
+    ub = estimate + std.error * qt(.975, 28),
+    ci_contains = (lm0$coefficients[2] >= lb) & (lm0$coefficients[2] <= ub),
+    ci_above = lm0$coefficients[2] < lb,
+    ci_below = lm0$coefficients[2] > ub,
+    ci_group = 2 * ci_above + (!ci_below)
+  ) %>%
+  arrange(ci_group, estimate) %>%
+  mutate(x = 1:1e4)
+```
+
+**From our previous simulation:** `r ci_df$ci_contains %>% multiply_by(100) %>% mean() %>% round(1)`% of 95% confidence intervals contain the true parameter value of $\beta_2$.
+
+```{R, simulation ci, echo = F, dev = "svg", fig.height = 5.5}
+# Plot
+ggplot(data = ci_df) +
+geom_segment(aes(y = lb, yend = ub, x = x, xend = x, color = ci_contains)) +
+geom_hline(yintercept = lm0$coefficients[2]) +
+scale_y_continuous(breaks = lm0$coefficients[2], labels = TeX("$\\beta_2$")) +
+scale_color_manual(values = c(red_pink, "grey85")) +
+theme_simple +
+theme(
+  axis.text.x = element_blank(),
+  axis.text.y = element_text(size = 18)) + xlab("") + 
+  ylab("") 
+```
+
+---
+# Confidence Intervals
+
+## Example: Association of police with crime
+
+You can instruct `tidy` to return a 95 percent confidence interval for the association of campus police with campus crime:
+
+```{R echo = T, highlight.output = 5}
+lm(crime ~ police, data = campus) %>% tidy(conf.int = TRUE, conf.level = 0.95)
+```
+
+---
+# Confidence Intervals
+
+## Example: Association of police with crime
+
+```{R, dev = "svg", fig.height = 5, echo = F}
+reg <- lm(crime ~ police, data = campus)
+
+conf1 <- tidy(reg, conf.int = TRUE, conf.level = 0.75) %>% 
+  filter(term == "police") %>% 
+  mutate(term = "75% CI")
+conf2 <- tidy(reg, conf.int = TRUE, conf.level = 0.9) %>% 
+  filter(term == "police") %>% 
+  mutate(term = "90% CI")
+conf3 <- tidy(reg, conf.int = TRUE, conf.level = 0.95) %>% 
+  filter(term == "police") %>% 
+  mutate(term = "95% CI")
+conf4 <- tidy(reg, conf.int = TRUE, conf.level = 0.99) %>% 
+  filter(term == "police") %>% 
+  mutate(term = "99% CI")
+
+conf <- bind_rows(conf1, conf2, conf3, conf4)
+
+conf %>% 
+  ggplot(aes(x = term, y = estimate, ymin = conf.low, ymax = conf.high)) +
+  geom_pointrange(color = red_pink, size = 1) +
+  geom_hline(yintercept = 0, linetype = "dashed", size = 1) +
+  coord_flip() +
+  theme_simple +
+  theme(
+    axis.title.y = element_text(size = 18, angle = 90),
+    axis.title.x = element_text(size = 18)
+  ) +
+  ylab("Value") +
+  xlab("Police Coefficient")
+```
+
+Four confidence intervals for the same coefficient.

@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Simple Linear Regression: Inference</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Philip Economides" />
+    <link href="09-Simple_LR_Inference_files/remark-css/default.css" rel="stylesheet" />
+    <link href="09-Simple_LR_Inference_files/remark-css/metropolis.css" rel="stylesheet" />
+    <link href="09-Simple_LR_Inference_files/remark-css/metropolis-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="my-css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Simple Linear Regression: Inference
+## EC 320: Introduction to Econometrics
+### Philip Economides
+### Winter 2022
+
+---
+
+class: inverse, middle
+
+
+
+# Prologue
+
+---
+# Housekeeping
+
+Problem Set 3 
+
+- Due tonight by 11:59pm.
+
+Problem Set 4
+
+- Due Monday, November 18 by 11:59pm.
+- 10 points extra credit for using R Markdown to generate responses to the analytical problems (HTML or Word).
+
+---
+# Last Time
+
+We discussed the .hi-green[classical assumptions of OLS:]
+
+&gt; 
+1. **Linearity:** The population relationship is linear in parameters with an additive error term.
+2. **Sample Variation:** There is variation in `\(X\)`.
+3. **Exogeneity:** The `\(X\)` variable is exogenous (*i.e.,* `\(\mathop{\mathbb{E}}\left( u|X \right) = 0\)`).
+4. **Homoskedasticity:** The error term has the same variance for each value of the independent variable (*i.e.,* `\(\mathop{\text{Var}}(u|X) = \sigma^2\)`).
+5. **Non-Autocorrelation:** Any pair of error terms share zero correlation due to having been independently drawn. (*i.e.,* `\(\mathop{\mathbb{E}}\left( u_i u_j \right) = 0 \ \forall i \text{ s.t. } i \neq j\)`)
+6. **Normality:** The population error term is normally distributed with mean zero and variance `\(\sigma^2\)` (*i.e.,* `\(u \sim N(0,\sigma^2)\)`)
+
+We restricted our attention to the first 5 assumptions.
+
+---
+count: false
+
+# Last Time
+
+We discussed the .hi-green[classical assumptions of OLS:]
+
+&gt; 
+1. **Linearity:** The population relationship is linear in parameters with an additive error term.
+2. **Sample Variation:** There is variation in `\(X\)`.
+3. **Exogeneity:** The `\(X\)` variable is exogenous (*i.e.,* `\(\mathop{\mathbb{E}}\left( u|X \right) = 0\)`).
+4. **Homoskedasticity:** The error term has the same variance for each value of the independent variable (*i.e.,* `\(\mathop{\text{Var}}(u|X) = \sigma^2\)`).
+5. **Non-Autocorrelation:** Any pair of error terms share zero correlation due to having been independently drawn. (*i.e.,* `\(\mathop{\mathbb{E}}\left( u_i u_j \right) = 0 \ \forall i \text{ s.t. } i \neq j\)`)
+6. .hi[Normality:] .pink[The population error term is normally distributed with mean zero and variance] `\(\color{#e64173}{\sigma^2}\)` .pink[(*i.e.,*] `\(\color{#e64173}{u \sim N(0,\sigma^2)}\)`.pink[)]
+
+We restricted our attention to the first 5 assumptions.
+
+---
+# Classical Assumptions
+
+## Last Time
+
+1. We used the first 4 assumptions to show that OLS is unbiased: `\(\mathop{\mathbb{E}}\left[ \hat{\beta} \right] = \beta\)`
+
+2. We used the first 5 assumptions to derive a formula for the __variance__ of the OLS estimator: `\(\mathop{\text{Var}}(\hat{\beta}) = \frac{\sigma^2}{\sum_{i=1}^n (X_i - \bar{X})^2}\)`.
+
+---
+# Classical Assumptions
+
+## Today
+
+We will use the sampling distribution of `\(\hat{\beta}\)` to conduct hypothesis tests.
+
+- Can use all 6 classical assumptions to show that OLS is normally distributed:
+
+`$$\hat{\beta} \sim \mathop{N}\left( \beta, \frac{\sigma^2}{\sum_{i=1}^n (X_i - \bar{X})^2} \right)$$`
+
+- We'll "prove" this using .mono[R].
+
+---
+# Simulation
+
+
+
+.pull-left[
+
+&lt;img src="09-Simple_LR_Inference_files/figure-html/pop1-1.svg" style="display: block; margin: auto;" /&gt;
+
+.center[**Population**]
+
+]
+
+--
+
+.pull-right[
+
+&lt;img src="09-Simple_LR_Inference_files/figure-html/scatter1-1.svg" style="display: block; margin: auto;" /&gt;
+
+.center[**Population relationship**]
+
+$$ Y_i = 2.53 + 0.57 X_i + u_i $$
+
+$$ Y_i = \beta_1 + \beta_2 X_i + u_i $$
+
+
+]
+
+---
+# Simulation
+
+.pull-left[
+
+&lt;img src="09-Simple_LR_Inference_files/figure-html/sample1-1.svg" style="display: block; margin: auto;" /&gt;
+
+.center[**Sample 1:** 30 random individuals]
+
+]
+
+--
+
+.pull-right[
+
+&lt;img src="09-Simple_LR_Inference_files/figure-html/sample1 scatter-1.svg" style="display: block; margin: auto;" /&gt;
+
+.center[
+
+**Population relationship**
+&lt;br&gt;
+`\(Y_i = 2.53 + 0.57 X_i + u_i\)`
+
+**Sample relationship**
+&lt;br&gt;
+`\(\hat{Y}_i = 2.36 + 0.61 X_i\)`
+
+]
+
+]
+
+---
+# Simulation
+
+.pull-left[
+
+&lt;img src="09-Simple_LR_Inference_files/figure-html/sample2-1.svg" style="display: block; margin: auto;" /&gt;
+
+.center[**Sample 2:** 30 random individuals]
+
+]
+
+.pull-right[
+
+&lt;img src="09-Simple_LR_Inference_files/figure-html/sample2 scatter-1.svg" style="display: block; margin: auto;" /&gt;
+
+.center[
+
+**Population relationship**
+&lt;br&gt;
+`\(Y_i = 2.53 + 0.57 Y_i + u_i\)`
+
+**Sample relationship**
+&lt;br&gt;
+`\(\hat{Y}_i = 2.79 + 0.56 X_i\)`
+
+]
+
+]
+---
+# Simulation
+
+.pull-left[
+
+&lt;img src="09-Simple_LR_Inference_files/figure-html/sample3-1.svg" style="display: block; margin: auto;" /&gt;
+
+.center[**Sample 3:** 30 random individuals]
+
+]
+
+.pull-right[
+
+&lt;img src="09-Simple_LR_Inference_files/figure-html/sample3 scatter-1.svg" style="display: block; margin: auto;" /&gt;
+
+.center[
+
+**Population relationship**
+&lt;br&gt;
+`\(Y_i = 2.53 + 0.57 X_i + u_i\)`
+
+**Sample relationship**
+&lt;br&gt;
+`\(\hat{Y}_i = 3.21 + 0.45 X_i\)`
+
+]
+
+]
+
+---
+layout: false
+class: white-slide, middle
+
+Repeat **10,000 times** (Monte Carlo simulation).
+
+---
+class: white-slide
+
+&lt;img src="09-Simple_LR_Inference_files/figure-html/simulation scatter-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+class: white-slide, middle
+
+.pull-left[
+
+.center[
+**Intercept Estimates**
+]
+&lt;img src="09-Simple_LR_Inference_files/figure-html/simulation hist1-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+
+.center[
+**Slope Estimates**
+]
+&lt;img src="09-Simple_LR_Inference_files/figure-html/simulation hist2-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+---
+# Simulation
+
+Can you spot the classical assumptions?
+
+
+```r
+# Set population and sample sizes
+n_p &lt;- 100 
+n_s &lt;- 30 
+# Generate population data
+pop_df &lt;- tibble(
+  x = rnorm(n_p, mean = 5, sd = 1.5),
+  e = rnorm(n_p, mean = 0, sd = 1),
+  y = 2.53 + 0.57 * x + e
+)
+# Define simulation procedure
+sim_ols &lt;- function(x, size = n_s) {
+  lm(y ~ x, data = pop_df %&gt;% sample_n(size = size)) %&gt;% 
+    tidy() %&gt;% 
+    mutate(iteration = x)
+}
+# Run simulation
+sim_df &lt;- map_df(1:10000, ~sim_ols(.x, size = n_s))
+```
+
+---
+count: false
+
+# Simulation
+
+Can you spot the classical assumptions?
+
+
+```r
+# Set population and sample sizes
+*n_p &lt;- 100
+*n_s &lt;- 30
+# Generate population data
+pop_df &lt;- tibble(
+  x = rnorm(n_p, mean = 5, sd = 1.5),
+  e = rnorm(n_p, mean = 0, sd = 1),
+  y = 2.53 + 0.57 * x + e
+)
+# Define simulation procedure
+sim_ols &lt;- function(x, size = n_s) {
+  lm(y ~ x, data = pop_df %&gt;% sample_n(size = size)) %&gt;% 
+    tidy() %&gt;% 
+    mutate(iteration = x)
+}
+# Run simulation
+sim_df &lt;- map_df(1:10000, ~sim_ols(.x, size = n_s))
+```
+
+---
+count: false
+
+# Simulation
+
+Can you spot the classical assumptions?
+
+
+```r
+# Set population and sample sizes
+n_p &lt;- 100
+n_s &lt;- 30 
+# Generate population data
+pop_df &lt;- tibble(
+* x = rnorm(n_p, mean = 5, sd = 1.5),
+  e = rnorm(n_p, mean = 0, sd = 1),
+  y = 2.53 + 0.57 * x + e
+)
+# Define simulation procedure
+sim_ols &lt;- function(x, size = n_s) {
+  lm(y ~ x, data = pop_df %&gt;% sample_n(size = size)) %&gt;% 
+    tidy() %&gt;% 
+    mutate(iteration = x)
+}
+# Run simulation
+sim_df &lt;- map_df(1:10000, ~sim_ols(.x, size = n_s))
+```
+
+---
+count: false
+
+# Simulation
+
+Can you spot the classical assumptions?
+
+
+```r
+# Set population and sample sizes
+n_p &lt;- 100
+n_s &lt;- 30 
+# Generate population data
+pop_df &lt;- tibble(
+  x = rnorm(n_p, mean = 5, sd = 1.5), 
+* e = rnorm(n_p, mean = 0, sd = 1),
+  y = 2.53 + 0.57 * x + e
+)
+# Define simulation procedure
+sim_ols &lt;- function(x, size = n_s) {
+  lm(y ~ x, data = pop_df %&gt;% sample_n(size = size)) %&gt;% 
+    tidy() %&gt;% 
+    mutate(iteration = x)
+}
+# Run simulation
+sim_df &lt;- map_df(1:10000, ~sim_ols(.x, size = n_s))
+```
+
+---
+count: false
+
+# Simulation
+
+Can you spot the classical assumptions?
+
+
+```r
+# Set population and sample sizes
+n_p &lt;- 100
+n_s &lt;- 30 
+# Generate population data
+pop_df &lt;- tibble(
+  x = rnorm(n_p, mean = 5, sd = 1.5), 
+  e = rnorm(n_p, mean = 0, sd = 1), 
+* y = 2.53 + 0.57 * x + e
+)
+# Define simulation procedure
+sim_ols &lt;- function(x, size = n_s) {
+  lm(y ~ x, data = pop_df %&gt;% sample_n(size = size)) %&gt;% 
+    tidy() %&gt;% 
+    mutate(iteration = x)
+}
+# Run simulation
+sim_df &lt;- map_df(1:10000, ~sim_ols(.x, size = n_s))
+```
+
+---
+count: false
+
+# Simulation
+
+Can you spot the classical assumptions?
+
+
+```r
+# Set population and sample sizes
+n_p &lt;- 100
+n_s &lt;- 30 
+# Generate population data
+pop_df &lt;- tibble(
+  x = rnorm(n_p, mean = 5, sd = 1.5), 
+  e = rnorm(n_p, mean = 0, sd = 1), 
+  y = 2.53 + 0.57 * x + e 
+)
+# Define simulation procedure
+*sim_ols &lt;- function(x, size = n_s) {
+* lm(y ~ x, data = pop_df %&gt;% sample_n(size = size)) %&gt;%
+*   tidy() %&gt;%
+*   mutate(iteration = x)
+*} 
+# Run simulation
+sim_df &lt;- map_df(1:10000, ~sim_ols(.x, size = n_s)) 
+```
+
+---
+count: false
+
+# Simulation
+
+Can you spot the classical assumptions?
+
+
+```r
+# Set population and sample sizes
+n_p &lt;- 100
+n_s &lt;- 30 
+# Generate population data
+pop_df &lt;- tibble(
+  x = rnorm(n_p, mean = 5, sd = 1.5), 
+  e = rnorm(n_p, mean = 0, sd = 1), 
+  y = 2.53 + 0.57 * x + e 
+)
+# Define simulation procedure
+sim_ols &lt;- function(x, size = n_s) { 
+  lm(y ~ x, data = pop_df %&gt;% sample_n(size = size)) %&gt;% 
+    tidy() %&gt;% 
+    mutate(iteration = x) 
+}
+# Run simulation
+*sim_df &lt;- map_df(1:10000, ~sim_ols(.x, size = n_s))
+```
+
+---
+class: inverse, middle
+
+# Inference
+
+---
+# Motivation
+
+What does statistical evidence say about existing theories?
+
+We want to test hypotheses posed by politicians, economists, scientists, people with foil hats, _etc._
+
+- Does building a giant wall **reduce crime**?
+- Does shutting down a government **adversely affect the economy**?
+- Does legal cannabis **reduce drunk driving** or **reduce opioid use**?
+- Do air quality standards **improve health** or **reduce jobs**?
+
+--
+
+While uncertainty exists, we can still conduct *reliable* statistical tests (rejecting or failing to reject a hypothesis).
+
+---
+# Inference
+
+We know OLS has some nice properties, and we know how to estimate an intercept and slope coefficient using OLS.
+
+Our current workflow:
+- Get data (points with `\(X\)` and `\(Y\)` values).
+- Regress `\(Y\)` on `\(X\)`.
+- Plot the fitted values (*i.e.*, `\(\hat{Y_i} = \hat{\beta}_0 + \hat{\beta}_1X_i\)`) and report the estimates.
+
+--
+
+But how do we actually **learn** something from this exercise?
+
+--
+
+- Based upon our value of `\(\hat{\beta}_2\)`, can we rule out previously hypothesized values?
+- How confident should we be in the precision of our estimates?
+
+--
+
+We need to be able to deal with uncertainty. Enter: **Inference.**
+
+---
+# Inference
+
+We use the standard error of `\(\hat{\beta}_2\)`, along with `\(\hat{\beta}_2\)` itself, to learn about the parameter `\(\beta_2\)`.
+
+After deriving the distribution of `\(\hat{\beta}_2\)`,&lt;sup&gt;.pink[†]&lt;/sup&gt; we have two (related) options for formal statistical inference (learning) about our unknown parameter `\(\beta_2\)`:
+
+- **Hypothesis tests:** Determine whether there is statistically significant evidence to reject a hypothesized value or range of values.
+
+- **Confidence intervals:** Use the estimate and its standard error to create an interval that, when repeated, will generally&lt;sup&gt;.pink[††]&lt;/sup&gt; contain the true parameter.
+
+.footnote[
+.pink[†] *Hint:* It's normal with mean `\(\beta_2\)` and variance `\(\frac{\sigma^2}{\sum_{i=1}^n (X_i - \bar{X})^2}\)`.
+&lt;br&gt;
+.pink[††] _E.g._, similarly constructed 95% confidence intervals will contain the true parameter 95% of the time.
+]
+
+---
+# OLS Variance
+
+Hypothesis tests and confidence intervals require information about the variance of the OLS estimator:
+
+`$$\mathop{\text{Var}}(\hat{\beta}_2) = \frac{\sigma^2}{\sum_{i=1}^n (X_i - \bar{X})^2}.$$`
+
+--
+
+**Problem** 
+
+- The variance formula has a population parameter: `\(\sigma^2\)` (a.k.a. error variance).
+
+- We can't observe population parameters.
+
+--
+
+- **Solution:** Estimate `\(\sigma^2\)`.
+
+---
+# Estimating Error Variance
+
+## Learning from our (prediction) errors
+
+We can estimate the variance of `\(u_i\)` (a.k.a. `\(\sigma^2\)`) using the sum of squared residuals:
+
+$$ s^2_u = \dfrac{\sum_i \hat{u}_i^2}{n - k} $$
+
+where `\(k\)` gives the number of regression parameters.
+
+- In a simple linear regression, `\(k=2\)`.
+
+- `\(s^2_u\)` is an unbiased estimator of `\(\sigma^2\)`.
+
+---
+# OLS Variance, Take 2
+
+With `\(s^2_u = \dfrac{\sum_i \hat{u}_i^2}{n - k}\)`, we can calculate
+
+`$$\mathop{\text{Var}}(\hat{\beta}_2) = \frac{s^2_u}{\sum_{i=1}^n (X_i - \bar{X})^2}.$$`
+
+--
+
+Taking the square root, we get the __standard error__ of the OLS estimator:
+
+`$$\mathop{\hat{\text{SE}}} \left( \hat{\beta}_2 \right) = \sqrt{ \frac{s^2_u}{\sum_{i=1}^n (X_i - \bar{X})^2} }.$$`
+
+- Standard error .mono[=] standard deviation of an estimator.
+
+---
+# Standard Errors
+
+.mono[R]'s `lm()` function estimates standard errors out of the box:
+
+
+```r
+tidy(lm(y ~ x, pop_df))
+```
+
+```
+#&gt; # A tibble: 2 x 5
+#&gt;   term        estimate std.error statistic  p.value
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+#&gt; 1 (Intercept)    2.53     0.422       6.00 3.38e- 8
+#&gt; 2 x              0.567    0.0793      7.15 1.59e-10
+```
+
+I won't ask you to estimate standard errors by hand!
+
+---
+class: inverse, middle
+
+# Hypothesis Tests
+
+---
+# Hypothesis Tests
+
+__Null hypothesis (H.sub[0]):__ `\(\beta_2 = 0\)`
+
+__Alternative hypothesis (H.sub[a]):__ `\(\beta_2 \neq 0\)`
+
+--
+
+There are four possible outcomes of our test:
+
+1. We __fail to reject__ the null hypothesis and the null is true.
+
+2. We __reject__ the null hypothesis and the null is false.
+
+3. We __reject__ the null hypothesis, but the null is actually true (**Type I error**).
+
+4. We __fail to reject__ the null hypothesis, but the null is actually false (**Type II error**).
+
+---
+# Hypothesis Tests
+
+**Goal:** Make a statement about `\(\beta_2\)` using information on `\(\hat{\beta}_2\)`.
+
+--
+
+`\(\hat{\beta}_2\)` is random: it could be anything, even if `\(\beta_2 = 0\)` is true.
+
+- But if `\(\beta_2 = 0\)` is true, then `\(\hat{\beta}_2\)` is unlikely to take values far from zero.
+
+- As the standard error shrinks, we are even less likely to observe "extreme" values of `\(\hat{\beta}_2\)` (assuming `\(\beta_2 = 0\)`).
+
+--
+
+Our test should take .pink[extreme values] of `\(\hat{\beta}_2\)` as .pink[evidence against the null hypothesis], but it should also weight them by what we know about the variance of `\(\hat{\beta}_2\)`.
+
+---
+# Hypothesis Tests
+
+.pull-left[
+__Null hypothesis__
+
+H.sub[0]: `\(\beta_2 = 0\)`
+
+]
+
+.pull-right[
+__Alternative hypothesis__
+
+H.sub[a]: `\(\beta_2 \neq 0\)`
+
+]
+
+&lt;br&gt;
+&lt;br&gt;
+
+To conduct the test, we calculate a `\(t\)`-statistic:
+
+`$$t = \frac{\hat{\beta}_2 - \beta_2^0}{\mathop{\hat{\text{SE}}} \left( \hat{\beta}_2 \right)}$$`
+
+- Distributed according to a `\(t\)`-distribution with `\(n-2\)` _degrees of freedom_.
+- `\(\beta_2^0\)` is the value of `\(\beta_2\)` in our null hypothesis (*e.g.,* `\(\beta_2^0 = 0\)`).
+
+
+---
+# Hypothesis Tests
+
+Next, we use the `\(\color{#708090}{t}\)`.hi-slate[-statistic] to calculate a `\(\color{#007935}{p}\)`.hi-green[-value].
+
+&lt;img src="09-Simple_LR_Inference_files/figure-html/unnamed-chunk-8-1.svg" style="display: block; margin: auto;" /&gt;
+
+Describes the probability of seeing a `\(t\)`-statistic as extreme as the one we observe _if the null hypothesis is actually true_.
+
+--
+
+But...we still need some benchmark to compare our `\(p\)`-value against.
+
+---
+# Hypothesis Tests
+
+We worry mostly about false positives, so we conduct hypothesis tests based on the probability of making a Type I error.
+
+**How?** We select a .hi[significance level] `\(\color{#e64173}{\alpha}\)` that specifies our tolerance for false positives. This is the probability of Type I error we choose to live with.
+
+&lt;img src="09-Simple_LR_Inference_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Hypothesis Tests
+
+We then compare `\(\alpha\)` to the `\(p\)`-value of our test.
+
+- If the `\(p\)`-value is less than `\(\alpha\)`, then we __reject the null hypothesis__ at the `\(\alpha\cdot100\)` percent level.
+
+- If the `\(p\)`-value is greater than `\(\alpha\)`, then we __fail to reject the null hypothesis__.
+
+- **Note:** _Fail to reject_ `\(\neq\)` _accept_.
+
+---
+# Hypothesis Tests
+
+**Example:** Are campus police associated with campus crime?
+
+
+```r
+lm(crime ~ police, data = campus) %&gt;% tidy()
+```
+
+```
+#&gt; # A tibble: 2 x 5
+#&gt;   term        estimate std.error statistic  p.value
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+#&gt; 1 (Intercept)    18.4       2.38      7.75 1.06e-11
+*#&gt; 2 police          1.76      1.30      1.35 1.81e- 1
+```
+
+H.sub[0]: `\(\beta_\text{Police} = 0\)` *v.s.* H.sub[a]: `\(\beta_\text{Police} \neq 0\)`
+
+--
+
+Significance level: `\(\alpha = 0.05\)` (*i.e.,* 5 percent test)
+
+--
+
+Test Condition: Reject H.sub[0] if `\(p &lt; \alpha\)`
+
+--
+
+`\(p = 0.18\)`. **Do we reject the null hypothesis?**
+
+---
+# Hypothesis Tests
+
+`\(p\)`-values are difficult to calculate by hand.
+
+__Alternative:__ Compare `\(\color{#708090}{t}\)`.hi-slate[-statistic] to .hi-purple[critical values] from the `\(t\)`-distribution.
+
+&lt;img src="09-Simple_LR_Inference_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Hypothesis Tests
+
+**Notation:** `\(t_{1-\alpha/2, n-2}\)` or `\(t_\text{crit}\)`.
+
+- Find in a `\(t\)` table using the significance level `\(\alpha\)` and `\(n-2\)` degrees of freedom.
+
+Compare the the critical value to your `\(t\)`-statistic:
+
+- If `\(|t| &gt; |t_{1-\alpha/2, n-2}|\)`, then __reject the null__.
+
+- If `\(|t| &lt; |t_{1-\alpha/2, n-2}|\)`, then __fail to reject the null__.
+
+---
+# Two-Sided Tests
+
+Based on a critical value of `\(t_{1-\alpha/2, n-2} = t_{0.975, 100} =\)` 1.98, we can identify a .hi[rejection region] on the `\(t\)`-distribution. 
+
+&lt;img src="09-Simple_LR_Inference_files/figure-html/unnamed-chunk-12-1.svg" style="display: block; margin: auto;" /&gt;
+
+--
+
+If our `\(t\)` statistic is in the rejection region, then we reject the null hypothesis at the 5 percent level. 
+
+---
+# Two-Sided Tests
+
+.mono[R] defaults to testing hypotheses against the null hypothesis of zero.
+
+
+```r
+lm(y ~ x, data = pop_df) %&gt;% tidy()
+```
+
+```
+#&gt; # A tibble: 2 x 5
+#&gt;   term        estimate std.error statistic  p.value
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+#&gt; 1 (Intercept)    2.53     0.422       6.00 3.38e- 8
+*#&gt; 2 x              0.567    0.0793      7.15 1.59e-10
+```
+
+--
+
+H.sub[0]: `\(\beta_2 = 0\)` *vs.* H.sub[a]: `\(\beta_2 \neq 0\)`
+
+--
+
+Significance level: `\(\alpha = 0.05\)` (*i.e.,* 5 percent test)
+
+--
+
+ `\(t_\text{stat} = 7.15\)` and `\(t_\text{0.975, 28} = 2.05\)`
+--
+ , which implies that  `\(p &lt; 0.05\)`.
+
+--
+
+Therefore, we .hi[reject H.sub[0]] at the 5% level.
+
+---
+# Two-Sided Tests
+
+**Example:** Are campus police associated with campus crime?
+
+
+```r
+lm(crime ~ police, data = campus) %&gt;% tidy()
+```
+
+```
+#&gt; # A tibble: 2 x 5
+#&gt;   term        estimate std.error statistic  p.value
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+#&gt; 1 (Intercept)    18.4       2.38      7.75 1.06e-11
+*#&gt; 2 police          1.76      1.30      1.35 1.81e- 1
+```
+
+H.sub[0]: `\(\beta_\text{Police} = 0\)` *v.s.* H.sub[a]: `\(\beta_\text{Police} \neq 0\)`
+
+--
+
+Significance level: `\(\alpha = 0.1\)` (*i.e.,* 10 percent test)
+
+--
+
+Test Condition: Reject H.sub[0] if `\(|t| &gt; t_\text{crit}\)`
+
+--
+
+`\(t = 1.35\)` and `\(t_\text{crit} = 1.66\)`. **Do we reject the null hypothesis?**
+
+---
+# One-Sided Tests
+
+Sometimes we are confident that a parameter is non-negative or non-positive.
+
+A __one-sided__ test assumes that values on one side of the null hypothesis are impossible.
+
+- __Option 1:__ H.sub[0]: `\(\beta_2 = 0\)` *vs.* H.sub[a]: `\(\beta_2 &gt; 0\)`
+
+- __Option 2:__ H.sub[0]: `\(\beta_2 = 0\)` *vs.* H.sub[a]: `\(\beta_2 &lt; 0\)`
+
+--
+
+If this assumption is reasonable, then our rejection region changes.
+
+- Same `\(\alpha\)`.
+
+---
+# One-Sided Tests
+
+__Left-tailed:__ Based on a critical value of `\(t_{1-\alpha, n-2} = t_{0.95, 100} =\)` 1.66, we can identify a .hi[rejection region] on the `\(t\)`-distribution. 
+
+&lt;img src="09-Simple_LR_Inference_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /&gt;
+
+--
+
+If our `\(t\)` statistic is in the rejection region, then we reject the null hypothesis at the 5 percent level. 
+
+---
+# One-Sided Tests
+
+__Right-tailed:__ Based on a critical value of `\(t_{1-\alpha, n-2} = t_{0.95, 100} =\)` 1.66, we can identify a .hi[rejection region] on the `\(t\)`-distribution. 
+
+&lt;img src="09-Simple_LR_Inference_files/figure-html/unnamed-chunk-15-1.svg" style="display: block; margin: auto;" /&gt;
+
+--
+
+If our `\(t\)` statistic is in the rejection region, then we reject the null hypothesis at the 5 percent level. 
+
+---
+# One-Sided Tests
+
+**Example:** Do campus police deter campus crime?
+
+
+```r
+lm(crime ~ police, data = campus) %&gt;% tidy()
+```
+
+```
+#&gt; # A tibble: 2 x 5
+#&gt;   term        estimate std.error statistic  p.value
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+#&gt; 1 (Intercept)    18.4       2.38      7.75 1.06e-11
+*#&gt; 2 police          1.76      1.30      1.35 1.81e- 1
+```
+
+H.sub[0]: `\(\beta_\text{Police} = 0\)` *v.s.* H.sub[a]: `\(\beta_\text{Police} &lt; 0\)`
+
+--
+
+Significance level: `\(\alpha = 0.1\)` (*i.e.,* 10 percent test)
+
+--
+
+Test Condition: Reject H.sub[0] if `\(t &lt; -t_\text{crit}\)`
+
+--
+
+`\(t = 1.35\)` and `\(t_\text{crit} = 1.29\)`. **Do we reject the null hypothesis?**
+
+
+---
+class: inverse, middle
+
+# Confidence Intervals
+
+---
+# Confidence Intervals
+
+Until now, we have considered __point estimates__ of population parameters.
+
+- Sometimes a range of values is more interesting/honest.
+
+--
+
+We can construct `\((1-\alpha)\cdot100\)`-percent level confidence intervals for `\(\beta_2\)`
+
+`$$\hat{\beta}_2 \pm t_{1-\alpha/2, n-2} \, \mathop{\hat{\text{SE}}} \left( \hat{\beta}_2 \right)$$`
+
+--
+
+`\(t_{1-\alpha/2,n-2}\)` denotes the `\(1-\alpha/2\)` quantile of a `\(t\)` distribution with `\(n-2\)` degrees of freedom.
+
+---
+# Confidence Intervals
+
+**Q:** Where does the confidence interval formula come from?
+
+--
+
+**A:** The confidence interval formula comes from the rejection condition of a two-sided test.
+
+&gt; Reject H.sub[0] if `\(|t| &gt; t_\text{crit}\)`
+
+--
+
+The test condition implies
+
+&gt; Fail to reject H.sub[0] if `\(|t| \leq t_\text{crit}\)`
+
+which is equivalent to 
+
+&gt; Fail to reject H.sub[0] if `\(-t_\text{crit} \leq t \leq t_\text{crit}\)`.
+
+---
+# Confidence Intervals
+
+Replacing `\(t\)` with its formula gives 
+
+&gt; Fail to reject H.sub[0] if `\(-t_\text{crit} \leq \frac{\hat{\beta}_2 - \beta_2^0}{\mathop{\hat{\text{SE}}} \left( \hat{\beta}_2 \right)} \leq t_\text{crit}\)`.
+
+--
+
+Standard errors are always positive, so the inequalities do not flip when we multiply by `\(\mathop{\hat{\text{SE}}} \left( \hat{\beta}_2 \right)\)`:
+
+&gt; Fail to reject H.sub[0] if `\(-t_\text{crit} \mathop{\hat{\text{SE}}} \left( \hat{\beta}_2 \right) \leq \hat{\beta}_2 - \beta_2^0\leq t_\text{crit} \mathop{\hat{\text{SE}}} \left( \hat{\beta}_2 \right)\)`.
+
+--
+
+Subtracting `\(\hat{\beta}_2\)` yields
+
+&gt; Fail to reject H.sub[0] if `\(-\hat{\beta}_2 -t_\text{crit} \mathop{\hat{\text{SE}}} \left( \hat{\beta}_2 \right) \leq - \beta_2^0 \leq - \hat{\beta}_2 + t_\text{crit} \mathop{\hat{\text{SE}}} \left( \hat{\beta}_2 \right)\)`.
+
+---
+# Confidence Intervals
+
+Multiplying by -1 and rearranging gives
+
+&gt; Fail to reject H.sub[0] if &lt;br&gt; `\(\hat{\beta}_2 - t_\text{crit} \mathop{\hat{\text{SE}}} \left( \hat{\beta}_2 \right) \leq \beta_2^0 \leq \hat{\beta}_2 + t_\text{crit} \mathop{\hat{\text{SE}}} \left( \hat{\beta}_2 \right)\)`.
+
+--
+
+Replacing `\(\beta_2^0\)` with `\(\beta_2\)` and dropping the test condition yields the interval
+
+`$$\hat{\beta}_2 - t_\text{crit} \mathop{\hat{\text{SE}}} \left( \hat{\beta}_2 \right) \leq \beta_2 \leq \hat{\beta}_2 + t_\text{crit} \mathop{\hat{\text{SE}}} \left( \hat{\beta}_2 \right)$$`
+
+which is equivalent to 
+
+`$$\hat{\beta}_2 \pm t_\text{crit} \, \mathop{\hat{\text{SE}}} \left( \hat{\beta}_2 \right).$$`
+
+---
+# Confidence Intervals
+
+**Insight:** A confidence interval is related to a two-sided hypothesis test. 
+
+- If a 95 percent confidence interval contains zero, then we fail to reject the null hypothesis at the 5 percent level.
+
+- If a 95 percent confidence interval does not contain zero, then we reject the null hypothesis at the 5 percent level.
+
+- **Generally:** A `\((1- \alpha) \cdot 100\)` percent confidence interval embeds a two-sided test at the `\(\alpha \cdot 100\)` level.
+
+---
+# Confidence Intervals
+
+## Example
+
+
+```r
+lm(y ~ x, data = pop_df) %&gt;% tidy()
+```
+
+```
+#&gt; # A tibble: 2 x 5
+#&gt;   term        estimate std.error statistic  p.value
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+#&gt; 1 (Intercept)    2.53     0.422       6.00 3.38e- 8
+*#&gt; 2 x              0.567    0.0793      7.15 1.59e-10
+```
+
+--
+
+
+```r
+# find degrees of freedom
+dof &lt;- summary(lm(y ~ x, data = pop_df))$df[2]
+# return critical value
+qt(0.975, dof)
+```
+
+```
+#&gt; [1] 1.984467
+```
+
+--
+
+**95% confidence interval** for `\(\beta_2\)` is `\(0.567 \pm 1.98 \times 0.0793 = \left[ 0.410,\, 0.724 \right]\)`
+
+---
+# Confidence Intervals
+
+We have a confidence interval for `\(\beta_2\)`, *i.e.,* `\(\left[ 0.410,\, 0.724 \right]\)`. 
+
+.hi[What does it mean?]
+
+--
+
+**Informally:** The confidence interval gives us a region (interval) in which we can place some trust (confidence) for containing the parameter.
+
+--
+
+**More formally:** If we repeatedly sample from our population and construct confidence intervals for each of these samples, then `\((1-\alpha) \cdot100\)` percent of our intervals (*e.g.,* 95%) will contain the population parameter *somewhere in the interval*.
+
+--
+
+Now back to our simulation...
+
+---
+# Confidence Intervals
+
+We drew 10,000 samples (each of size `\(n = 30\)`) from our population and estimated our regression model for each sample:
+
+$$ Y_i = \hat{\beta}_1 + \hat{\beta}_2 X_i + \hat{u}_i $$
+&lt;center&gt;(repeated 10,000 times)&lt;/center&gt;
+
+Now, let's estimate 95% confidence intervals for each of these intervals...
+
+---
+# Confidence Intervals
+
+
+
+**From our previous simulation:** 97.9% of 95% confidence intervals contain the true parameter value of `\(\beta_2\)`.
+
+&lt;img src="09-Simple_LR_Inference_files/figure-html/simulation ci-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Confidence Intervals
+
+## Example: Association of police with crime
+
+You can instruct `tidy` to return a 95 percent confidence interval for the association of campus police with campus crime:
+
+
+```r
+lm(crime ~ police, data = campus) %&gt;% tidy(conf.int = TRUE, conf.level = 0.95)
+```
+
+```
+#&gt; # A tibble: 2 x 7
+#&gt;   term        estimate std.error statistic  p.value conf.low conf.high
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+#&gt; 1 (Intercept)    18.4       2.38      7.75 1.06e-11   13.7       23.1 
+*#&gt; 2 police          1.76      1.30      1.35 1.81e- 1   -0.830      4.34
+```
+
+---
+# Confidence Intervals
+
+## Example: Association of police with crime
+
+&lt;img src="09-Simple_LR_Inference_files/figure-html/unnamed-chunk-19-1.svg" style="display: block; margin: auto;" /&gt;
+
+Four confidence intervals for the same coefficient.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
