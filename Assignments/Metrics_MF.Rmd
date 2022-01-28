@@ -315,7 +315,7 @@ data_descrip = cbind(Name, Description)
 
 as_tibble(data_descrip)
 ```
-2. Regress earnings in 2009 on years of education. How much do earnings increase (Level & %) on average for every additional year of schooling? (Note: To place a variable into a % interpretation, you need to log transform your data. First start by filling out zero and missing values.)
+2. Regress earnings in 2009 on years of education. How much do earnings increase (Level & %) on average for every additional year of schooling? (Note: To place a variable into a % interpretation, you need to log transform your data. First start by filtering out zero and missing values.)
 
 
 ```{r, 3-1-2}
