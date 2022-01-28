@@ -29,14 +29,22 @@ class: inverse, middle
 ---
 # Housekeeping
 
-Problem Set 3 
+**Problem Set 4**
 
-- Due tonight by 11:59pm.
+- Due Monday, February 18st by 11:59pm.
+- Since .hi-pink[Midterm] is on 9th, I'll post this afterwards. 
 
-Problem Set 4
 
-- Due Monday, November 18 by 11:59pm.
-- 10 points extra credit for using R Markdown to generate responses to the analytical problems (HTML or Word).
+**Data Project**
+
+- Due Tuesday, March 1st by 11:59pm
+- Remember to keep an eye on guidelines file
+- .hi-pink[Do not leave last minute]
+
+**Problem Set 5**
+
+- Due Monday, March 7th by 11:59pm.
+- Leaves you 9 days of preparation time for the .hi-pink[Final]
 
 ---
 # Last Time
@@ -48,7 +56,7 @@ We discussed the .hi-green[classical assumptions of OLS:]
 2. **Sample Variation:** There is variation in `\(X\)`.
 3. **Exogeneity:** The `\(X\)` variable is exogenous (*i.e.,* `\(\mathop{\mathbb{E}}\left( u|X \right) = 0\)`).
 4. **Homoskedasticity:** The error term has the same variance for each value of the independent variable (*i.e.,* `\(\mathop{\text{Var}}(u|X) = \sigma^2\)`).
-5. **Non-Autocorrelation:** Any pair of error terms share zero correlation due to having been independently drawn. (*i.e.,* `\(\mathop{\mathbb{E}}\left( u_i u_j \right) = 0 \ \forall i \text{ s.t. } i \neq j\)`)
+5. **Non-Autocorrelation:** Any pair of error terms share zero correlation due to having been independently drawn. (*i.e.,* `\(\mathop{\mathbb{E}}\left( u_i u_j \right) = 0 \ \forall i \text{ s.t. } i \neq j\)`).
 6. **Normality:** The population error term is normally distributed with mean zero and variance `\(\sigma^2\)` (*i.e.,* `\(u \sim N(0,\sigma^2)\)`)
 
 We restricted our attention to the first 5 assumptions.
@@ -73,9 +81,11 @@ We restricted our attention to the first 5 assumptions.
 ---
 # Classical Assumptions
 
+&lt;br&gt;
+
 ## Last Time
 
-1. We used the first 4 assumptions to show that OLS is unbiased: `\(\mathop{\mathbb{E}}\left[ \hat{\beta} \right] = \beta\)`
+1. We used the first 3 assumptions to show that OLS is unbiased: `\(\mathop{\mathbb{E}}\left[ \hat{\beta} \right] = \beta\)`
 
 2. We used the first 5 assumptions to derive a formula for the __variance__ of the OLS estimator: `\(\mathop{\text{Var}}(\hat{\beta}) = \frac{\sigma^2}{\sum_{i=1}^n (X_i - \bar{X})^2}\)`.
 
@@ -540,7 +550,7 @@ Taking the square root, we get the __standard error__ of the OLS estimator:
 
 `$$\mathop{\hat{\text{SE}}} \left( \hat{\beta}_2 \right) = \sqrt{ \frac{s^2_u}{\sum_{i=1}^n (X_i - \bar{X})^2} }.$$`
 
-- Standard error .mono[=] standard deviation of an estimator.
+- Standard error .mono[=] sample standard deviation of an estimator.
 
 ---
 # Standard Errors
@@ -1061,6 +1071,10 @@ lm(crime ~ police, data = campus) %&gt;% tidy(conf.int = TRUE, conf.level = 0.95
 &lt;img src="09-Simple_LR_Inference_files/figure-html/unnamed-chunk-19-1.svg" style="display: block; margin: auto;" /&gt;
 
 Four confidence intervals for the same coefficient.
+
+---
+
+exclude: true
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
