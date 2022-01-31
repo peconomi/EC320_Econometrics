@@ -74,19 +74,24 @@ r_2 <- summary(lm(lwage ~ educ, data = data))$r.squared
 # Prologue
 
 ---
+
 # Housekeeping
 
-<br>
+Survey results in:
 
-- Reminder: .hi-pink[Problem Set 3] due by 11:59pm
+- Assignments (x2), more room between lab and HW
+
+- Lecture slides (x1), upload Sunday nights max
+
+--
+
+Updates
+
+- .hi-pink[Problem Set 3:] due by Wednesday 11:59pm
 
 - This lecture last one relevant to .hi-pink[Midterm exam]
 
 - Revise material, have questions ready for .hi-pink[review session]
-
-- Anything after this lecture will not come up in midterm exam
-
-
 
 ---
 # Agenda
