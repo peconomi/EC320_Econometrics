@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Multiple Linear Regression: Inference</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Philip Economides" />
+    <script src="11-MLR_Inference_files/header-attrs/header-attrs.js"></script>
+    <link href="11-MLR_Inference_files/remark-css/default.css" rel="stylesheet" />
+    <link href="11-MLR_Inference_files/remark-css/metropolis.css" rel="stylesheet" />
+    <link href="11-MLR_Inference_files/remark-css/metropolis-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="my-css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Multiple Linear Regression: Inference
+## EC 320: Introduction to Econometrics
+### Philip Economides
+### Winter 2022
+
+---
+
+class: inverse, middle
+
+
+
+# Prologue
+
+---
+
+# Review
+
+Suppose that an epidemiologist studies the effect of coffee consumption on cardiovascular health by estimating
+
+`$$\text{Health}_i = \beta_1 + \beta_2 \text{Coffee}_i + u_i.$$`
+
+1. What do we have to assume to interpret `\(\beta_2\)` as the true effect of coffee consumption on health?
+
+2. What omitted variables would bias the estimator of `\(\beta_2\)`?
+
+3. For each omitted variable, how would you sign the bias?
+
+---
+class: inverse, middle
+
+# OLS Variances
+
+---
+# OLS Variances
+
+Multiple regression model: `\(Y_i = \beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + \cdots + \beta_{k} X_{ki} + u_i\)`.
+
+--
+
+The variance of a slope estimator `\(\hat{\beta_j}\)` on an independent variable `\(X_{j}\)` is
+
+`$$\mathop{\text{Var}} \left( \hat{\beta_j} \right) = \dfrac{\sigma^2}{\left( 1 - R^2_j \right)\sum_{i=1}^n \left( X_{ji} - \bar{X}_j \right)^2},$$`
+
+where `\(R^2_j\)` is the `\(R^2\)` from a regression of `\(X_{j}\)` on the other independent variables and an intercept.
+
+---
+# OLS Variances
+
+`$$\mathop{\text{Var}} \left( \hat{\beta_j} \right) = \dfrac{\sigma^2}{\left( 1 - R^2_j \right)\sum_{i=1}^n \left( X_{ji} - \bar{X}_j \right)^2}$$`
+## Moving parts
+
+1. **Error variance:** As `\(\sigma^2\)` increases, `\(\mathop{\text{Var}} \left( \hat{\beta_j} \right)\)` increases.
+
+--
+
+2. **Total variation in** `\(X_j\)`**:** As `\(\sum_{i=1}^n \left( X_{ji} - \bar{X}_j \right)^2\)` increases, `\(\mathop{\text{Var}} \left( \hat{\beta_j} \right)\)` decreases. 
+
+--
+
+3. **Relationships between independent variables:** As `\(R^2_j\)` increases, `\(\mathop{\text{Var}} \left( \hat{\beta_j} \right)\)` increases.
+
+---
+# Multicollinearity
+
+Suppose that we want to understand the relationship between crime rates and poverty rates in US cities. We could estimate the model
+
+`$$\text{Crime}_i = \beta_0 + \beta_1 \text{Poverty}_i + \beta_2 \text{Income}_i + u_i,$$`
+where `\(\text{Income}_i\)` controls for median income in city `\(i\)`.
+
+--
+
+Before obtaining standard errors and conducting hypothesis tests, we need:
+
+`$$\mathop{\text{Var}} \left( \hat{\beta}_1 \right) = \dfrac{\sigma^2}{\left( 1 - R^2_1 \right)\sum_{i=1}^n \left( \text{Poverty}_{i} - \overline{\text{Poverty}} \right)^2}.$$`
+
+--
+
+`\(R^2_1\)` is the `\(R^2\)` from a regression of poverty on median income:
+
+`$$\text{Poverty}_i = \gamma_0 + \gamma_1 \text{Income}_i + v_i.$$`
+
+---
+# Multicollinearity
+
+**Scenario 1:** If `\(\text{Income}_i\)` explains most of the variation in `\(\text{Poverty}_i\)`, then `\(R^2_1\)` will approach one.
+
+- If `\(R^2_1\)` is one, then `\(\text{Poverty}_i\)` and `\(\text{Income}_i\)` are perfectly collinear (violates the _no perfect collinearity_ assumption).
+
+--
+
+**Scenario 2:** If `\(\text{Income}_i\)` explains none of the variation in `\(\text{Poverty}_i\)`, then `\(R^2_1\)` is zero.
+
+--
+
+**Question:** In which scenario is the variance of the poverty coefficient smaller?
+
+`$$\mathop{\text{Var}} \left( \hat{\beta}_1 \right) = \dfrac{\sigma^2}{\left( 1 - R^2_1 \right)\sum_{i=1}^n \left( \text{Poverty}_{i} - \overline{\text{Poverty}} \right)^2}$$`
+
+--
+
+**Answer:** Scenario 2.
+
+---
+# Multicollinearity
+
+&lt;img src="11-MLR_Inference_files/figure-html/unnamed-chunk-1-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Multicollinearity
+
+&lt;img src="11-MLR_Inference_files/figure-html/unnamed-chunk-2-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Multicollinearity
+
+As the relationships between the variables increase, `\(R^2_j\)` increases.
+
+For high `\(R^2_j\)`, `\(\mathop{\text{Var}} \left( \hat{\beta_j} \right)\)` is large:
+
+`$$\mathop{\text{Var}} \left( \hat{\beta_j} \right) = \dfrac{\sigma^2}{\left( 1 - R^2_j \right)\sum_{i=1}^n \left( X_{ji} - \bar{X}_j \right)^2}.$$`
+
+--
+
+This phenomenon is known as .hi[multicollinearity].
+
+- Some view multicollinearity as a "problem" to be solved.
+
+- Can increase `\(n\)` or drop independent variables that are highly related to the others.
+
+- .hi[Warning:] Dropping variables can generate omitted variable bias.
+
+---
+# Multicollinearity
+
+**Example:** Effect of different types of school spending on high school graduation rates.
+
+$$
+`\begin{aligned}
+\text{Graduation}_i = \beta_0 &amp;+ \beta_1\text{Salaries}_i +  \beta_2 \text{Athletics}_i \\ &amp; +  \beta_3 \text{Textbooks}_i + \beta_4 \text{Facilities}_i + u_i
+\end{aligned}`
+$$
+
+- Schools that spend more on teachers also tend to spend more on athletic programs, textbooks, and building maintenance.
+
+- While total spending likely has a statistically significant effect on graduation rates, might not be able to detect statistically significant effects for individual line items.
+
+--
+
+**Potential solutions:** Re-define research question to consider the effect of total spending on graduation rates _or_ gather more data to decrease OLS variances (*i.e.*, increase `\(n\)`).
+
+---
+# Irrelevant Variables
+
+Suppose that the true relationship between birth weight and _in utero_ exposure to toxic air pollution is 
+
+`$$(\text{Birth Weight})_i = \beta_0 + \beta_1 \text{Pollution}_i + u_i.$$`
+
+--
+
+Suppose that, instead of estimating the "true model," an analyst estimates
+
+`$$(\text{Birth Weight})_i = \tilde{\beta_0} + \tilde{\beta_1} \text{Pollution}_i + \tilde{\beta_2}\text{NBA}_i + u_i,$$`
+where `\(\text{NBA}_i\)` is the record of the nearest NBA team during the season before birth.
+
+--
+
+One can show that `\(\mathop{\mathbb{E}} \left( \hat{\tilde{\beta_1}} \right) = \beta_1\)` (*i.e.*, `\(\hat{\tilde{\beta_1}}\)` is unbiased).
+
+However, the variances of `\(\hat{\tilde{\beta_1}}\)` and `\(\hat{\beta_1}\)` differ.
+
+---
+# Irrelevant Variables
+
+&lt;img src="11-MLR_Inference_files/figure-html/venn-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Irrelevant Variables
+
+The variance of `\(\hat{\beta}_1\)` from estimating the "true model" is
+
+`$$\mathop{\text{Var}} \left( \hat{\beta_1} \right) = \dfrac{\sigma^2}{\sum_{i=1}^n \left( \text{Pollution}_{i} - \overline{\text{Pollution}} \right)^2}.$$`
+
+The variance of `\(\hat{\tilde\beta}_1\)` from estimating the model with the irrelevant variable is
+
+`$$\mathop{\text{Var}} \left( \hat{\tilde{\beta_1}} \right) = \dfrac{\sigma^2}{\left( 1 - R^2_1 \right)\sum_{i=1}^n \left( \text{Pollution}_{i} - \overline{\text{Pollution}} \right)^2}.$$`
+
+Notice that `\(\mathop{\text{Var}} \left( \hat{\beta_1} \right) \leq \mathop{\text{Var}} \left( \hat{\tilde{\beta_1}} \right)\)`.
+
+--
+
+.hi[Including irrelevant control variables can increase OLS variances!]
+
+---
+# Estimating Error Variance
+
+We cannot observe `\(\sigma^2\)`, so we must estimate it using the residuals from an estimated regression:
+
+`$$s_u^2 = \dfrac{\sum_{i=1}^n \hat{u}_i^2}{n - k - 1}$$`
+
+- `\(k+1\)` is the number of parameters (one "slope" for each `\(X\)` variable and an intercept).
+
+- `\(n - k - 1\)` .mono[=] degrees of freedom.
+
+- Using the first 5 OLS assumptions, one can prove that `\(s_u^2\)` is an unbiased estimator of `\(\sigma^2\)`.
+
+---
+# Standard Errors
+
+The formula for the standard error is the square root of `\(\mathop{\text{Var}} \left( \hat{\beta_j} \right)\)`:
+
+`$$\mathop{\text{SE}}(\hat{\beta_j}) = \sqrt{ \frac{s^2_u}{(  1 - R^2_j ) \sum_{i=1}^n ( X_{ji} - \bar{X}_j )^2} }.$$`
+
+---
+class: inverse, middle
+
+# Inference
+
+---
+# OLS Classical Assumptions
+
+&gt; 
+1. **Linearity:** The population relationship is linear in parameters with an additive error term.
+2. **Sample Variation:** There is variation in `\(X\)`.
+3. **Exogeneity:** The `\(X\)` variable is exogenous (*i.e.,* `\(\mathop{\mathbb{E}}\left( u|X \right) = 0\)`).
+4. **Homoskedasticity:** The error term has the same variance for each value of the independent variable (*i.e.,* `\(\mathop{\text{Var}}(u|X) = \sigma^2\)`).
+5. **Non-Autocorrelation:** Any pair of error terms share zero correlation due to having been independently drawn. (*i.e.,* `\(\mathop{\mathbb{E}}\left( u_i u_j \right) = 0 \ \forall i \text{ s.t. } i \neq j\)`).
+6. **Normality:** The population error term is normally distributed with mean zero and variance `\(\sigma^2\)` (*i.e.,* `\(u \sim N(0,\sigma^2)\)`)
+
+--
+
+1-3 imply .hi[unbiasedness.]
+
+--
+
+1-5 imply .hi[efficiency.]
+
+---
+# Normality
+
+With the first five assumptions, normality buys us a __sampling distribution__ for `\(\hat{\beta_j}\)`:
+
+- `\(\hat{\beta_j} \sim \mathop{\text{Normal}}\left( \beta_j, \ \mathop{\text{Var}} \left( \hat{\beta_j} \right) \right)\)`
+
+- `\(\frac{\hat{\beta_j} - \beta_j}{\sqrt{\mathop{\text{Var}} \left( \hat{\beta_j} \right)}} \sim \mathop{\text{Normal}}(0, 1)\)`
+
+--
+
+Common violations: .hi-green[autocorrelation] and .hi-orange[spatially correlated errors].
+
+---
+# Sampling Distribution
+
+In practice, we can only estimate `\(\sigma^2\)`, so we use the `\(t\)` distribution:
+
+- `\(\frac{\hat{\beta_j} - \beta_j}{\mathop{\text{SE}} \left( \hat{\beta_j} \right)} \sim t_{n-k-1} = t_{\text{df}}\)`.
+
+- Use this to construct `\(t\)`-statistics and conduct hypothesis testing.
+
+--
+
+Where are the critical values?
+
+- Critical values describe specific quantiles of the `\(t_{\text{df}}\)` distribution.
+
+- `\(t_{\text{df}}\)` is the entire sampling distribution.
+
+---
+# Hypothesis Testing
+
+**Conduct a one-sided (right tail) test at the 5% level.**
+
+
+```r
+lm(read4 ~ lexppp + lunch, data = meap01) %&gt;% tidy()
+```
+
+```
+#&gt; # A tibble: 3 x 5
+#&gt;   term        estimate std.error statistic   p.value
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+#&gt; 1 (Intercept)  -14.0     14.2       -0.989 3.23e-  1
+*#&gt; 2 lexppp        10.8      1.68       6.45  1.40e- 10
+#&gt; 3 lunch         -0.463    0.0136   -33.9   5.72e-196
+```
+
+--
+
+H.sub[0]: `\(\beta_\text{Spend} = 0\)` *vs.* H.sub[a]: `\(\beta_\text{Spend} &gt; 0\)`
+
+--
+
+`\(t_\text{stat} = 6.45\)` and `\(t_{0.95, \ 1823-3} = 1.65\)`
+
+--
+
+Reject H.sub[0] if `\(t_\text{stat} = 6.45 &gt; t_{0.95, \ 1823-3} = 1.65\)`.
+
+--
+
+Statement is true, so we .hi[reject H.sub[0]] at the 5% level.
+
+---
+# Hypothesis Testing
+
+**Conduct a one-sided (left tail) test at the 5% level.**
+
+
+```r
+lm(read4 ~ lexppp + lunch, data = meap01) %&gt;% tidy()
+```
+
+```
+#&gt; # A tibble: 3 x 5
+#&gt;   term        estimate std.error statistic   p.value
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+#&gt; 1 (Intercept)  -14.0     14.2       -0.989 3.23e-  1
+*#&gt; 2 lexppp        10.8      1.68       6.45  1.40e- 10
+#&gt; 3 lunch         -0.463    0.0136   -33.9   5.72e-196
+```
+
+--
+
+H.sub[0]: `\(\beta_\text{Spend} = 0\)` *vs.* H.sub[a]: `\(\beta_\text{Spend} &lt; 0\)`
+
+--
+
+`\(t_\text{stat} = 6.45\)` and `\(t_{0.95, \ 1823-3} = 1.65\)`
+
+--
+
+Reject H.sub[0] if `\(t_\text{stat} = 6.45 &lt; -t_{0.95, \ 1823-3} = -1.65\)`.
+
+--
+
+Statement is false, so we .hi[fail to reject H.sub[0]] at the 5% level.
+
+---
+# Hypothesis Testing
+
+**Conduct a two-sided test at the 5% level.**
+
+
+```r
+lm(read4 ~ lexppp + lunch, data = meap01) %&gt;% tidy()
+```
+
+```
+#&gt; # A tibble: 3 x 5
+#&gt;   term        estimate std.error statistic   p.value
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+#&gt; 1 (Intercept)  -14.0     14.2       -0.989 3.23e-  1
+*#&gt; 2 lexppp        10.8      1.68       6.45  1.40e- 10
+#&gt; 3 lunch         -0.463    0.0136   -33.9   5.72e-196
+```
+
+--
+
+H.sub[0]: `\(\beta_\text{Spend} = 0\)` *vs.* H.sub[a]: `\(\beta_\text{Spend} \neq 0\)`
+
+--
+
+`\(t_\text{stat} = 6.45\)` and `\(t_{0.975, \ 1823-3} = 1.96\)`
+
+--
+
+Reject H.sub[0] if `\(|t_\text{stat}| = |6.45| &gt; t_{0.975, \ 1823-3} = 1.96\)`.
+
+--
+
+Statement is true, so we .hi[reject H.sub[0]] at the 5% level.
+
+---
+# Hypothesis Testing
+
+**Conduct a two-sided test at the 5% level.** 
+
+
+```r
+lm(read4 ~ lexppp + lunch, data = meap01) %&gt;% tidy()
+```
+
+```
+#&gt; # A tibble: 3 x 5
+#&gt;   term        estimate std.error statistic   p.value
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+#&gt; 1 (Intercept)  -14.0     14.2       -0.989 3.23e-  1
+#&gt; 2 lexppp        10.8      1.68       6.45  1.40e- 10
+*#&gt; 3 lunch         -0.463    0.0136   -33.9   5.72e-196
+```
+
+H.sub[0]: `\(\beta_\text{Lunch} = -1\)` *vs.* H.sub[a]: `\(\beta_\text{Lunch} \neq -1\)`
+
+--
+
+`\(t_\text{stat} = \frac{\hat{\beta}_\text{Lunch} - \beta_\text{Lunch}^0}{\mathop{\text{SE}}(\hat{\beta}_\text{Lunch})} = 39.49\)` and `\(t_{0.975, \ 1823-3} = 1.96\)`
+
+--
+
+Reject H.sub[0] if `\(|t_\text{stat}| = |39.49| &gt; t_{0.975, \ 1823-3} = 1.96\)`.
+
+--
+
+Statement is true, so we .hi[reject H.sub[0]] at the 5% level.
+
+---
+# *F* Tests
+
+.hi-purple[*t* tests] allow us to test simple hypotheses involving a .purple[single parameter].
+
+- _e.g._, `\(\beta_1 = 0\)` or `\(\beta_2 = 1\)`.
+
+--
+
+.hi[*F* tests] allow us to test hypotheses that involve .pink[multiple parameters].
+
+- _e.g._, `\(\beta_1 = \beta_2\)` or `\(\beta_3 + \beta_4 = 1\)`.
+
+---
+# *F* Tests
+
+**Example**
+
+Economists often say that "money is fungible."
+
+We might want to test whether money received as income actually has the same effect on consumption as money received from tax credits.
+
+`$$\text{Consumption}_i = \beta_0 + \beta_1 \text{Income}_{i} + \beta_2 \text{Credit}_i + u_i$$`
+
+---
+# *F* Tests
+
+**Example, continued**
+
+
+We can write our null hypothesis as
+
+`$$H_0:\: \beta_1 = \beta_2 \iff H_0 :\: \beta_1 - \beta_2 = 0$$`
+
+Imposing the null hypothesis gives us a **restricted model**
+
+`$$\text{Consumption}_i = \beta_0 + \beta_1 \text{Income}_{i} + \beta_1 \text{Credit}_i + u_i$$`
+`$$\text{Consumption}_i = \beta_0 + \beta_1 \left( \text{Income}_{i} + \text{Credit}_i \right) + u_i$$`
+
+---
+# *F* Tests
+
+**Example, continued**
+
+To test the null hypothesis `\(H_o :\: \beta_1 = \beta_2\)` against `\(H_a :\: \beta_1 \neq \beta_2\)`,
+&lt;br&gt;we use the `\(F\)` statistic
+$$
+`\begin{align}
+  F_{q,\,n-k-1} = \dfrac{\left(\text{RSS}_r - \text{RSS}_u\right)/q}{\text{RSS}_u/(n-k-1)}
+\end{align}`
+$$
+which (as its name suggests) follows the `\(F\)` distribution with `\(q\)` numerator degrees of freedom and `\(n-k-1\)` denominator degrees of freedom.
+
+Here, `\(q\)` is the number of restrictions we impose via `\(H_0\)`.
+
+
+---
+# *F* Tests
+
+**Example, continued**
+
+The term `\(\text{RSS}_r\)` is the sum of squared residuals (RSS) from our **restricted model**
+`$$\text{Consumption}_i = \beta_0 + \beta_1 \left( \text{Income}_{i} + \text{Credit}_i \right) + u_i$$`
+
+and `\(\text{RSS}_u\)` is the sum of squared residuals (RSS) from our **unrestricted model**
+`$$\text{Consumption}_i = \beta_0 + \beta_1 \text{Income}_{i} + \beta_2 \text{Credit}_i + u_i$$`
+
+---
+# *F* Tests
+
+Finally, we compare our `\(F\)`-statistic to a critical value of `\(F\)` to test the null hypothesis.
+
+If `\(F\)` &gt; `\(F_\text{crit}\)`, then reject the null hypothesis at the `\(\alpha \times 100\)` percent level.
+
+- Find `\(F_\text{crit}\)` in a table using the desired significance level, numerator degrees of freedom, and denominator degrees of freedom.
+
+--
+
+**Aside:** Why are `\(F\)`-statistics always positive?
+
+---
+# *F* Tests
+
+RSS is usually a large cumbersome number.
+
+**Alternative:** Calculate the `\(F\)`-statistic using `\(R^2\)`.
+
+$$
+`\begin{align}
+  F = \dfrac{\left(R^2_u - R^2_r\right)/q}{ (1 - R^2_u)/(n-k-1)}
+\end{align}`
+$$
+
+--
+
+Where does this come from?
+
+- `\(\text{TSS} = \text{RSS} + \text{ESS}\)`
+- `\(R^2 = \text{ESS}/\text{TSS}\)`
+- `\(\text{RSS}_r = \text{TSS}(1-R^2_r)\)`
+- `\(\text{RSS}_u = \text{TSS}(1-R^2_u)\)`
+
+---
+class: inverse, middle
+
+# Application: Hedonic Modeling
+
+---
+# Hedonic Modeling
+
+**Questions**
+
+- How much are home buyers willing to pay for houses with additional bedrooms?
+- How much salary are workers willing to give up in exchange for safer working conditions?
+- What is the market value of my neighbor's house?
+
+--
+
+**Answers?**
+
+.hi[Hedonic modeling] is a specific application of multiple regression.
+
+- Prices or wages on the left hand side.
+- Attributes of a good or a job on the right-hand side.
+- Use coefficient estimates and fitted values.
+
+---
+# Hedonic Modeling
+
+## Example
+
+Using data on home sales, you run a regression and obtain the fitted model
+
+`$$\hat{\text{Price}}_i = 75000 + 50 \cdot (\text{Sq. ft.})_i + 16000 \cdot \text{Bedrooms}_i + 10000 \cdot \text{Bathrooms}_i$$`
+
+--
+
+What is the forecasted price of a 1000-square-foot house with 1 bedroom and 1 bathroom?
+
+--
+
+`$$\hat{\text{Price}} = 75000 + 50 \cdot (1000) + 16000 \cdot (1) + 10000 \cdot (1) = 1.51\times 10^{5}$$`
+
+--
+
+A homeowner is thinking about adding 1500 square feet to their home with 3 more bedrooms and an additional bathroom. How much extra money could she expect if she completed the addition and sold her home?
+
+--
+
+`$$\Delta\text{Price} = 50 \cdot (1500) + 16000 \cdot (3) + 10000 \cdot (1) = 1.33\times 10^{5}$$`
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

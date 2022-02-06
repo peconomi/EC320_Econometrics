@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Multiple Linear Regression: Estimation</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Philip Economides" />
+    <script src="10-Multiple_LR_Est_files/header-attrs/header-attrs.js"></script>
+    <link href="10-Multiple_LR_Est_files/remark-css/default.css" rel="stylesheet" />
+    <link href="10-Multiple_LR_Est_files/remark-css/metropolis.css" rel="stylesheet" />
+    <link href="10-Multiple_LR_Est_files/remark-css/metropolis-fonts.css" rel="stylesheet" />
+    <script src="10-Multiple_LR_Est_files/kePrint/kePrint.js"></script>
+    <link href="10-Multiple_LR_Est_files/lightable/lightable.css" rel="stylesheet" />
+    <link rel="stylesheet" href="my-css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Multiple Linear Regression: Estimation
+## EC 320: Introduction to Econometrics
+### Philip Economides
+### Winter 2022
+
+---
+
+class: inverse, middle
+
+
+
+# Prologue
+
+
+---
+
+# Housekeeping
+
+
+.hi-pink[Midterms] are graded. Dropping grades tonight. If anyone wants to talk shortly after, office hours will be at 3pm TUES (Zoom)
+
+--
+
+
+---
+
+# Housekeeping
+
+.hi-pink[PBS4] has been posted, due Feb 18th
+
+- Mostly revision over previous code to ensure everyone's skills are more aligned prior to data project
+
+- Inference questions based on last week's lab, following the .hi-pink[Midterm]
+
+
+Be prepared for upcoming .hi-pink[Quiz] (Feb 23rd) and .hi-pink[Data Project] (March 1st)
+
+- You now have the skills to prepare most of your data project 
+
+- I encourage you to run ideas by me first 
+
+- My suggestions will be aimed at improving your grades 
+
+- Late submissions will be severely penalized (5% per **hour**)
+
+---
+# Other Things Being Equal
+
+**Goal:** Isolate the effect of one variable on another.
+
+- All else equal, how does increasing `\(X\)` affect `\(Y\)`.
+
+--
+
+**Challenge:** Changes in `\(X\)` often coincide with changes in other variables.
+
+- Failure to account for other changes can _bias_ OLS estimates of the effect of `\(X\)` on `\(Y\)`.
+
+--
+
+**A potential solution:** Account for other variables using .hi[multiple linear regression].
+
+- Easier to defend the exogeneity assumption. 
+
+---
+# Other Things Equal?
+
+OLS picks `\(\hat{\beta}_0\)` and `\(\hat{\beta}_1\)` that trace out the line of best fit. Ideally, we would like to interpret the slope of the line as the causal effect of `\(X\)` on `\(Y\)`.
+
+
+
+&lt;img src="10-Multiple_LR_Est_files/figure-html/unnamed-chunk-2-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Confounders
+
+However, the data are grouped by a third variable `\(W\)`. How would omitting `\(W\)` from the regression model affect the slope estimator?
+
+&lt;img src="10-Multiple_LR_Est_files/figure-html/unnamed-chunk-3-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Confounders
+
+The problem with `\(W\)` is that it affects both `\(Y\)` and `\(X\)`. Without adjusting for `\(W\)`, we cannot isolate the causal effect of `\(X\)` on `\(Y\)`.
+
+&lt;img src="10-Multiple_LR_Est_files/figure-html/unnamed-chunk-4-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Controlling for Confounders
+
+
+
+.center[![Control](control.gif)]
+
+---
+# Controlling for Confounders
+
+
+```r
+lm(Y ~ X, data = df) %&gt;% tidy()
+```
+
+```
+#&gt; # A tibble: 2 x 5
+#&gt;   term        estimate std.error statistic  p.value
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+#&gt; 1 (Intercept)    1.71     0.177       9.64 2.77e-18
+#&gt; 2 X              0.428    0.0839      5.09 8.13e- 7
+```
+
+--
+
+
+```r
+lm(Y ~ X + W, data = df) %&gt;% tidy()
+```
+
+```
+#&gt; # A tibble: 3 x 5
+#&gt;   term        estimate std.error statistic  p.value
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+#&gt; 1 (Intercept)    1.25     0.108      11.6  3.40e-24
+#&gt; 2 X             -0.588    0.0726     -8.11 5.42e-14
+#&gt; 3 W              4.04     0.210      19.2  5.42e-47
+```
+
+---
+class: inverse, middle
+
+# Multiple Linear Regression
+
+---
+# Multiple Linear Regression
+
+## More explanatory variables
+
+**Simple linear regression** features one .pink[outcome variable] and one .purple[explanatory variable]:
+
+`$$\color{#e64173}{Y_i} = \beta_0 + \beta_1 \color{#9370DB}{X_i} + u_i.$$`
+
+**Multiple linear regression** features one .pink[outcome variable] and multiple .purple[explanatory variables]:
+
+`$$\color{#e64173}{Y_i} = \beta_0 + \beta_1 \color{#9370DB}{X_{1i}} + \beta_2 \color{#9370DB}{X_{2i}} + \cdots + \beta_{k} \color{#9370DB}{X_{ki}} + u_i.$$`
+
+--
+
+**Why?**
+
+--
+
+- Better explain the variation in `\(Y\)`.
+- Improve predictions.
+- Avoid bias.
+
+---
+# Multiple Linear Regression
+
+&lt;img src="10-Multiple_LR_Est_files/figure-html/unnamed-chunk-8-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# OLS Estimation
+
+As was the case with simple linear regressions, OLS minimizes the sum of squared residuals (RSS).
+
+However, residuals are now defined as
+
+`$$\hat{u}_i = Y_i - \hat{\beta}_0 - \hat{\beta}_1 X_{1i} - \hat{\beta}_2 X_{2i} - \cdots - \hat{\beta}_{k} X_{ki}.$$`
+
+--
+
+To obtain estimates, take partial derivatives of RSS with respect to each `\(\hat{\beta}\)`, set each derivative equal to zero, and solve the system of `\(k+1\)` equations.
+
+- Without matrices, the algebra is difficult. For the remainder of this course, we will let .mono[R] do the work for us.
+
+---
+# Coefficient Interpretation
+
+**Model**
+
+`$$\color{}{Y_i} = \beta_0 + \beta_1 \color{}{X_{1i}} + \beta_2 \color{}{X_{2i}} + \cdots + \beta_{k} \color{}{X_{ki}} + u_i.$$`
+
+**Interpretation**
+
+- The intercept `\(\hat{\beta}_0\)` is the average value of `\(Y_i\)` when all of the explanatory variables are equal to zero.
+- Slope parameters `\(\hat{\beta}_1, \dots, \hat{\beta}_{k}\)` give us the change in `\(Y_i\)` from a one-unit change in `\(X_j\)`, holding the other `\(X\)` variables constant. 
+
+---
+# Algebraic Properties of OLS
+
+The OLS first-order conditions yield the same properties as before.
+
+1. Residuals sum to zero: `\(\sum_{i=1}^n \hat{u_i} = 0\)`.
+
+2. The sample covariance between the independent variables and the residuals is zero.
+
+3. The point `\((\bar{X_1}, \bar{X_2}, \dots, \bar{X_k}, \bar{Y})\)` is always on the fitted regression "line."
+
+---
+# Goodness of Fit
+
+Fitted values are defined similarly:
+
+`$$\hat{Y_i} = \hat{\beta}_0 + \hat{\beta}_1 X_{1i} + \hat{\beta}_2 X_{2i} + \cdots + \hat{\beta}_{k} X_{ki}.$$`
+
+The formula for `\(R^2\)` is the same as before:
+
+`$$R^2 =\frac{\sum(\hat{Y_i}-\bar{Y})^2}{\sum(Y_i-\bar{Y})^2}.$$`
+
+---
+# Goodness of Fit
+
+**Model 1:** `\(Y_i = \beta_0 + \beta_1 X_{1i} + u_i\)`.
+
+**Model 2:** `\(Y_i = \beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + v_i\)`
+
+--
+
+.hi-green[True or false?]
+
+Model 2 will yield a lower `\(R^2\)` than Model 1.
+
+- Hint: Think of `\(R^2\)` as `\(R^2 = 1 - \frac{\text{RSS}}{\text{TSS}}\)`.
+
+---
+# Goodness of Fit 
+
+&lt;img src="10-Multiple_LR_Est_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Goodness of Fit 
+
+&lt;img src="10-Multiple_LR_Est_files/figure-html/unnamed-chunk-10-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Goodness of Fit
+
+**Problem:** As we add variables to our model, `\(R^2\)` *mechanically* increases.
+
+--
+
+To see this problem, we can simulate a dataset of 10,000 observations on `\(y\)` and 1,000 random `\(x_k\)` variables. **No relations between `\(y\)` and the `\(x_k\)`!**
+
+Pseudo-code outline of the simulation:
+--
+
+.pseudocode-small[
+
+- Generate 10,000 observations on `\(y\)`
+- Generate 10,000 observations on variables `\(x_1\)` through `\(x_{1000}\)`
+- Regressions
+  - LM&lt;sub&gt;1&lt;/sub&gt;: Regress `\(y\)` on `\(x_1\)`; record R&lt;sup&gt;2&lt;/sup&gt;
+  - LM&lt;sub&gt;2&lt;/sub&gt;: Regress `\(y\)` on `\(x_1\)` and `\(x_2\)`; record R&lt;sup&gt;2&lt;/sup&gt;
+  - ...
+  - LM&lt;sub&gt;1000&lt;/sub&gt;: Regress `\(y\)` on `\(x_1\)`, `\(x_2\)`, ..., `\(x_{1000}\)`; record R&lt;sup&gt;2&lt;/sup&gt;
+]
+
+---
+# Goodness of Fit
+
+**Problem:** As we add variables to our model, `\(R^2\)` *mechanically* increases.
+
+.mono[R] code for the simulation:
+
+
+```r
+set.seed(1234)
+plan(multiprocess)
+y &lt;- rnorm(1e4)
+x &lt;- matrix(data = rnorm(1e7), nrow = 1e4)
+x %&lt;&gt;% cbind(matrix(data = 1, nrow = 1e4, ncol = 1), x)
+r_fun &lt;- function(i) {
+ tmp_reg &lt;- lm(y ~ x[,1:(i + 1)]) %&gt;% summary()
+                    data.frame(
+                    k = i + 1,
+                    r2 = tmp_reg$r.squared,
+                    r2_adj = tmp_reg$adj.r.squared)
+}
+r_df &lt;- future_map(1:(1e3-1), r_fun) %&gt;% bind_rows()
+```
+
+---
+# Goodness of Fit
+
+**Problem:** As we add variables to our model, `\(\color{#314f4f}{R^2}\)` *mechanically* increases.
+
+
+
+&lt;img src="10-Multiple_LR_Est_files/figure-html/r2 plot-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Goodness of Fit
+
+**One solution:** .pink[Adjusted] `\(\color{#e64173}{R^2}\)`
+
+&lt;img src="10-Multiple_LR_Est_files/figure-html/adjusted r2 plot-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Goodness of Fit
+
+**Problem:** As we add variables to our model, `\(R^2\)` *mechanically* increases.
+
+**One solution:** Penalize for the number of variables, _e.g._, adjusted `\(R^2\)`:
+
+$$ \bar{R}^2 = 1 - \dfrac{\sum_i \left( Y_i - \hat{Y}_i \right)^2/(n-k-1)}{\sum_i \left( Y_i - \bar{Y} \right)^2/(n-1)} $$
+
+*Note:* Adjusted `\(R^2\)` need not be between 0 and 1.
+
+---
+# Goodness of Fit
+
+## Example: 2016 Election
+
+
+```r
+lm(trump_margin ~ white, data = election) %&gt;% glance()
+```
+
+```
+#&gt; # A tibble: 1 x 12
+#&gt;   r.squared adj.r.squared sigma statistic   p.value    df  logLik    AIC    BIC
+#&gt;       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+#&gt; 1     0.320         0.320  25.4     1462. 1.51e-262     1 -14472. 28950. 28969.
+#&gt; # ... with 3 more variables: deviance &lt;dbl&gt;, df.residual &lt;int&gt;, nobs &lt;int&gt;
+```
+
+--
+
+
+```r
+lm(trump_margin ~ white + poverty, data = election) %&gt;% glance()
+```
+
+```
+#&gt; # A tibble: 1 x 12
+#&gt;   r.squared adj.r.squared sigma statistic   p.value    df  logLik    AIC    BIC
+#&gt;       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+#&gt; 1     0.345         0.344  24.9      818. 4.20e-286     2 -14414. 28836. 28860.
+#&gt; # ... with 3 more variables: deviance &lt;dbl&gt;, df.residual &lt;int&gt;, nobs &lt;int&gt;
+```
+---
+# OLS Assumptions 
+
+Same as before, except for .pink[Assumption 2]:
+
+1. **Linearity:** The population relationship is linear in parameters with an additive error term.
+2. .hi[No perfect collinearity:] .pink[No] `\(\color{#e64173}{X}\)` .pink[variable is a perfect linear combination of the others.]
+3. **Exogeneity:** The `\(X\)` variable is exogenous (*i.e.,* `\(\mathop{\mathbb{E}}\left( u|X \right) = 0\)`).
+4. **Homoskedasticity:** The error term has the same variance for each value of the independent variable (*i.e.,* `\(\mathop{\text{Var}}(u|X) = \sigma^2\)`).
+5. **Non-autocorrelation:** Any pair of error terms share zero correlation due to having been independently drawn. (*i.e.,* `\(\mathop{\mathbb{E}}\left( u_i u_j \right) = 0 \ \forall i \text{ s.t. } i \neq j\)`).
+6. **Normality:** The population error term is normally distributed with mean zero and variance `\(\sigma^2\)` (*i.e.,* `\(u \sim N(0,\sigma^2)\)`)
+
+---
+# Perfect Collinearity
+
+## Example: 2016 Election
+
+OLS cannot estimate parameters for .mono[white] and .mono[nonwhite] simultaneously.
+
+- .mono[white] .mono[=] 100 .mono[-] .mono[nonwhite].
+
+--
+
+
+```r
+lm(trump_margin ~ white + nonwhite, data = election) %&gt;% tidy()
+```
+
+```
+#&gt; # A tibble: 3 x 5
+#&gt;   term        estimate std.error statistic    p.value
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
+#&gt; 1 (Intercept)  -40.7      1.95       -20.9  6.82e- 91
+#&gt; 2 white          0.910    0.0238      38.2  1.51e-262
+#&gt; 3 nonwhite      NA       NA           NA   NA
+```
+
+.mono[R] drops perfectly collinear variables for you.
+
+---
+# Multiple Linear Regression 
+
+## Tradeoffs
+
+There are tradeoffs to remember as we add/remove variables:
+
+**Fewer variables**
+
+- Generally explain less variation in `\(y\)`.
+- Provide simple interpretations and visualizations (*parsimonious*).
+- May need to worry about omitted-variable bias.
+
+**More variables**
+
+- More likely to find *spurious* relationships (statistically significant due to chance; do not reflect true, population-level relationships).
+- More difficult to interpret the model.
+- May still leave out important variables.
+
+---
+# Omitted Variables
+
+&lt;img src="10-Multiple_LR_Est_files/figure-html/venn2-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Omitted Variables
+
+&lt;img src="10-Multiple_LR_Est_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Omitted Variables
+
+&lt;table&gt;
+&lt;caption&gt;Math Score&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Explanatory variable &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; 1 &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; 2 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Intercept &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt; -84.84 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; -6.34 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (18.57) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (15.00) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; log(Spend) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt; -1.52 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 11.34 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (2.18) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (1.77) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Lunch &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; -0.47 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.01) &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+Data from 1823 elementary schools in Michigan
+
+- *Math Score* is average fourth grade state math test scores.
+- *log(Spend)* is the natural logarithm of spending per pupil.
+- *Lunch* is the percentage of student eligible for free or reduced-price lunch.
+
+---
+count: false
+
+# Omitted Variables
+
+&lt;table&gt;
+&lt;caption&gt;Math Score&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Explanatory variable &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; 1 &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; 2 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Intercept &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; -84.84 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt; -6.34 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (18.57) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (15.00) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; log(Spend) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; -1.52 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt; 11.34 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (2.18) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (1.77) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Lunch &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt; -0.47 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (0.01) &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+Data from 1823 elementary schools in Michigan
+
+- *Math Score* is average fourth grade state math test scores.
+- *log(Spend)* is the natural logarithm of spending per pupil.
+- *Lunch* is the percentage of student eligible for free or reduced-price lunch.
+
+---
+# Omitted-Variable Bias
+
+**Model 1:** `\(Y_i = \beta_0 + \beta_1 X_{1i} + u_i\)`.
+
+**Model 2:** `\(Y_i = \beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + v_i\)`
+
+Estimating Model 1 (without `\(X_2\)`) yields .hi[omitted-variable bias:]
+
+`$$\color{#e64173}{\text{Bias} = \beta_2 \frac{\mathop{\text{Cov}}(X_{1i}, X_{2i})}{\mathop{\text{Var}}(X_{1i})}}.$$`
+
+--
+
+The sign of the bias depends on
+
+1. The correlation between `\(X_2\)` and `\(Y\)`, _i.e._, `\(\beta_2\)`.
+
+2. The correlation between `\(X_1\)` and `\(X_2\)`, _i.e._, `\(\mathop{\text{Cov}}(X_{1i}, X_{2i})\)`.
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

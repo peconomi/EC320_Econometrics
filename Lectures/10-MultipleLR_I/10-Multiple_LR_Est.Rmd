@@ -84,6 +84,38 @@ election <- read_csv("election_2016.csv") %>%
 
 # Prologue
 
+
+---
+
+# Housekeeping
+
+
+.hi-pink[Midterms] are graded. Dropping grades tonight. If anyone wants to talk shortly after, office hours will be at 3pm TUES (Zoom)
+
+--
+
+
+---
+
+# Housekeeping
+
+.hi-pink[PBS4] has been posted, due Feb 18th
+
+- Mostly revision over previous code to ensure everyone's skills are more aligned prior to data project
+
+- Inference questions based on last week's lab, following the .hi-pink[Midterm]
+
+
+Be prepared for upcoming .hi-pink[Quiz] (Feb 23rd) and .hi-pink[Data Project] (March 1st)
+
+- You now have the skills to prepare most of your data project 
+
+- I encourage you to run ideas by me first 
+
+- My suggestions will be aimed at improving your grades 
+
+- Late submissions will be severely penalized (5% per **hour**)
+
 ---
 # Other Things Being Equal
 
@@ -106,7 +138,7 @@ election <- read_csv("election_2016.csv") %>%
 ---
 # Other Things Equal?
 
-OLS picks $\hat{\beta}_0$ and $\hat{\beta}_1$ that trace out the line of best fit. Ideally, we wound like to interpret the slope of the line as the causal effect of $X$ on $Y$.
+OLS picks $\hat{\beta}_0$ and $\hat{\beta}_1$ that trace out the line of best fit. Ideally, we would like to interpret the slope of the line as the causal effect of $X$ on $Y$.
 
 ```{r, cache = T, include = F}
 df <- data.frame(W = as.integer((1:200>100))) %>%
@@ -528,13 +560,13 @@ lm(trump_margin ~ white + poverty, data = election) %>% glance()
 ---
 # OLS Assumptions 
 
-Same as before, except for .pink[assumption 2]:
+Same as before, except for .pink[Assumption 2]:
 
 1. **Linearity:** The population relationship is linear in parameters with an additive error term.
 2. .hi[No perfect collinearity:] .pink[No] $\color{#e64173}{X}$ .pink[variable is a perfect linear combination of the others.]
-3. **Random Sampling:** We have a random sample from the population of interest.
-4. **Exogeneity:** The $X$ variable is exogenous (*i.e.,* $\mathop{\mathbb{E}}\left( u|X \right) = 0$).
-5. **Homoskedasticity:** The error term has the same variance for each value of the independent variable (*i.e.,* $\mathop{\text{Var}}(u|X) = \sigma^2$).
+3. **Exogeneity:** The $X$ variable is exogenous (*i.e.,* $\mathop{\mathbb{E}}\left( u|X \right) = 0$).
+4. **Homoskedasticity:** The error term has the same variance for each value of the independent variable (*i.e.,* $\mathop{\text{Var}}(u|X) = \sigma^2$).
+5. **Non-autocorrelation:** Any pair of error terms share zero correlation due to having been independently drawn. (*i.e.,* $\mathop{\mathbb{E}}\left( u_i u_j \right) = 0 \ \forall i \text{ s.t. } i \neq j$).
 6. **Normality:** The population error term is normally distributed with mean zero and variance $\sigma^2$ (*i.e.,* $u \sim N(0,\sigma^2)$)
 
 ---
