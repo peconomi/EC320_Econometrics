@@ -122,7 +122,7 @@ knitr::include_graphics("important-proof-component.png")
 
 --
 
-.hi-pink[Know your proofs] that I've asked for in homework
+.hi-pink[Know your proofs] from homework and detailed in slides
 
 ---
 
