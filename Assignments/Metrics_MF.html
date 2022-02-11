@@ -381,7 +381,7 @@ pre code {
 #&gt; 10 faminc1978  Family Income in 1978                  
 #&gt; 11 nsibs79     Number of Siblings</code></pre>
 <ol start="2" style="list-style-type: decimal">
-<li><p>Regress earnings in 2009 on years of education. How much do earnings increase (Level &amp; %) on average for every additional year of schooling? (Note: To place a variable into a % interpretation, you need to log transform your data. First start by filling out zero and missing values.)</p></li>
+<li><p>Regress earnings in 2009 on years of education. How much do earnings increase (Level &amp; %) on average for every additional year of schooling? (Note: To place a variable into a % interpretation, you need to log transform your data. First start by filtering out zero and missing values.)</p></li>
 <li><p>Present your regression outputs using <code>stargazer()</code> or <code>export_summs()</code>.</p></li>
 <li><p>Use ggplot2 to plot the conditional expectation of earnings with respect to years of education. In other words, solve for the average earnings conditional on a given year of earnings across all your discrete values. (Y-axis = Earnings, X-axis=Years of Education).</p></li>
 </ol>
@@ -463,7 +463,77 @@ pre code {
 <blockquote>
 <p>Due date: 18 February 2022</p>
 </blockquote>
+<div id="q1.-gun-violence-wrangling-practice" class="section level3">
+<h3>Q1. Gun Violence (Wrangling Practice)</h3>
+<p>The dataset Guns.csv contains data on 50 US states plus the District of Columbia for the 23 years 1977-1999. The main variables of interest are vio (the violent crime rate) and shall, a dummy variable for whether the state had a ‘shall-carry’ law in effect that year (i.e. a law instructing local authorities to issue concealed weapons permits to all citizens, with some restrictions). Recall that a dummy variable is any binary variable, and will take a value of 1 only if a particular condition is met. In this, case the treatment of having this law in place being in effect for a given state at a given time. The data set includes other variables, for a description see the definitions table posted on Canvas.</p>
+<p>Follow the instructions below to prepare an analysis between these two random variables.</p>
+<ol style="list-style-type: decimal">
+<li>Import the Guns.csv file using <code>read_csv()</code><strong>(2. pts)</strong></li>
+</ol>
+<p>       </p>
+<ol start="2" style="list-style-type: decimal">
+<li>Run the following code once you have loaded your data. This will mutate your data to include the state names by creating a new dataset and then forming a merge. You will need to replace the object name with what you chose to name your data object. <strong>(2. pts)</strong></li>
+</ol>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># matching_obj &lt;- tibble(</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">#  stateid = unique(Guns$stateid),</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">#  statename = c(state.name[1:8], &quot;Dis. of Columbia&quot;, state.name[9:50])</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">#)</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co"># To match all your names to the ids, we&#39;ll use dplyr&#39;s `left_join()`, any matching variable names will be assessed as the details to match on. When stateid 1 is detected across multiple rows, it will fill in &quot;Alabama&quot; under each for the new variable &quot;statename&quot;.</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Guns &lt;- left_join(Guns, matching_obj)</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co"># As you can see it only used &quot;stateid&quot; from both objects to match observations from our right-hand data set &quot;matching_obj&quot; and join them into the left object &quot;Guns&quot;</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Use View(Guns) in the console to see how this worked out for your new statename variable</span></span></code></pre></div>
+<p>       </p>
+<ol start="3" style="list-style-type: decimal">
+<li>Referring to your data object, summarise the average level of gun violence per statename into a separate data object using <code>group_by()</code> and <code>summarise()</code>. <strong>(6. pts)</strong></li>
+</ol>
+<p>       </p>
+<ol start="4" style="list-style-type: decimal">
+<li>Present a visualization you consider appropriate for exposing these underlying state differences you generated in part 3. (Hint: <code>glimpse(data)</code> is a great way to choose which variables you need to focus on). <strong>(6. pts)</strong></li>
+</ol>
+<p><strong>Bonus:</strong> Rather than having x-axis values determined by the alphabetical order of states, present your states in descending order (based on your average measure). Use the <code>reorder()</code> function inside your <code>aes()</code> to do so.</p>
+<p>       </p>
+<ol start="5" style="list-style-type: decimal">
+<li>Provide comment on this distribution of gun violence, does anything strike you, from looking at these averages of the violent crime rate (incidents per 100,000 members of the population) over time, per state? Use some of the other variables in the dataset for gleaning further insight. <strong>(4. pts)</strong></li>
+</ol>
+<p>       </p>
+<p>Note: These data were provided by Professor John Donohue of Stanford University and were used in his paper with Ian Ayres <strong>“Shooting Down the ‘More Guns Less Crime’ Hypothesis” Stanford Law Review, 2003, Vol. 55, 1193-1312</strong>. I’ve uploaded the paper on Canvas for those interested in reading about a fundamental application of econometric theory in a practical setting.</p>
+<p>       </p>
+</div>
+<div id="q2.-gun-violence-regression-and-inference" class="section level3">
+<h3>Q2. Gun Violence (Regression and Inference)</h3>
+<p>Now that we have a better grasp of what our data is looking at, lets see how these “shall-carry law” laws affected average violent crime rates.</p>
+<ol style="list-style-type: decimal">
+<li>Regress the following relationship and store your estimates of our two population parameters using the <code>tidy()</code> function into an object called <code>reg_all</code>. <strong>(4. pts)</strong></li>
+</ol>
+<p>       </p>
+<ol start="2" style="list-style-type: decimal">
+<li>Provide a stargazer table for these results. How would you interpret the regression results? Comment on the meaning behind our estimated coefficient and determine the statistical significance of this result. <strong>(4. pts)</strong></li>
+</ol>
+<p>       </p>
+<ol start="3" style="list-style-type: decimal">
+<li>Construct confidence intervals at the 99%, 95%, 90%, 80% and 70% level. Use <code>geom_errorbar()</code> to portray each of these confidence intervals in a single visualization (similar to our last slide when addressing inference). The appropriate <span class="math inline">\(t^{crit}\)</span> values to use are <span class="math inline">\(\{2.576, 1.960, 1.645, 1.282, 1.036\}\)</span>, respectively. (Hint: That <code>reg_all</code> object you created here will be useful). <strong>(4. pts)</strong></li>
+</ol>
+<p>       </p>
+<ol start="4" style="list-style-type: decimal">
+<li>Supposing you were presenting regression results to your colleagues, how would you describe one of these intervals? <strong>(4. pts)</strong></li>
+</ol>
+<p>       </p>
+<ol start="5" style="list-style-type: decimal">
+<li>Inuitively, do you think any of our key assumptions regarding the Gauss-Markov theorem (assumptions 1 to 5) could have been violated when running this regression? For each assumption you consider violated, provide an explanation for why this may be the case. (Hint: We’ll be dealing with some of these problems when we into the multivariate regression model setting). <strong>(4. pts)</strong></li>
+</ol>
+<p>       </p>
+</div>
+<div id="q3.-confidence-intervals-10.-pts" class="section level3">
+<h3>Q3. Confidence Intervals (10. pts)</h3>
+<p>Find some interesting data online, potentially the sources you’ve settled on for your data project, and use your explanatory variable (X) to explain the variation in your dependent variable (Y), by applying an <code>lm()</code> regression.</p>
+<p>Present your results using <code>stargazer()</code> and then generate confidence intervals at the 70%, 80%, 90%, 95% and 99% confidence levels in a single graph. If your observations are less than 1000, you’ll need to apply the correct critical values.</p>
+<p>See the t-table I’ve posted in this week’s module with the homework for a reference point. Your degrees of freedom (df) is determined by <span class="math inline">\(n-k\)</span>, your observation count minus your number of estimated parameters. Your two-tailed test score will be highlighted by the confidence scores along the bottom of the table.</p>
 <hr />
+</div>
 </div>
 <div id="a5---simulating-endogeneity-problems" class="section level2">
 <h2>A5 - Simulating Endogeneity Problems</h2>

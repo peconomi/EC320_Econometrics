@@ -455,6 +455,167 @@ Could you suggest any confounding variables that may be biasing your results? Th
 
 > Due date: 18 February 2022
 
+
+
+### Q1. Gun Violence (Wrangling Practice)
+
+The dataset Guns.csv contains data on 50 US states plus the District of Columbia
+for the 23 years 1977-1999.
+The main variables of interest are vio (the violent crime rate) and shall, a dummy variable for whether the state had a 'shall-carry' law in effect that year (i.e. a law instructing local authorities to issue concealed weapons permits to all
+citizens, with some restrictions).
+Recall that a dummy variable is any binary variable, and will take a value of  1 only if a particular condition is met. In this, case the treatment of having this law in place being in effect for a given state at a given time.
+The data set includes other variables, for a description see the definitions table posted on Canvas. 
+
+Follow the instructions below to prepare an analysis between these two random variables.
+
+
+1. Import the Guns.csv file using `read_csv()`__(2. pts)__
+
+```{r, 4-1-1}
+
+
+```
+
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+
+2. Run the following code once you have loaded your data. This will mutate your data to include the state names by creating a new dataset and then forming a merge. You will need to replace the object name with what you chose to name your data object. __(2. pts)__
+
+
+```{r, 4-1-2}
+
+# matching_obj <- tibble(
+#  stateid = unique(Guns$stateid),
+#  statename = c(state.name[1:8], "Dis. of Columbia", state.name[9:50])
+#)
+
+# To match all your names to the ids, we'll use dplyr's `left_join()`, any matching variable names will be assessed as the details to match on. When stateid 1 is detected across multiple rows, it will fill in "Alabama" under each for the new variable "statename".
+
+# Guns <- left_join(Guns, matching_obj)
+
+# As you can see it only used "stateid" from both objects to match observations from our right-hand data set "matching_obj" and join them into the left object "Guns"
+
+# Use View(Guns) in the console to see how this worked out for your new statename variable
+
+```
+
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+
+3. Referring to your data object, summarise the average level of gun violence per statename into a separate data object using `group_by()` and `summarise()`. __(6. pts)__
+  
+
+```{r, 4-1-3}
+
+
+```
+
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+
+4. Present a visualization you consider appropriate for exposing these underlying state differences you generated in part 3. (Hint: `glimpse(data)` is a great way to choose which variables you need to focus on). __(6. pts)__
+
+**Bonus:** Rather than having x-axis values determined by the alphabetical order of states, present your states in descending order (based on your average measure). Use the `reorder()` function inside your `aes()` to do so. 
+
+```{r, 4-1-4}
+
+
+```
+
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+
+5. Provide comment on this distribution of gun violence, does anything strike you, from looking at these averages of the violent crime rate (incidents per 100,000 members of the population) over time, per state? Use some of the other variables in the dataset for gleaning further insight. __(4. pts)__
+
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+
+
+Note: These data were provided by Professor John Donohue of Stanford University and were used in his paper with Ian Ayres **“Shooting Down the ‘More Guns Less Crime’ Hypothesis” Stanford Law Review, 2003, Vol. 55, 1193-1312**. I've uploaded the paper on Canvas for those interested in reading about a fundamental application of econometric theory in a practical setting.
+
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+
+### Q2. Gun Violence (Regression and Inference)
+
+Now that we have a better grasp of what our data is looking at, lets see how these "shall-carry law" laws affected average violent crime rates.
+
+1. Regress the following relationship and store your estimates of our two population parameters using the `tidy()` function into an object called `reg_all`. __(4. pts)__ 
+
+```{r, 4-2-1}
+
+
+
+```
+
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+
+2. Provide a stargazer table for these results. How would you interpret the regression results? Comment on the meaning behind our estimated coefficient and determine the statistical significance of this result. __(4. pts)__
+
+```{r, 4-2-2}
+
+
+```
+
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+
+3. Construct confidence intervals at the 99%, 95%, 90%, 80% and 70% level. Use `geom_errorbar()` to portray each of these confidence intervals in a single visualization (similar to our last slide when addressing inference). The appropriate $t^{crit}$ values to use are $\{2.576, 1.960, 1.645, 1.282, 1.036\}$, respectively. (Hint: That `reg_all` object you created here will be useful). __(4. pts)__
+
+```{r, 4-2-3}
+
+
+```
+
+
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+
+4. Supposing you were presenting regression results to your colleagues, how would you describe one of these intervals? __(4. pts)__
+
+
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+
+
+5. Inuitively, do you think any of our key assumptions regarding the Gauss-Markov theorem (assumptions 1 to 5) could have been violated when running this regression?
+For each assumption you consider violated, provide an explanation for why this may be the case. (Hint: We'll be dealing with some of these problems when we into the multivariate regression model setting). __(4. pts)__
+
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+
+
+### Q3. Confidence Intervals (10. pts)
+
+Find some interesting data online, potentially the sources you've settled on for your data project, and use your explanatory variable (X) to explain the variation in your dependent variable (Y), by applying an `lm()` regression. 
+
+Present your results using `stargazer()` and then generate confidence intervals at the 70%, 80%, 90%, 95% and 99% confidence levels in a single graph. If your observations are less than 1000, you'll need to apply the correct critical values. 
+
+See the t-table I've posted in this week's module with the homework for a reference point. Your degrees of freedom (df) is determined by $n-k$, your observation count minus your number of estimated parameters. Your two-tailed test score will be highlighted by the confidence scores along the bottom of the table.
+
 ---
 
 

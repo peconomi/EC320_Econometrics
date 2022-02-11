@@ -90,9 +90,17 @@ election <- read_csv("election_2016.csv") %>%
 # Housekeeping
 
 
-.hi-pink[Midterms] are graded. Dropping grades tonight. If anyone wants to talk shortly after, office hours will be at 3pm TUES (Zoom)
+.hi-pink[Midterm:] Dropping grades tonight. 
+
+If anyone wants to talk shortly after, office hours will be at 3pm TUES (Zoom)
 
 --
+
+* Performance was strong so final will be of similar difficulty
+
+* Once data projects are in, I'll have a good idea of overall % what defines each grade
+
+* Final worth almost twice as much as midterm, those aiming to do better have plenty of ground remaining for recovery
 
 
 ---
@@ -103,18 +111,16 @@ election <- read_csv("election_2016.csv") %>%
 
 - Mostly revision over previous code to ensure everyone's skills are more aligned prior to data project
 
-- Inference questions based on last week's lab, following the .hi-pink[Midterm]
+- Inference questions based on last week's lab
 
 
 Be prepared for upcoming .hi-pink[Quiz] (Feb 23rd) and .hi-pink[Data Project] (March 1st)
-
-- You now have the skills to prepare most of your data project 
 
 - I encourage you to run ideas by me first 
 
 - My suggestions will be aimed at improving your grades 
 
-- Late submissions will be severely penalized (5% per **hour**)
+- Late project submissions will be severely penalized (5% per **hour**)
 
 ---
 # Other Things Being Equal
