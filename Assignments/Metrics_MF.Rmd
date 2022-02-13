@@ -469,7 +469,7 @@ The data set includes other variables, for a description see the definitions tab
 Follow the instructions below to prepare an analysis between these two random variables.
 
 
-1. Import the Guns.csv file using `read_csv()`__(2. pts)__
+1. Import the Guns.csv file using `read_csv()` __(2. pts)__
 
 ```{r, 4-1-1}
 
@@ -600,7 +600,7 @@ Now that we have a better grasp of what our data is looking at, lets see how the
 
 
 5. Inuitively, do you think any of our key assumptions regarding the Gauss-Markov theorem (assumptions 1 to 5) could have been violated when running this regression?
-For each assumption you consider violated, provide an explanation for why this may be the case. (Hint: We'll be dealing with some of these problems when we into the multivariate regression model setting). __(4. pts)__
+For each assumption you consider violated, provide an explanation for why this may be the case. (Hint: We'll be dealing with some of these problems when we go into multivariate regression model setting). __(4. pts)__
 
 &nbsp;
 &nbsp;
