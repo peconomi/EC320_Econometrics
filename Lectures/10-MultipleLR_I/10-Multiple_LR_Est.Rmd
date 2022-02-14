@@ -90,7 +90,7 @@ election <- read_csv("election_2016.csv") %>%
 # Housekeeping
 
 
-.hi-pink[Midterm:] Dropping grades tonight. 
+.hi-pink[Midterm] scores released
 
 If anyone wants to talk shortly after, office hours will be at 3pm TUES (Zoom)
 
@@ -98,9 +98,11 @@ If anyone wants to talk shortly after, office hours will be at 3pm TUES (Zoom)
 
 * Performance was strong so final will be of similar difficulty
 
-* Once data projects are in, I'll have a good idea of overall % what defines each grade
+* Once data projects done, better idea of overall % what defines each grade
 
 * Final worth almost twice as much as midterm, those aiming to do better have plenty of ground remaining for recovery
+
+* 60% of class currently in A/B territory
 
 
 ---
@@ -120,7 +122,7 @@ Be prepared for upcoming .hi-pink[Quiz] (Feb 23rd) and .hi-pink[Data Project] (M
 
 - My suggestions will be aimed at improving your grades 
 
-- Late project submissions will be severely penalized (5% per **hour**)
+- Late project     submissions will be severely penalized (5% per **hour**)
 
 ---
 # Other Things Being Equal
@@ -735,5 +737,14 @@ The sign of the bias depends on
 
 2. The correlation between $X_1$ and $X_2$, _i.e._, $\mathop{\text{Cov}}(X_{1i}, X_{2i})$.
 
+---
+
+exclude: true
+
+```{R generate pdfs, include = F, eval = F}
+#remotes::install_github('rstudio/pagedown')
+library(pagedown)
+pagedown::chrome_print("10-Multiple_LR_Est.html", output = "10-Multiple_LR_Est.pdf")
+```
 
 

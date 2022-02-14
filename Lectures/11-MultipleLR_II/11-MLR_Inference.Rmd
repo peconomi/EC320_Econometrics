@@ -650,3 +650,12 @@ A homeowner is thinking about adding 1500 square feet to their home with 3 more 
 
 $$\Delta\text{Price} = 50 \cdot (1500) + 16000 \cdot (3) + 10000 \cdot (1) = `r 50 * (1500) + 16000 * (3) + 10000 * (1)`$$
 
+---
+
+exclude: true
+
+```{R generate pdfs, include = F, eval = F}
+#remotes::install_github('rstudio/pagedown')
+library(pagedown)
+pagedown::chrome_print("11-MLR_Inference.html", output = "11-MLR_Inference.pdf")
+```
