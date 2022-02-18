@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Categorical Variables</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Philip Economides" />
+    <script src="13-Categorical_Variables_files/header-attrs/header-attrs.js"></script>
+    <link href="13-Categorical_Variables_files/remark-css/default.css" rel="stylesheet" />
+    <link href="13-Categorical_Variables_files/remark-css/metropolis.css" rel="stylesheet" />
+    <link href="13-Categorical_Variables_files/remark-css/metropolis-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="my-css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Categorical Variables
+## EC 320: Introduction to Econometrics
+### Philip Economides
+### Winter 2022
+
+---
+
+class: inverse, middle
+
+
+
+# Prologue
+
+---
+class: inverse, middle
+
+# Categorical Variables
+
+---
+# Categorical Variables
+
+**Goal:** Make quantitative statements about .pink[qualitative information].
+
+- *e.g.,* race, gender, being employed, living in Oregon, *etc.*
+
+--
+
+**Approach:** Construct .pink[binary variables].
+
+- _a.k.a._ .pink[dummy variables] or .pink[indicator variables].
+- Value equals 1 if observation is in the category or 0 if otherwise.
+
+--
+
+**Regression implications**
+
+1. Binary variables change the interpretation of the intercept.
+
+2. Coefficients on binary variables have different interpretations than those on continuous variables.
+
+---
+# Continuous Variables
+
+Consider the relationship
+
+$$ \text{Pay}_i = \beta_0 + \beta_1 \text{School}_i + u_i $$
+
+where
+
+- `\(\text{Pay}_i\)` is a continuous variable measuring an individual's pay
+- `\(\text{School}_i\)` is a continuous variable that measures years of education
+
+--
+
+**Interpretation**
+
+- `\(\beta_0\)`: `\(y\)`-intercept, _i.e._, `\(\text{Pay}\)` when `\(\text{School} = 0\)`
+- `\(\beta_1\)`: expected increase in `\(\text{Pay}\)` for a one-unit increase in `\(\text{School}\)`
+
+---
+# Continuous Variables
+
+Consider the relationship
+
+$$ \text{Pay}_i = \beta_0 + \beta_1 \text{School}_i + u_i $$
+
+**Derive the slope's interpretation:**
+
+`\(\mathop{\mathbb{E}}\left[ \text{Pay} | \text{School} = \ell + 1 \right] - \mathop{\mathbb{E}}\left[ \text{Pay} | \text{School} = \ell \right]\)`
+--
+&lt;br&gt; `\(\quad = \mathop{\mathbb{E}}\left[ \beta_0 + \beta_1 (\ell + 1) + u \right] - \mathop{\mathbb{E}}\left[ \beta_0 + \beta_1 \ell + u \right]\)`
+--
+&lt;br&gt; `\(\quad = \left[ \beta_0 + \beta_1 (\ell + 1) \right] - \left[ \beta_0 + \beta_1 \ell \right]\)`
+--
+&lt;br&gt; `\(\quad = \beta_0 - \beta_0 + \beta_1 \ell - \beta_1 \ell + \beta_1\)`
+--
+&lt;br&gt; `\(\quad = \beta_1\)`.
+
+--
+
+The slope gives the expected increase in pay for an additional year of schooling.
+
+---
+# Continuous Variables
+
+Consider the relationship
+
+$$ \text{Pay}_i = \beta_0 + \beta_1 \text{School}_i + u_i $$
+
+**Alternative derivation**
+
+Differentiate the model with respect to schooling:
+
+$$ \dfrac{d\text{Pay}}{d\text{School}} = \beta_1 $$
+
+The slope gives the expected increase in pay for an additional year of schooling.
+
+---
+# Continuous Variables
+
+If we have multiple explanatory variables, _e.g._,
+
+$$ \text{Pay}_i = \beta_0 + \beta_1 \text{School}_i + \beta_2 \text{Ability}_i + u_i $$
+
+then the interpretation changes slightly.
+
+--
+
+`\(\mathop{\mathbb{E}}\left[ \text{Pay} | \text{School} = \ell + 1 \land \text{Ability} = \alpha \right] - \mathop{\mathbb{E}}\left[ \text{Pay} | \text{School} = \ell \land \text{Ability} = \alpha \right]\)`
+--
+&lt;br&gt; `\(\quad = \mathop{\mathbb{E}}\left[ \beta_0 + \beta_1 (\ell + 1) + \beta_2 \alpha + u \right] - \mathop{\mathbb{E}}\left[ \beta_0 + \beta_1 \ell + \beta_2 \alpha + u \right]\)`
+--
+&lt;br&gt; `\(\quad = \left[ \beta_0 + \beta_1 (\ell + 1) + \beta_2 \alpha \right] - \left[ \beta_0 + \beta_1 \ell + \beta_2 \alpha \right]\)`
+--
+&lt;br&gt; `\(\quad = \beta_0 - \beta_0 + \beta_1 \ell - \beta_1 \ell + \beta_1 + \beta_2 \alpha - \beta_2 \alpha\)`
+--
+&lt;br&gt; `\(\quad = \beta_1\)`
+
+--
+
+The slope gives the expected increase in pay for an additional year of schooling, **holding ability constant**.
+
+---
+# Continuous Variables
+
+If we have multiple explanatory variables, _e.g._,
+
+$$ \text{Pay}_i = \beta_0 + \beta_1 \text{School}_i + \beta_2 \text{Ability}_i + u_i $$
+
+then the interpretation changes slightly.
+
+--
+
+**Alternative derivation**
+
+Differentiate the model with respect to schooling:
+
+$$ \dfrac{\partial\text{Pay}}{\partial\text{School}} = \beta_1 $$
+
+The slope gives the expected increase in pay for an additional year of schooling, **holding ability constant**.
+
+---
+# Categorical Variables
+
+Consider the relationship
+
+$$ \text{Pay}_i = \beta_0 + \beta_1 \text{Female}_i + u_i $$
+
+where `\(\text{Pay}_i\)` is a continuous variable measuring an individual's pay and `\(\text{Female}_i\)` is a binary variable equal to `\(1\)` when `\(i\)` is female.
+
+**Interpretation**
+
+`\(\beta_0\)` is the expected `\(\text{Pay}\)` for males (_i.e._, when `\(\text{Female} = 0\)`):
+
+`\(\mathop{\mathbb{E}}\left[ \text{Pay} | \text{Male} \right]\)`
+--
+&lt;br&gt; `\(\quad = \mathop{\mathbb{E}}\left[ \beta_0 + \beta_1\times 0 + u_i \right]\)`
+--
+&lt;br&gt; `\(\quad = \mathop{\mathbb{E}}\left[ \beta_0 + 0 + u_i \right]\)`
+--
+&lt;br&gt; `\(\quad = \beta_0\)`
+
+---
+# Categorical Variables
+
+Consider the relationship
+
+$$ \text{Pay}_i = \beta_0 + \beta_1 \text{Female}_i + u_i $$
+
+where `\(\text{Pay}_i\)` is a continuous variable measuring an individual's pay and `\(\text{Female}_i\)` is a binary variable equal to `\(1\)` when `\(i\)` is female.
+
+**Interpretation**
+
+`\(\beta_1\)` is the expected difference in `\(\text{Pay}\)` between females and males:
+
+`\(\mathop{\mathbb{E}}\left[ \text{Pay} | \text{Female} \right] - \mathop{\mathbb{E}}\left[ \text{Pay} | \text{Male} \right]\)`
+--
+&lt;br&gt; `\(\quad = \mathop{\mathbb{E}}\left[ \beta_0 + \beta_1\times 1 + u_i \right] - \mathop{\mathbb{E}}\left[ \beta_0 + \beta_1\times 0 + u_i \right]\)`
+--
+&lt;br&gt; `\(\quad = \mathop{\mathbb{E}}\left[ \beta_0 + \beta_1 + u_i \right] - \mathop{\mathbb{E}}\left[ \beta_0 + 0 + u_i \right]\)`
+--
+&lt;br&gt; `\(\quad = \beta_0 + \beta_1 - \beta_0\)`
+--
+&lt;br&gt; `\(\quad = \beta_1\)`
+
+---
+# Categorical Variables
+
+Consider the relationship
+
+$$ \text{Pay}_i = \beta_0 + \beta_1 \text{Female}_i + u_i $$
+
+where `\(\text{Pay}_i\)` is a continuous variable measuring an individual's pay and `\(\text{Female}_i\)` is a binary variable equal to `\(1\)` when `\(i\)` is female.
+
+**Interpretation**
+
+`\(\beta_0 + \beta_1\)`: is the expected `\(\text{Pay}\)` for females:
+
+`\(\mathop{\mathbb{E}}\left[ \text{Pay} | \text{Female} \right]\)`
+--
+&lt;br&gt; `\(\quad = \mathop{\mathbb{E}}\left[ \beta_0 + \beta_1\times 1 + u_i \right]\)`
+--
+&lt;br&gt; `\(\quad = \mathop{\mathbb{E}}\left[ \beta_0 + \beta_1 + u_i \right]\)`
+--
+&lt;br&gt; `\(\quad = \beta_0 + \beta_1\)`
+
+---
+# Categorical Variables
+
+Consider the relationship
+
+$$ \text{Pay}_i = \beta_0 + \beta_1 \text{Female}_i + u_i $$
+
+**Interpretation**
+
+- `\(\beta_0\)`: expected `\(\text{Pay}\)` for males (_i.e._, when `\(\text{Female} = 0\)`)
+- `\(\beta_1\)`: expected difference in `\(\text{Pay}\)` between females and males
+- `\(\beta_0 + \beta_1\)`: expected `\(\text{Pay}\)` for females
+- Males are the **reference group**
+
+--
+
+**Note:** If there are no other variables to condition on, then `\(\hat{\beta}_1\)` equals the difference in group means, _e.g._, `\(\bar{X}_\text{Female} - \bar{X}_\text{Male}\)`.
+
+--
+
+**Note&lt;sub&gt;2&lt;/sub&gt;:** The *holding all other variables constant* interpretation also applies for categorical variables in multiple regression settings.
+
+---
+# Categorical Variables
+
+`\(Y_i = \beta_0 + \beta_1 X_i + u_i\)` for binary variable `\(X_i = \{\color{#314f4f}{0}, \, \color{#e64173}{1}\}\)`
+
+
+
+&lt;img src="13-Categorical_Variables_files/figure-html/dat plot 1-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Categorical Variables
+
+`\(Y_i = \beta_0 + \beta_1 X_i + u_i\)` for binary variable `\(X_i = \{\color{#314f4f}{0}, \, \color{#e64173}{1}\}\)`
+
+&lt;img src="13-Categorical_Variables_files/figure-html/dat plot 2-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Multiple Regression
+
+
+
+`\(Y_i = \beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + u_i \quad\)` `\(X_1\)` is continuous `\(\quad X_2\)` is categorical
+
+&lt;img src="13-Categorical_Variables_files/figure-html/mult reg plot 1-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+count: false
+
+# Multiple Regression
+
+The intercept and categorical variable `\(X_2\)` control for the groups' means.
+
+&lt;img src="13-Categorical_Variables_files/figure-html/mult reg plot 2-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+count: false
+
+# Multiple Regression
+
+With groups' means removed:
+
+&lt;img src="13-Categorical_Variables_files/figure-html/mult reg plot 3-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+count: false
+
+# Multiple Regression
+
+`\(\hat{\beta}_1\)` estimates the relationship between `\(Y\)` and `\(X_1\)` after controlling for `\(X_2\)`.
+
+&lt;img src="13-Categorical_Variables_files/figure-html/mult reg plot 4-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+count: false
+
+# Multiple Regression
+
+Another way to think about it:
+
+&lt;img src="13-Categorical_Variables_files/figure-html/mult reg plot 5-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+class: white-slide
+
+**Question:** Why not estimate `\(\text{Pay}_i = \beta_0 + \beta_1 \text{Female}_i + \beta_2 \text{Male}_i  + u_i\)`?
+
+--
+
+**Answer:** The intercept is a perfect linear combination of `\(\text{Male}_i\)` and `\(\text{Female}_i\)`.
+
+- Violates .pink[no perfect collinearity] assumption.
+
+- OLS can't estimate all three parameters simultaneously.
+
+- Known as .hi[dummy variable trap].
+
+**Practical solution:** Select a reference category and drop its indicator. 
+
+---
+# Dummy Variable _Trap?_
+
+Don't worry, .mono[R] will bail you out if you include perfectly collinear indicators.
+
+**Example**
+
+
+```r
+lm(wage ~ black + nonblack, data = wage_data) %&gt;% tidy()
+```
+
+```
+#&gt; # A tibble: 3 x 5
+#&gt;   term        estimate std.error statistic   p.value
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+#&gt; 1 (Intercept)     617.      5.27     117.   0       
+#&gt; 2 black          -168.     10.9      -15.4  7.78e-52
+#&gt; 3 nonblack         NA      NA         NA   NA
+```
+
+--
+
+Thanks, .mono[R].
+
+---
+# Omitted Variable Bias
+
+**Omitted variable bias** (OVB) arises when we omit a variable that
+
+1. Affects the outcome variable `\(Y\)`
+
+2. Correlates with an explanatory variable `\(X_j\)`
+
+Biases OLS estimator of `\(\beta_j\)`.
+
+---
+# Omitted Variable Bias
+
+**Example**
+
+Let's imagine a simple population model for the amount individual `\(i\)` gets paid
+
+$$ \text{Pay}_i = \beta_0 + \beta_1 \text{School}_i + \beta_2 \text{Male}_i + u_i $$
+
+where `\(\text{School}_i\)` gives `\(i\)`'s years of schooling and `\(\text{Male}_i\)` denotes an indicator variable for whether individual `\(i\)` is male.
+
+**Interpretation**
+
+- `\(\beta_1\)`: returns to an additional year of schooling (*ceteris paribus*)
+- `\(\beta_2\)`: premium for being male (*ceteris paribus*)
+--
+&lt;br&gt;If `\(\beta_2 &gt; 0\)`, then there is discrimination against women.
+
+---
+# Omitted Variable Bias
+
+**Example, continued**
+
+From the population model
+
+$$ \text{Pay}_i = \beta_0 + \beta_1 \text{School}_i + \beta_2 \text{Male}_i + u_i $$
+
+An analyst focuses on the relationship between pay and schooling, _i.e._,
+
+$$ \text{Pay}_i = \beta_0 + \beta_1 \text{School}_i + \left(\beta_2 \text{Male}_i + u_i\right) $$
+$$ \text{Pay}_i = \beta_0 + \beta_1 \text{School}_i + \varepsilon_i $$
+
+where `\(\varepsilon_i = \beta_2 \text{Male}_i + u_i\)`.
+
+--
+
+We assumed exogeneity to show that OLS is unbiasedness. But even if `\(\mathop{\mathbb{E}}\left[ u | X \right] = 0\)`, it is not necessarily true that `\(\mathop{\mathbb{E}}\left[ \varepsilon | X \right] = 0\)` (false if `\(\beta_2 \neq 0\)`).
+
+--
+
+Specifically, `\(\mathop{\mathbb{E}}\left[ \varepsilon | \text{Male} = 1 \right] = \beta_2 + \mathop{\mathbb{E}}\left[ u | \text{Male} = 1 \right] \neq 0\)`.
+--
+ **Now OLS is biased.**
+
+---
+# Omitted Variable Bias
+
+Let's try to see this result graphically.
+
+
+
+The true population model:
+
+$$ \text{Pay}_i = 20 + 0.5 \times \text{School}_i + 10 \times \text{Male}_i + u_i $$
+
+The regression model that suffers from omitted-variable bias:
+
+$$ \text{Pay}_i = \hat{\beta}_0 + \hat{\beta}_1 \times \text{School}_i + e_i $$
+
+Finally, imagine that women, on average, receive more schooling than men.
+
+---
+# Omitted Variable Bias
+
+True model: `\(\text{Pay}_i = 20 + 0.5 \times \text{School}_i + 10 \times \text{Male}_i + u_i\)`
+
+&lt;img src="13-Categorical_Variables_files/figure-html/plot ovb 1-1.svg" style="display: block; margin: auto;" /&gt;
+---
+count: false
+
+# Omitted Variable Bias
+
+Biased regression: `\(\widehat{\text{Pay}}_i = 31.3 + -0.9 \times \text{School}_i\)`
+
+&lt;img src="13-Categorical_Variables_files/figure-html/plot ovb 2-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+count: false
+
+# Omitted Variable Bias
+
+Recalling the omitted variable: Gender (**&lt;font color="#e64173"&gt;female&lt;/font&gt;** and **&lt;font color="#314f4f"&gt;male&lt;/font&gt;**)
+
+&lt;img src="13-Categorical_Variables_files/figure-html/plot ovb 3-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+count: false
+
+# Omitted Variable Bias
+
+Recalling the omitted variable: Gender (**&lt;font color="#e64173"&gt;female&lt;/font&gt;** and **&lt;font color="#314f4f"&gt;male&lt;/font&gt;**)
+
+&lt;img src="13-Categorical_Variables_files/figure-html/plot ovb 4-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+count: false
+
+# Omitted Variable Bias
+
+Unbiased regression: `\(\widehat{\text{Pay}}_i = 20.9 + 0.4 \times \text{School}_i + 9.1 \times \text{Male}_i\)`
+
+&lt;img src="13-Categorical_Variables_files/figure-html/plot ovb 5-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Categorical Variables
+
+## Example: Weekly Wages
+
+
+```r
+lm(wage ~ south, data = wage_data) %&gt;% tidy()
+```
+
+```
+#&gt; # A tibble: 2 x 5
+#&gt;   term        estimate std.error statistic  p.value
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+#&gt; 1 (Intercept)     632.      6.00     105.  0       
+#&gt; 2 south          -137.      9.45     -14.5 6.21e-46
+```
+
+--
+
+**Q.sub[1]:** What is the reference category?
+
+**Q.sub[2]:** Interpret the coefficients.
+
+**Q.sub[3]:** Suppose you ran `lm(wage ~ nonsouth, data = wage_data)` instead. What is the coefficient estimate on `nonsouth`? What is the intercept estimate?
+
+---
+# Categorical Variables
+
+## Example: Weekly Wages
+
+
+```r
+lm(wage ~ south + black, data = wage_data) %&gt;% tidy()
+```
+
+```
+#&gt; # A tibble: 3 x 5
+#&gt;   term        estimate std.error statistic  p.value
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+#&gt; 1 (Intercept)    647.       6.02     107.  0       
+#&gt; 2 south          -98.6      9.84     -10.0 2.89e-23
+#&gt; 3 black         -129.      11.4      -11.3 3.43e-29
+```
+
+--
+
+**Q.sub[1]:** What is the reference category?
+
+**Q.sub[2]:** Interpret the coefficients.
+
+**Q.sub[3]:** Suppose you ran `lm(wage ~ south + nonblack, data = wage_data)` instead. What is the coefficient estimate on `nonblack`? What is the coefficient estimate on `south`? What is the intercept estimate?
+
+---
+# Categorical Variables
+
+## Example: Weekly Wages
+
+**Answer to Q.sub[3]:**
+
+
+```r
+lm(wage ~ south + nonblack, data = wage_data) %&gt;% tidy()
+```
+
+```
+#&gt; # A tibble: 3 x 5
+#&gt;   term        estimate std.error statistic  p.value
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+#&gt; 1 (Intercept)    518.      11.7       44.3 0       
+#&gt; 2 south          -98.6      9.84     -10.0 2.89e-23
+#&gt; 3 nonblack       129.      11.4       11.3 3.43e-29
+```
+
+
+---
+
+exclude: true
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

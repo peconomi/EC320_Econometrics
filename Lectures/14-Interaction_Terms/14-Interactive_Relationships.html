@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Interactive Relationships</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Philip Economides" />
+    <script src="14-Interactive_Relationships_files/header-attrs/header-attrs.js"></script>
+    <link href="14-Interactive_Relationships_files/remark-css/default.css" rel="stylesheet" />
+    <link href="14-Interactive_Relationships_files/remark-css/metropolis.css" rel="stylesheet" />
+    <link href="14-Interactive_Relationships_files/remark-css/metropolis-fonts.css" rel="stylesheet" />
+    <script src="14-Interactive_Relationships_files/kePrint/kePrint.js"></script>
+    <link href="14-Interactive_Relationships_files/lightable/lightable.css" rel="stylesheet" />
+    <link rel="stylesheet" href="my-css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Interactive Relationships
+## EC 320: Introduction to Econometrics
+### Philip Economides
+### Winter 2022
+
+---
+
+class: inverse, middle
+
+
+
+# Prologue
+
+---
+# Last Time
+
+We considered a model where schooling has the same effect for everyone (**&lt;font color="#e64173"&gt;F&lt;/font&gt;** and **&lt;font color="#314f4f"&gt;M&lt;/font&gt;**):
+
+
+
+&lt;img src="14-Interactive_Relationships_files/figure-html/int plot 1-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Today
+
+We will consider models that allow effects to differ by another variable (*e.g.,* by gender: **&lt;font color="#e64173"&gt;F&lt;/font&gt;** and **&lt;font color="#314f4f"&gt;M&lt;/font&gt;**):
+
+&lt;img src="14-Interactive_Relationships_files/figure-html/int plot 2-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+class: inverse, middle
+
+# Interactive Relationships
+
+---
+# Motivation
+
+## *On average?* For whom?
+
+Regression coefficients describe average effects.
+
+- Averages can mask .pink[heterogeneous effects] that differ by group or by the level of another variable.
+
+We can use .hi[interaction terms] to model heterogeneous effects.
+
+- Accommodate complexity and nuance by going beyond *"the effect of* `\(X\)` *on* `\(Y\)` *is* `\(\beta_1\)`*."*
+
+---
+# Interaction Terms
+
+**Starting point:** `\(Y_i = \beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + u_i\)`
+
+- `\(X_{1i}\)` is the variable of interest
+- `\(X_{2i}\)` is a control variable
+
+--
+
+**A richer model:** Add an interaction term to study whether `\(X_{2i}\)` .pink[*moderates*] the effect of `\(X_{1i}\)`:
+
+`$$Y_i = \beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + \beta_3 X_{1i} \cdot X_{2i} + u_i$$`
+
+--
+
+**Interpretation:** The partial derivative of `\(Y_i\)` with respect to `\(X_{1i}\)` is the .hi[marginal effect] of `\(X_1\)` on `\(Y_i\)`:
+
+`$$\color{#e64173}{\dfrac{\partial Y}{\partial X_1} = \beta_1 + \beta_3 X_{2i}}$$`
+
+--
+
+- Effect of `\(X_1\)` depends on the level of `\(X_2\)` 🤯
+
+---
+class: inverse, middle
+
+# Differential Returns to Education
+
+---
+# Differential Returns to Education
+
+**Research Question:** Do the returns to education vary by race?
+
+Consider the interactive regression model
+
+$$
+\text{Wage}_i = \beta_0 + \beta_1 \text{Education}_i + \beta_2 \text{Black}_i + \beta_3 \text{Education}_i \times \text{Black}_i  + u_i
+$$
+
+What is the marginal effect of an additional year of education?
+
+--
+
+$$
+\dfrac{\partial \text{Wage}}{\partial \text{Education}} = \beta_1 + \beta_3 \text{Black}_i  
+$$
+
+---
+# Differential Returns to Education
+
+
+
+
+```r
+lm(wage ~ educ + black + educ:black, data = wage2) %&gt;% tidy()
+```
+
+```
+#&gt; # A tibble: 4 x 5
+#&gt;   term        estimate std.error statistic  p.value
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+#&gt; 1 (Intercept)    196.      82.2       2.38 1.75e- 2
+#&gt; 2 educ            58.4      5.96      9.80 1.19e-21
+#&gt; 3 black          321.     263.        1.22 2.23e- 1
+#&gt; 4 educ:black     -40.7     20.7      -1.96 4.99e- 2
+```
+
+.green[What is the] .hi-green[return to education] .green[for] .hi-green[black] .green[workers?]
+--
+`\(\widehat{\left(\dfrac{\partial \text{Wage}}{\partial \text{Education}} \right)}\Bigg|_{\small \text{Black}=1} = \hat{\beta}_1 + \hat{\beta}_3 = 17.65\)`
+
+---
+# Differential Returns to Education
+
+
+```r
+lm(wage ~ educ + black + educ:black, data = wage2) %&gt;% tidy()
+```
+
+```
+#&gt; # A tibble: 4 x 5
+#&gt;   term        estimate std.error statistic  p.value
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+#&gt; 1 (Intercept)    196.      82.2       2.38 1.75e- 2
+#&gt; 2 educ            58.4      5.96      9.80 1.19e-21
+#&gt; 3 black          321.     263.        1.22 2.23e- 1
+#&gt; 4 educ:black     -40.7     20.7      -1.96 4.99e- 2
+```
+
+.green[What is the] .hi-green[return to education] .green[for] .hi-green[non-black] .green[workers?]
+--
+`\(\widehat{\left(\dfrac{\partial \text{Wage}}{\partial \text{Education}} \right)}\Bigg|_{\small \text{Black}=0} = \hat{\beta}_1  = 58.38\)`
+
+---
+# Differential Returns to Education
+
+**Q:** Does the return to education differ by race?
+
+- For answer, conduct a two-sided *t* test of the null hypothesis that the interaction coefficient equals 0 at the 5% level.
+
+--
+
+
+```r
+lm(wage ~ educ + black + educ:black, data = wage2) %&gt;% tidy()
+```
+
+```
+#&gt; # A tibble: 4 x 5
+#&gt;   term        estimate std.error statistic  p.value
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+#&gt; 1 (Intercept)    196.      82.2       2.38 1.75e- 2
+#&gt; 2 educ            58.4      5.96      9.80 1.19e-21
+#&gt; 3 black          321.     263.        1.22 2.23e- 1
+*#&gt; 4 educ:black     -40.7     20.7      -1.96 4.99e- 2
+```
+
+--
+
+*p*-value .mono[=] 0.0499 &lt; 0.05 
+--
+.mono[=&gt;] reject null hypothesis.
+
+--
+
+**A:** The return to education is significantly lower for black workers.
+
+---
+# Differential Returns to Education
+
+We can also test hypotheses about specific marginal effects.
+
+- *e.g.,* H.sub[0]: `\(\left(\dfrac{\partial \text{Wage}}{\partial \text{Education}} \right)\Bigg|_{\small \text{Black}=1} = 0\)`.
+- Conduct a `\(t\)` test or construct confidence intervals.
+
+--
+
+**Problem 1:** `lm()` output does not include standard errors for the marginal effects.
+
+--
+
+**Problem 2:** The formula for marginal effect standard errors includes covariances between coefficient estimates. The math is messy.&lt;sup&gt;.pink[†]&lt;/sup&gt;
+
+.footnote[
+.pink[†] Stay tuned.
+]
+
+--
+
+**Solution:** Construct confidence intervals using the `margins` package.
+
+---
+# Differential Returns to Education
+
+The `margins` function provides standard errors and 95% confidence intervals for each marginal effect.
+
+
+```r
+p_load(margins)
+
+reg &lt;- lm(wage ~ educ + black + educ:black, data = wage2)
+
+margins(reg, at = list(black = 0:1)) %&gt;% summary() %&gt;% filter(factor == "educ")
+```
+
+```
+#&gt;  factor  black     AME      SE      z      p    lower   upper
+*#&gt;    educ 0.0000 58.3773  5.9541 9.8045 0.0000  46.7074 70.0472
+#&gt;    educ 1.0000 17.6544 19.8723 0.8884 0.3743 -21.2946 56.6035
+```
+
+.pink[Marginal effect of education on wages for non-black workers.]
+
+---
+count: false
+
+# Differential Returns to Education
+
+The `margins` function provides standard errors and 95% confidence intervals for each marginal effect.
+
+
+```r
+p_load(margins)
+
+reg &lt;- lm(wage ~ educ + black + educ:black, data = wage2)
+
+margins(reg, at = list(black = 0:1)) %&gt;% summary() %&gt;% filter(factor == "educ")
+```
+
+```
+#&gt;  factor  black     AME      SE      z      p    lower   upper
+#&gt;    educ 0.0000 58.3773  5.9541 9.8045 0.0000  46.7074 70.0472
+*#&gt;    educ 1.0000 17.6544 19.8723 0.8884 0.3743 -21.2946 56.6035
+```
+
+.pink[Marginal effect of education on wages for black workers.]
+
+---
+# Differential Returns to Education
+
+We can use the `geom_pointrange()` option in `ggplot2` to plot the marginal effects with 95% confidence intervals.
+
+&lt;img src="14-Interactive_Relationships_files/figure-html/unnamed-chunk-7-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Differential Returns to Education
+
+We can use the `geom_pointrange()` option in `ggplot2` to plot the marginal effects with 95% confidence intervals.
+
+
+```r
+margs &lt;- margins(reg, at = list(black = 0:1)) %&gt;% 
+  summary() %&gt;% 
+  filter(factor == "educ") %&gt;% 
+  mutate(Term = case_when(black == 1 ~ "Black Workers",
+                          black == 0 ~ "Non-black Workers"))
+margs %&gt;% 
+  ggplot(aes(x = Term, y = AME, ymin = lower, ymax = upper)) + 
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  geom_pointrange() +
+  coord_flip() +
+  xlab("") + 
+  ylab("Marginal Effect of Education on Wages") 
+```
+
+---
+class: inverse, middle
+
+# Differential Effects of School Funding?
+
+---
+# Differential Effects of School Funding?
+
+**Research Question:** Does the effect of school spending on student achievement vary by the share of students experiencing poverty?
+
+- Does the marginal dollar go further in a school with a relatively affluent student body?
+
+--
+
+**Regression Model**
+
+$$
+\text{Read}_i = \beta_0 + \beta_1 \text{Spend}_i + \beta_2 \text{Lunch}_i + \beta_3 \text{Spend}_i \times \text{Lunch}_i + u_i  
+$$
+
+- `\(\text{Read}_i\)` is the average fourth grade standardized reading test score in school `\(i\)` (100-point scale).
+- `\(\text{Spend}_i\)` measured as thousands of dollars per student.
+- `\(\text{Lunch}_i\)` is the percentage of students on free or reduced-price lunch.
+
+
+---
+# Differential Effects of School Funding?
+
+**Regression Model**
+
+$$
+\text{Read}_i = \beta_0 + \beta_1 \text{Spend}_i + \beta_2 \text{Lunch}_i + \beta_3 \text{Spend}_i \times \text{Lunch}_i + u_i  
+$$
+
+--
+
+**Results**
+
+
+```r
+lm(read4 ~ spend + lunch + spend:lunch, data = meap01) %&gt;% tidy()
+```
+
+```
+#&gt; # A tibble: 4 x 5
+#&gt;   term        estimate std.error statistic  p.value
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+#&gt; 1 (Intercept)  61.1       3.14       19.4  1.39e-76
+#&gt; 2 spend         3.29      0.601       5.47 5.13e- 8
+#&gt; 3 lunch        -0.304     0.0667     -4.56 5.53e- 6
+#&gt; 4 spend:lunch  -0.0293    0.0120     -2.44 1.49e- 2
+```
+
+---
+# Differential Effects of School Funding?
+
+**Results**
+
+
+```r
+lm(read4 ~ spend + lunch + spend:lunch, data = meap01) %&gt;% tidy()
+```
+
+```
+#&gt; # A tibble: 4 x 5
+#&gt;   term        estimate std.error statistic  p.value
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+#&gt; 1 (Intercept)  61.1       3.14       19.4  1.39e-76
+#&gt; 2 spend         3.29      0.601       5.47 5.13e- 8
+#&gt; 3 lunch        -0.304     0.0667     -4.56 5.53e- 6
+#&gt; 4 spend:lunch  -0.0293    0.0120     -2.44 1.49e- 2
+```
+
+What is the estimated marginal effect of an additional 1000 dollars per student?
+
+--
+
+$$
+\widehat{\dfrac{\partial \text{Read}}{\partial \text{Spend}}} = \hat{\beta}_1 + \hat{\beta}_3 \text{Lunch}_i
+$$
+
+---
+# Differential Effects of School Funding?
+
+**Q:** Does the effect of school spending on student achievement vary by the share of students experiencing poverty?
+
+If the marginal effects do not vary by poverty levels, then 
+
+$$
+`\begin{aligned}
+\dfrac{\partial \text{Read}}{\partial \text{Spend}} &amp;= \beta_1 + \beta_3 \text{Lunch}_i \\ &amp;= \beta_1
+\end{aligned}`
+$$
+
+--
+
+H.sub[0]: `\(\beta_3 = 0\)` *vs.* H.sub[a]: `\(\beta_3 \neq 0\)`
+
+- Can evaluate using a `\(t\)` test or an `\(F\)` test.
+
+---
+# Differential Effects of School Funding?
+
+**Conduct a two-sided *t* test at the 10% level** 
+
+
+```r
+lm(read4 ~ spend + lunch + spend:lunch, data = meap01) %&gt;% tidy()
+```
+
+```
+#&gt; # A tibble: 4 x 5
+#&gt;   term        estimate std.error statistic  p.value
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+#&gt; 1 (Intercept)  61.1       3.14       19.4  1.39e-76
+#&gt; 2 spend         3.29      0.601       5.47 5.13e- 8
+#&gt; 3 lunch        -0.304     0.0667     -4.56 5.53e- 6
+*#&gt; 4 spend:lunch  -0.0293    0.0120     -2.44 1.49e- 2
+```
+
+**H.sub[0]:** `\(\beta_3 = 0\)` *vs.* **H.sub[a]:** `\(\beta_3 \neq 0\)`
+
+--
+
+*t* .mono[=] -2.44 and *t*.sub[0.95, 1823-4] .mono[=] 1.65
+
+--
+
+Reject **H.sub[0]** if |*t*| .mono[=] |-2.44| .mono[&gt;] *t*.sub[0.95, 1823-4] .mono[=] 1.65.
+
+--
+
+Statement is true .mono[=&gt;] .hi[reject H.sub[0]] at the 10% level.
+
+---
+# Differential Effects of School Funding?
+
+**Conduct an *F* test at the 10% level** 
+
+
+```r
+reg_unrestrict &lt;- lm(read4 ~ spend + lunch + spend:lunch, data = meap01)
+reg_restrict &lt;- lm(read4 ~ spend + lunch, data = meap01)
+anova(reg_unrestrict, reg_restrict)
+```
+
+```
+#&gt; Analysis of Variance Table
+#&gt; 
+#&gt; Model 1: read4 ~ spend + lunch + spend:lunch
+#&gt; Model 2: read4 ~ spend + lunch
+#&gt;   Res.Df    RSS Df Sum of Sq      F  Pr(&gt;F)  
+#&gt; 1   1819 408262                              
+*#&gt; 2   1820 409596 -1     -1334 5.9434 0.01487 *
+#&gt; ---
+#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+--
+
+**H.sub[0]:** `\(\beta_3 = 0\)` *vs.* **H.sub[a]:** `\(\beta_3 \neq 0\)`
+
+*p*-value .mono[=] 0.01487 .mono[&lt;] 0.1 .mono[=&gt;] .hi[reject H.sub[0]] at the 10% level.
+
+---
+# Differential Effects of School Funding?
+
+**Q:** Is there a statistically significant effect of spending on student achievement for every level of poverty? 
+
+--
+
+One way to answer this question is to construct confidence intervals for the marginal effects.
+
+- Requires standard errors.
+
+- Standard errors will depend on the poverty level (our proxy: `\(\text{Lunch}_i\)`).
+
+--
+
+Time for math! 🎉
+
+---
+class: white-slide
+
+
+**Step 1:** Derive the estimated marginal effects.
+
+$$
+\widehat{\dfrac{\partial \text{Read}}{\partial \text{Spend}}} = \hat{\beta}_1 + \hat{\beta}_3 \text{Lunch}_i
+$$
+
+--
+
+&lt;br&gt;
+
+**Step 2:** Derive the variances of the estimated marginal effects.
+
+`\(\mathop{\text{Var}} \left(\widehat{\dfrac{\partial \text{Read}}{\partial \text{Spend}}} \right)\)`
+--
+&lt;br&gt; `\(\quad = \mathop{{\text{Var}}}\left(\hat{\beta}_1 + \hat{\beta}_3 \text{Lunch}_i \right)\)`
+--
+&lt;br&gt; `\(\quad = \mathop{{\text{Var}}}\left(\hat{\beta}_1 \right) + \mathop{{\text{Var}}}\left(\hat{\beta}_3 \text{Lunch}_i \right) + 2 \cdot \mathop{{\text{Cov}}}\left(\hat{\beta}_1, \ \hat{\beta}_3 \text{Lunch}_i \right)\)`
+--
+&lt;br&gt; `\(\quad = \mathop{{\text{Var}}}\left(\hat{\beta}_1 \right) + \text{Lunch}_i^2 \cdot\mathop{{\text{Var}}}\left(\hat{\beta}_3 \right) + 2 \cdot \text{Lunch}_i \cdot \mathop{{\text{Cov}}}\left(\hat{\beta}_1, \ \hat{\beta}_3 \right)\)`
+--
+&lt;br&gt; `\(\quad = \mathop{{\text{SE}}}\left(\hat{\beta}_1 \right)^2 + \text{Lunch}_i^2 \cdot\mathop{{\text{SE}}}\left(\hat{\beta}_3 \right)^2 + 2 \cdot \text{Lunch}_i \cdot \mathop{{\text{Cov}}}\left(\hat{\beta}_1, \ \hat{\beta}_3 \right)\)`
+
+---
+class: white-slide
+
+**Step 3:** Derive the standard errors of the estimated marginal effects.
+
+`\(\mathop{\text{SE}} \left(\widehat{\dfrac{\partial \text{Read}}{\partial \text{Spend}}} \right)\)`
+--
+&lt;br&gt; `\(\quad = \mathop{\text{Var}} \left(\widehat{\dfrac{\partial \text{Read}}{\partial \text{Spend}}} \right)^{1/2}\)`
+--
+&lt;br&gt; `\(\quad = \sqrt{\mathop{{\text{SE}}}\left(\hat{\beta}_1 \right)^2 + \text{Lunch}_i^2 \cdot\mathop{{\text{SE}}}\left(\hat{\beta}_3 \right)^2 + 2 \cdot \text{Lunch}_i \cdot \mathop{{\text{Cov}}}\left(\hat{\beta}_1, \ \hat{\beta}_3 \right)}\)`
+
+--
+
+&lt;br&gt;
+
+**Step 4:** Calculate the bounds of the confidence interval.
+
+$$
+`\begin{aligned}
+\hat{\beta}_1 &amp;+ \hat{\beta}_3 \cdot \text{Lunch}_i 
+\\&amp; \pm t_{\text{crit}} \cdot \sqrt{\mathop{{\text{SE}}}\left(\hat{\beta}_1 \right)^2 + \text{Lunch}_i^2 \cdot\mathop{{\text{SE}}}\left(\hat{\beta}_3 \right)^2 + 2 \cdot \text{Lunch}_i \cdot \mathop{{\text{Cov}}}\left(\hat{\beta}_1, \ \hat{\beta}_3 \right)}
+\end{aligned}`
+$$
+
+---
+# Differential Effects of School Funding?
+
+**Confidence Interval**
+$$
+`\begin{aligned}
+\hat{\beta}_1 &amp;+ \hat{\beta}_3 \cdot \text{Lunch}_i 
+\\&amp; \pm t_{\text{crit}} \cdot \sqrt{\mathop{{\text{SE}}}\left(\hat{\beta}_1 \right)^2 + \text{Lunch}_i^2 \cdot\mathop{{\text{SE}}}\left(\hat{\beta}_3 \right)^2 + 2 \cdot \text{Lunch}_i \cdot \mathop{{\text{Cov}}}\left(\hat{\beta}_1, \ \hat{\beta}_3 \right)}
+\end{aligned}`
+$$
+
+Notice that `\(\mathop{{\text{Cov}}}\left(\hat{\beta}_1, \ \hat{\beta}_3 \right)\)` is not reported in a regression table
+
+- Located in the variance-covariance matrix inside `lm()` object (beyond the scope of this class).
+- Can't calculate by hand without about `\(\mathop{{\text{Cov}}}\left(\hat{\beta}_1, \ \hat{\beta}_3 \right)\)`.
+- Special case: `\(\hat{\beta}_1\)` and `\(\hat{\beta}_3\)` are statistically independent .mono[=&gt;] `\(\mathop{{\text{Cov}}}\left(\hat{\beta}_1, \ \hat{\beta}_3 \right) = 0\)`.
+
+---
+# Differential Effects of School Funding?
+
+We can use the `cplot` function from `margins` with `ggplot2` to plot the marginal effects with 95% confidence intervals.
+
+&lt;img src="14-Interactive_Relationships_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Differential Effects of School Funding?
+
+We can use the `cplot` function from `margins` with `ggplot2` to plot the marginal effects with 95% confidence intervals.
+
+
+```r
+# run regression
+reg &lt;- lm(read4 ~ spend + lunch + spend:lunch, data = meap01)
+
+# retrieve marginal effects with 95% CI
+margs &lt;- cplot(reg, x = "lunch", dx = "spend", 
+               what = "effect", draw = FALSE)
+
+# plot the marginal effects
+margs %&gt;%  
+  ggplot(aes(x = xvals)) + 
+  geom_line(aes(y = yvals)) +
+  geom_line(aes(y = upper), linetype = 2) +
+  geom_line(aes(y = lower), linetype = 2) +
+  geom_hline(yintercept = 0, linetype = 3) +
+  xlab("Percentage on Free or Reduced-Price Lunch") + 
+  ylab("Marginal Effect of Spending on Reading Scores")
+```
+
+---
+class: inverse, middle
+
+# Moving to Opportunity
+
+---
+# Moving to Opportunity
+
+## Background
+
+**Policy Question:** How can we lift people out of poverty? 
+
+**Research Agenda:** What kinds of social assistance programs have lasting effects on upward mobility?
+
+Economists study a variety of state and federal social assistance programs.
+
+- .purple[Medicaid], .purple[SNAP] (food stamps), .purple[TANF] (cash welfare), .purple[WIC] (benefits for mothers), .purple[National School Lunch Program], .pink[public housing], .pink[Section 8] (housing vouchers), *etc.*
+
+- Considerable variation in benefits and incentive structures.
+
+--
+
+- Today: .pink[Section 8] *v.s.* .pink[public housing].
+
+---
+# Moving to Opportunity
+
+## Experiment
+
+**Research Question:** Does moving from a public housing project to high-opportunity neighborhood improve well-being?
+
+**Social Experiment:** .hi[Moving to Opportunity (MTO)] 
+
+4600 low-income families living in federal housing projects.
+
+- Recruited by the Department of Housing and Urban Development during the mid-1990s.
+
+- Housing projects in Baltimore, Boston, Chicago, Los Angeles, and New York.
+
+- .pink[Randomly assigned] various forms of housing assistance.
+
+---
+# Moving to Opportunity
+
+## Experiment
+
+**Experimental Design**
+
+Participants randomly assigned into one of three treatments:
+
+- .hi-pink[Experimental group:] Housing voucher for low-poverty neighborhoods only .mono[+] counseling
+
+- .hi-purple[Section 8 group:] Housing voucher for any neighborhood .mono[+] no counseling 
+
+- .hi-slate[Control group:] No housing voucher .mono[+] no counseling (*i.e.,* regular public housing)
+
+---
+# Moving to Opportunity
+
+## Experiment
+
+**Initial Results**
+
+1. Most families in the treatment groups actually used vouchers to move to better neighborhoods.
+
+2. Improvements in physical and mental health.
+
+3. No significant improvements in earnings or employment rates for parents.
+
+---
+# Moving to Opportunity
+
+## Experiment
+
+**What about children?**
+
+[Chetty, Hendren, and Katz (*American Economic Review*, 2016)](https://www.aeaweb.org/articles?id=10.1257/aer.20150572) study the long-run impact of MTO on children. 
+
+- Individual tax data linked to children from original MTO sample.
+
+- Adulthood outcomes: income, marriage, poverty rate in neighborhood of residence, taxes paid, *etc.*
+
+- Test how effects vary by age of child when family received voucher.
+
+---
+class: white-slide
+
+.center[**Long-Run Effects of MTO Experiment**]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;  &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Household Income ($) &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Married (%) &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Neighborhood Poverty (%) &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Taxes Paid ($) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Experimental &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt; 9441.1 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 8.309 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; -4.371 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 831.2 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (3035.8) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (3.445) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (1.770) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (279.4) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Section 8 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt; 4447.7 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 7.193 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; -1.237 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 521.7 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (3111.3) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (3.779) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (2.021) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (287.5) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Experimental × Age at Randomization &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt; -723.7 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; -0.582 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 0.261 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; -65.81 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (255.5) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.290) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.139) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (23.88) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Section 8 × Age at Randomization &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt; -338 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; -0.433 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 0.0109 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; -42.48 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (266.4) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.316) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.156) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (24.85) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Control Group Mean &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt; 16259.9 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 6.6 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 23.7 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 627.8 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Observations &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt; 20043 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 20043 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 15798 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 20043 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+class: white-slide
+
+.center[**Effect of MTO on Household Income in Adulthood**]
+&lt;img src="14-Interactive_Relationships_files/figure-html/income_margins-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+class: white-slide
+
+.center[**Long-Run Effects of MTO Experiment**]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;  &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Household Income ($) &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Married (%) &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Neighborhood Poverty (%) &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Taxes Paid ($) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Experimental &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 9441.1 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt; 8.309 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; -4.371 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 831.2 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (3035.8) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (3.445) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (1.770) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (279.4) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Section 8 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 4447.7 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt; 7.193 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; -1.237 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 521.7 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (3111.3) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (3.779) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (2.021) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (287.5) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Experimental × Age at Randomization &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; -723.7 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt; -0.582 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 0.261 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; -65.81 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (255.5) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (0.290) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.139) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (23.88) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Section 8 × Age at Randomization &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; -338 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt; -0.433 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 0.0109 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; -42.48 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (266.4) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (0.316) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.156) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (24.85) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Control Group Mean &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 16259.9 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt; 6.6 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 23.7 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 627.8 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Observations &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 20043 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt; 20043 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 15798 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 20043 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+class: white-slide
+
+.center[**Effect of MTO on Marriage Rates**]
+&lt;img src="14-Interactive_Relationships_files/figure-html/married_margins-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+class: white-slide
+
+.center[**Long-Run Effects of MTO Experiment**]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;  &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Household Income ($) &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Married (%) &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Neighborhood Poverty (%) &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Taxes Paid ($) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Experimental &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 9441.1 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 8.309 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt; -4.371 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 831.2 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (3035.8) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (3.445) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (1.770) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (279.4) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Section 8 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 4447.7 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 7.193 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt; -1.237 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 521.7 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (3111.3) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (3.779) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (2.021) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (287.5) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Experimental × Age at Randomization &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; -723.7 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; -0.582 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt; 0.261 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; -65.81 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (255.5) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.290) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (0.139) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (23.88) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Section 8 × Age at Randomization &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; -338 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; -0.433 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt; 0.0109 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; -42.48 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (266.4) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.316) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (0.156) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (24.85) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Control Group Mean &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 16259.9 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 6.6 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt; 23.7 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 627.8 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Observations &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 20043 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 20043 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt; 15798 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 20043 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+class: white-slide
+
+.center[**Effect of MTO on Poverty Rate in Neighborhood of Residence**]
+&lt;img src="14-Interactive_Relationships_files/figure-html/poverty_margins-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+class: white-slide
+
+.center[**Long-Run Effects of MTO Experiment**]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;  &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Household Income ($) &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Married (%) &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Neighborhood Poverty (%) &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Taxes Paid ($) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Experimental &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 9441.1 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 8.309 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; -4.371 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt; 831.2 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (3035.8) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (3.445) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (1.770) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (279.4) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Section 8 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 4447.7 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 7.193 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; -1.237 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt; 521.7 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (3111.3) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (3.779) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (2.021) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (287.5) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Experimental × Age at Randomization &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; -723.7 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; -0.582 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 0.261 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt; -65.81 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (255.5) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.290) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.139) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (23.88) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Section 8 × Age at Randomization &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; -338 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; -0.433 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 0.0109 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt; -42.48 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-style: italic;color: black !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (266.4) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.316) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;"&gt; (0.156) &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;color: #c2bebe !important;line-height: 110%;font-weight: bold;"&gt; (24.85) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Control Group Mean &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 16259.9 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 6.6 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 23.7 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt; 627.8 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;color: #23373b !important;line-height: 110%;font-style: italic;color: black !important;"&gt; Observations &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 20043 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 20043 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;"&gt; 15798 &lt;/td&gt;
+   &lt;td style="text-align:center;color: #23373b !important;line-height: 110%;font-weight: bold;"&gt; 20043 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+class: white-slide
+
+.center[**Effect of MTO on Taxes Paid**]
+&lt;img src="14-Interactive_Relationships_files/figure-html/tax_margins-1.svg" style="display: block; margin: auto;" /&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

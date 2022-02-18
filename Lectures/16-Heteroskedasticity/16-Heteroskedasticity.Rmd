@@ -1,0 +1,945 @@
+---
+title: "Nonlinear Relationships"
+subtitle: "EC 320: Introduction to Econometrics"
+author: "Philip Economides"
+date: "Winter 2022"
+output:
+  xaringan::moon_reader:
+    css: ['default', 'metropolis', 'metropolis-fonts', 'my-css.css']
+    # self_contained: true
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+class: inverse, middle
+
+```{r Setup, include = F}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(echo = TRUE, cache=TRUE)
+
+library(pacman)
+p_load(ggthemes, viridis, knitr, AER, extrafont, tidyverse, magrittr, wooldridge, stargazer, latex2exp, parallel, broom, kableExtra, ggforce, margins, furrr, gapminder)
+# Define colors
+red_pink <- "#e64173"
+turquoise <- "#20B2AA"
+orange <- "#FFA500"
+red <- "#fb6107"
+blue <- "#2b59c3"
+green <- "#8bb174"
+grey_light <- "grey70"
+grey_mid <- "grey50"
+grey_dark <- "grey20"
+purple <- "#6A5ACD"
+met_slate <- "#23373b" # metropolis font color
+# Knitr options
+opts_chunk$set(
+  comment = "#>",
+  fig.align = "center",
+  fig.height = 7,
+  fig.width = 10.5,
+  #dpi = 300,
+  #cache = T,
+  warning = F,
+  message = F
+)  
+theme_simple <- theme_bw() + theme(
+  axis.line = element_line(color = met_slate),
+  panel.grid = element_blank(),
+  rect = element_blank(),
+  strip.text = element_blank(),
+  text = element_text(family = "Fira Sans", color = met_slate, size = 14),
+  axis.text.x = element_text(size = 12),
+  axis.text.y = element_text(size = 12),
+  axis.ticks = element_blank(),
+  plot.title = element_blank(),
+  legend.position = "none"
+)
+theme_empty <- theme_bw() + theme(
+  line = element_blank(),
+  rect = element_blank(),
+  strip.text = element_blank(),
+  axis.text = element_blank(),
+  plot.title = element_blank(),
+  axis.title = element_blank(),
+  plot.margin = structure(c(0, 0, -1, -1), unit = "lines", valid.unit = 3L, class = "unit"),
+  legend.position = "none"
+)
+theme_axes <- theme_empty + theme(
+  axis.title = element_text(size = 18),
+  text = element_text(family = "Fira Sans", color = met_slate, size = 14),
+  plot.margin = structure(c(0, 0, 0.1, 0), unit = "lines", valid.unit = 3L, class = "unit")
+)
+# Returns education data
+wage2 <- get('wage2')
+# MI school funding and test scores data
+meap01 <- get('meap01') %>% 
+  mutate(exppp = exppp/1000)
+```
+
+# Prologue
+
+---
+# Housekeeping
+
+## Final Exam
+
+Review lecture this Wednesday.
+
+- Come prepared with questions.
+
+**Exam:** Tuesday, December 10 at 10:15am in Chapman 220.
+
+Office hours TBA for Monday, December 9.
+
+## Problem Set 5
+
+Due Saturday, December 7 by 11:59pm.
+
+- I will post the key immediately after.
+
+---
+class: inverse, middle
+
+# Nonlinear Relationships
+
+---
+# Can We Do Better?
+
+```{R, include = F}
+reg_lin <- lm(lifeExp ~ gdpPercap, gapminder)
+a_lin <- reg_lin$coefficients[1]
+b_lin <- reg_lin$coefficients[2]
+r2_lin <- summary(reg_lin)$r.squared
+```
+
+
+$$(\widehat{\text{Life Expectancy})_i} = `r round(a_lin, 2)` + `r round(b_lin, 4)` \cdot \text{GDP}_i$$
+
+```{R, echo = F, dev = "svg", fig.height = 5.75}
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
+geom_point(alpha = 0.75) +
+scale_x_continuous("GDP per capita", label = scales::comma) +
+ylab("Life Expectancy") +
+stat_smooth(method = "lm", size = 1, color = red_pink, se = F) +
+theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
+```
+
+---
+# Nonlinear Relationships
+
+Many economic relationships are **nonlinear**.
+
+- *e.g.*, most production functions, profit, diminishing marginal utility, tax revenue as a function of the tax rate, *etc.*
+
+--
+
+## The flexibility of OLS
+
+OLS can accommodate many, but not all, nonlinear relationships.
+
+- Underlying model must be linear-in-parameters.
+
+- Nonlinear transformations of variables are okay.
+
+- Modeling some nonlinear relationships requires advanced estimation techniques, such as *maximum likelihood*.<sup>.pink[†]</sup> 
+
+.footnote[
+.pink[†] Beyond the scope of this class.
+]
+
+---
+# Linearity
+
+.hi-green[Linear-in-parameters:] .green[Parameters] enter model as a weighted sum, where the weights are functions of the variables.
+
+- One of the assumptions required for the unbiasedness of OLS.
+
+.hi-pink[Linear-in-variables:] .pink[Variables] enter the model as a weighted sum, where the weights are functions of the parameters.
+
+- Not required for the unbiasedness of OLS.
+
+--
+
+The standard linear regression model satisfies both properties:
+
+$$Y_i = \beta_0 + \beta_1X_{1i} + \beta_2X_{2i} + \dots + \beta_kX_{ki} + u_i$$
+
+---
+# Linearity
+
+Which of the following is .hi-green[linear-in-parameters], .hi-pink[linear-in-variables], or .hi-purple[neither]?
+
+1. $Y_i = \beta_0 + \beta_1X_{i} + \beta_2X_{i}^2 + \dots + \beta_kX_{i}^k + u_i$
+
+2. $Y_i = \beta_0X_i^{\beta_1}v_i$
+
+3. $Y_i = \beta_0 + \beta_1\beta_2X_{i} + u_i$
+
+---
+count: false
+
+# Linearity
+
+Which of the following is .hi-green[linear-in-parameters], .hi-pink[linear-in-variables], or .hi-purple[neither]?
+
+1. $\color{#007935}{Y_i = \beta_0 + \beta_1X_{i} + \beta_2X_{i}^2 + \dots + \beta_kX_{i}^k + u_i}$
+
+2. $Y_i = \beta_0X_i^{\beta_1}v_i$
+
+3. $Y_i = \beta_0 + \beta_1\beta_2X_{i} + u_i$
+
+Model 1 is .green[linear-in-parameters], but not linear-in-variables. 
+
+---
+count: false
+
+# Linearity
+
+Which of the following is .hi-green[linear-in-parameters], .hi-pink[linear-in-variables], or .hi-purple[neither]?
+
+1. $\color{#007935}{Y_i = \beta_0 + \beta_1X_{i} + \beta_2X_{i}^2 + \dots + \beta_kX_{i}^k + u_i}$
+
+2. $\color{#9370DB}{Y_i = \beta_0X_i^{\beta_1}v_i}$
+
+3. $Y_i = \beta_0 + \beta_1\beta_2X_{i} + u_i$
+
+Model 1 is .green[linear-in-parameters], but not linear-in-variables. 
+
+Model 2 is .purple[neither]. 
+
+---
+count: false
+
+# Linearity
+
+Which of the following is .hi-green[linear-in-parameters], .hi-pink[linear-in-variables], or .hi-purple[neither]?
+
+1. $\color{#007935}{Y_i = \beta_0 + \beta_1X_{i} + \beta_2X_{i}^2 + \dots + \beta_kX_{i}^k + u_i}$
+
+2. $\color{#9370DB}{Y_i = \beta_0X_i^{\beta_1}v_i}$
+
+3. $\color{#e64173}{Y_i = \beta_0 + \beta_1\beta_2X_{i} + u_i}$
+
+Model 1 is .green[linear-in-parameters], but not linear-in-variables. 
+
+Model 2 is .purple[neither]. 
+
+Model 3 is .pink[linear-in-variables], but not linear-in-parameters.
+
+---
+# We're Going to Take Logs
+
+The natural log is the inverse function for the exponential function: <br> $\quad \log(e^x) = x$ for $x>0$.
+
+## (Natural) Log Rules
+
+1. Product rule: $\log(AB) = \log(A) + \log(B)$.
+
+--
+
+2. Quotient rule: $\log(A/B) = \log(A) - \log(B)$.
+
+--
+
+3. Power rule: $\log(A^B) = B \cdot \log(A)$.
+
+--
+
+4. Derivative: $f(x) = \log(x)$ .mono[=>] $f'(x) = \dfrac{1}{x}$.
+
+--
+
+5. $\log(e) = 1$, $\log(1) = 0$, and $\log(x)$ is undefined for $x \leq 0$.
+
+---
+# Log-Linear Model
+
+**Nonlinear Model** $$Y_i = \alpha e^{\beta_1 X_i}v_i$$
+
+- $Y > 0$, $X$ is continuous, and $v_i$ is a multiplicative error term.
+- Cannot estimate parameters with OLS directly.
+
+--
+
+**Logarithmic Transformation** $$\log(Y_i) = \log(\alpha) + \beta_1 X_i + \log(v_i)$$
+
+- Redefine $\log(\alpha) \equiv \beta_0$ and $\log(v_i) \equiv u_i$.
+
+--
+
+**Transformed (Linear) Model** $$\log(Y_i) = \beta_0 + \beta_1 X_i + u_i$$
+
+- *Can* estimate with OLS, but coefficient interpretation changes.
+
+---
+# Log-Linear Model
+
+**Regression Model**
+
+$$\log(Y_i) = \beta_0 + \beta_1 X_i + u_i$$
+
+**Interpretation**
+
+- A one-unit increase in the explanatory variable increases the outcome variable by approximately $\beta_1\times 100$ percent, on average.
+
+- *Example:* If $\log(\hat{\text{Pay}_i}) = 2.9 + 0.03 \cdot \text{School}_i$, then an additional year of schooling increases pay by approximately 3 percent, on average.
+
+---
+# Log-Linear Model
+
+**Derivation**
+
+Consider the log-linear model
+
+$$ \log(Y) = \beta_0 + \beta_1 \, X + u $$
+
+and differentiate
+
+$$ \dfrac{dY}{Y} = \beta_1 dX $$
+
+--
+
+A marginal (small) change in $X$ (_i.e._, $dX$) leads to a $\beta_1 dX$ **proportionate change** in $Y$.
+
+- Multiply by 100 to get the **percentage change** in $Y$.
+
+---
+# Log-Linear Example
+
+```{R, include = F}
+# Set seed
+set.seed(1234)
+# Sample size
+n <- 1e3
+# Generate data
+df1 <- tibble(
+  x = runif(n, 0, 3),
+  y = exp(10 + 0.75 * x + rnorm(n, sd = 0.5))
+)
+reg1 <- lm(log(y) ~ x, df1)
+a1 <- reg1$coefficients[1]
+b1 <- reg1$coefficients[2]
+```
+
+$$\log(\hat{Y_i}) = `r round(a1, 2)` + `r round(b1, 2)` \cdot \text{X}_i$$
+
+```{R, log linear plot, echo = F, cache = T, dev = "svg", fig.height = 6}
+# Plot
+ggplot(data = df1, aes(x = x, y = y)) +
+geom_point(size = 3, color = "darkslategrey", alpha = 0.5) +
+geom_smooth(color = red_pink, se = F) +
+xlab("X") +
+ylab("Y") +
+theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
+```
+
+---
+count: false
+
+# Log-Linear Example
+
+$$\log(\hat{Y_i}) = `r round(a1, 2)` + `r round(b1, 2)` \cdot \text{X}_i$$
+
+```{R, log linear plot 2, echo = F, cache = T, dev = "svg", fig.height = 6}
+# Plot
+ggplot(data = df1, aes(x = x, y = log(y))) +
+geom_point(size = 3, color = "darkslategrey", alpha = 0.5) +
+geom_smooth(color = red_pink, se = F, method = "lm") +
+xlab("X") +
+ylab("log(Y)") +
+theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
+```
+
+---
+# Log-Linear Model 
+
+**Note:** If you have a log-linear model with a binary indicator variable, the interpretation of the coefficient on that variable changes.
+
+Consider
+
+$$ \log(Y_i) = \beta_0 + \beta_1 X_i + u_i $$
+
+for binary variable $X$.
+
+Interpretation of $\beta_1$:
+
+- When $X$ changes from 0 to 1, $Y$ will increase by $100 \times \left( e^{\beta_1} -1 \right)$ percent.
+- When $X$ changes from 1 to 0, $Y$ will decrease by $100 \times \left( e^{-\beta_1} -1 \right)$ percent.
+
+---
+# Log-Linear Example
+
+```{R, include = F}
+# Set seed
+set.seed(1234)
+# Sample size
+n <- 1e3
+# Generate data
+df2 <- tibble(
+  trained = rep(c(1, 0), each = n/2),
+  productivity = exp(10 + 0.5 * trained + rnorm(n, sd = 1))
+)
+reg2 <- lm(log(productivity) ~ trained, df2)
+b2 <- reg2$coefficients[2]
+```
+
+Binary explanatory variable: `trained`
+
+- `trained == 1` if employee received training.
+- `trained == 0` if employee did not receive training.
+
+```{r}
+lm(log(productivity) ~ trained, data = df2) %>% tidy()
+```
+
+**Q:** How do we interpret the coefficient on `trained`?
+
+--
+
+**A.sub[1]:** Trained workers `r round(exp(b2-1)*100, 2)` percent more productive than untrained workers.
+
+--
+
+**A.sub[2]:** Untrained workers `r round(exp(-b2-1)*100, 2)` percent less productive than trained workers.
+
+
+---
+# Log-Log Model
+
+**Nonlinear Model**
+
+$$Y_i = \alpha  X_i^{\beta_1}v_i$$
+
+- $Y > 0$, $X > 0$, and $v_i$ is a multiplicative error term.
+- Cannot estimate parameters with OLS directly.
+
+--
+
+**Logarithmic Transformation**
+
+$$\log(Y_i) = \log(\alpha) + \beta_1 \log(X_i) + \log(v_i)$$
+
+- Redefine $\log(\alpha) \equiv \beta_0$ and $\log(v_i) \equiv u_i$. 
+
+--
+
+**Transformed (Linear) Model**
+
+$$\log(Y_i) = \beta_0 + \beta_1 \log(X_i) + u_i$$
+
+- *Can* estimate with OLS, but coefficient interpretation changes.
+
+---
+# Log-Log Model
+
+**Regression Model**
+
+$$ \log(Y_i) = \beta_0 + \beta_1 \log(X_i) + u_i $$
+
+**Interpretation**
+
+- A one-percent increase in the explanatory variable leads to a $\beta_1$-percent change in the outcome variable, on average.
+
+- Often interpreted as an elasticity.
+
+- *Example:* If $\log(\widehat{\text{Quantity Demanded}}_i) = 0.45 - 0.31 \cdot \log(\text{Income}_i)$, then each one-percent increase in income decreases quantity demanded by 0.31 percent.
+
+---
+# Log-Log Model
+
+**Derivation**
+
+Consider the log-log model
+
+$$ \log(Y_i) = \beta_0 + \beta_1 \log(X_i) + u $$
+
+and differentiate
+
+$$ \dfrac{dY}{Y} = \beta_1 \dfrac{dX}{X} $$
+
+A one-percent increase in $X$ leads to a $\beta_1$-percent increase in $Y$. 
+
+- Rearrange to show elasticity interpretation:
+
+$$ \dfrac{dY}{dX} \dfrac{X}{Y} = \beta_1 $$
+
+---
+# Log-Log Example
+
+```{R, include = F}
+# Set seed
+set.seed(1234)
+# Sample size
+n <- 1e3
+# Generate data
+log_df <- tibble(
+  x = runif(n, 0, 10),
+  y = exp(3 * log(x) + rnorm(n, sd = 0.5))
+)
+reg3 <- lm(log(y) ~ log(x), log_df)
+a3 <- reg3$coefficients[1]
+b3 <- reg3$coefficients[2]
+```
+
+$$\log(\hat{Y_i}) = `r round(a3, 2)` + `r round(b3, 2)` \cdot \log(\text{X}_i)$$
+
+```{R, log log plot, echo = F, cache = T, dev = "svg", fig.height = 6}
+# Plot
+ggplot(data = log_df, aes(x = x, y = y)) +
+geom_point(size = 3, color = "darkslategrey", alpha = 0.5) +
+geom_smooth(color = red_pink, se = F) +
+xlab("X") +
+ylab("Y") +
+theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
+```
+
+---
+count: false
+
+# Log-Log Example
+
+$$\log(\hat{Y_i}) = `r round(a3, 2)` + `r round(b3, 2)` \cdot \log(\text{X}_i)$$
+
+```{R, log log plot 2, echo = F, cache = T, dev = "svg", fig.height = 6}
+# Plot
+ggplot(data = log_df, aes(x = log(x), y = log(y))) +
+geom_point(size = 3, color = "darkslategrey", alpha = 0.5) +
+geom_smooth(color = red_pink, se = F, method = "lm") +
+xlab("log(X)") +
+ylab("log(Y)") +
+theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
+```
+
+---
+# Linear-Log Model
+
+**Nonlinear Model**
+
+$$e^{Y_i} = \alpha  X_i^{\beta_1}v_i$$
+
+- $X > 0$ and $v_i$ is a multiplicative error term.
+- Cannot estimate parameters with OLS directly.
+
+--
+
+**Logarithmic Transformation**
+
+$$Y_i = \log(\alpha) + \beta_1 \log(X_i) + \log(v_i)$$
+
+- Redefine $\log(\alpha) \equiv \beta_0$ and $\log(v_i) \equiv u_i$.
+
+--
+
+**Transformed (Linear) Model**
+
+$$Y_i = \beta_0 + \beta_1 \log(X_i) + u_i$$
+
+- *Can* estimate with OLS, but coefficient interpretation changes.
+
+---
+# Linear-Log Model
+
+**Regression Model**
+
+$$Y_i = \beta_0 + \beta_1 \log(X_i) + u_i$$
+
+**Interpretation**
+
+- A one-percent increase in the explanatory variable increases the outcome variable by approximately $\beta_1 \div 100$, on average.
+
+- *Example:* If $\hat{(\text{Blood Pressure})_i} = 150 - 9.1 \log(\text{Income}_i)$, then a one-percent increase in income decrease blood pressure by 0.091 points.
+
+---
+# Linear-Log Model
+
+**Derivation**
+
+Consider the log-linear model
+
+$$ Y = \beta_0 + \beta_1 \log(X) + u $$
+
+and differentiate
+
+$$ dY = \beta_1 \dfrac{dX}{X} $$
+
+--
+
+A one-percent increase in $X$ leads to a $\beta_1 \div 100$ **change** in $Y$.
+
+---
+# Linear-Log Example
+
+```{R, include = F}
+# Set seed
+set.seed(1234)
+# Sample size
+n <- 1e3
+# Generate data
+lin_log_df <- tibble(
+  x = runif(n, 0, 3),
+  y = log(x) + rnorm(n, sd = 0.25)
+)
+reg4 <- lm(y ~ log(x), lin_log_df)
+a4 <- reg4$coefficients[1]
+b4 <- reg4$coefficients[2]
+```
+
+$$\hat{Y_i} = `r round(a4, 2)` + `r round(b4, 2)` \cdot \log(\text{X}_i)$$
+
+```{R, linear log plot, echo = F, cache = T, dev = "svg", fig.height = 6}
+# Plot
+ggplot(data = lin_log_df, aes(x = x, y = y)) +
+geom_point(size = 3, color = "darkslategrey", alpha = 0.5) +
+xlab("X") +
+ylab("Y") +
+theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
+```
+
+---
+count: false
+
+# Linear-Log Example
+
+$$\hat{Y_i} = `r round(a4, 2)` + `r round(b4, 2)` \cdot \log(\text{X}_i)$$
+
+```{R, linear log plot 2, echo = F, cache = T, dev = "svg", fig.height = 6}
+# Plot
+ggplot(data = lin_log_df, aes(x = log(x), y = y)) +
+geom_point(size = 3, color = "darkslategrey", alpha = 0.5) +
+geom_smooth(color = red_pink, se = F, method = "lm") +
+xlab("log(X)") +
+ylab("Y") +
+theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
+```
+
+---
+class: white-slide
+
+.center[**(Approximate) Coefficient Interpretation**] 
+```{r, echo = F}
+cont_interp <- tibble(
+  model = c("Level-level <br> \\(Y_i = \\beta_0 + \\beta_1 X_i + u_i\\)",
+             "Log-level <br> \\(\\log(Y_i) = \\beta_0 + \\beta_1 X_i + u_i\\)",
+             "Log-log <br> \\(\\log(Y_i) = \\beta_0 + \\beta_1 \\log(X_i) + u_i\\)",
+             "Level-log <br> \\(Y_i = \\beta_0 + \\beta_1 \\log(X_i) + u_i\\)"),
+  interp = c("\\(\\Delta Y = \\beta_1 \\cdot \\Delta X\\) <br> A one-unit increase in \\(X\\) leads to a <br> \\(\\beta_1\\)-unit increase in \\(Y\\)",
+             "\\(\\%\\Delta Y = 100 \\cdot \\beta_1 \\cdot \\Delta X\\) <br> A one-unit increase in \\(X\\) leads to a <br> \\(\\beta_1 \\cdot 100\\)-percent increase in \\(Y\\)",
+             "\\(\\%\\Delta Y = \\beta_1 \\cdot \\%\\Delta X\\) <br> A one-percent increase in \\(X\\) leads to a <br> \\(\\beta_1\\)-percent increase in \\(Y\\)",
+             "\\(\\Delta Y = (\\beta_1 \\div 100) \\cdot \\%\\Delta X\\) <br> A one-percent increase in \\(X\\) leads to a <br> \\(\\beta_1 \\div 100\\)-unit increase in \\(Y\\)")
+) %>% 
+  kable(
+  escape = F,
+  col.names = c("Model", "\\(\\beta_1\\) Interpretation"),
+  align = c("l", "l")
+) %>% 
+  column_spec(1, color = "black", bold = T, italic = T, extra_css = "vertical-align:top;") %>% 
+  column_spec(2, color = "black", italic = T)
+
+cont_interp
+```
+
+---
+# Can We Do Better?
+
+$$(\widehat{\text{Life Expectancy})_i} = `r round(a_lin, 2)` + `r round(b_lin, 4)` \cdot \text{GDP}_i \quad\quad R^2 = `r round(r2_lin, 2)`$$
+
+```{R, echo = F, dev = "svg", fig.height = 5.75}
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
+geom_point(alpha = 0.75) +
+scale_x_continuous("GDP per capita", label = scales::comma) +
+ylab("Life Expectancy") +
+stat_smooth(method = "lm", size = 1, color = red_pink, se = F) +
+theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
+```
+
+---
+# Can We Do Better?
+
+```{R, include = F}
+reg_log_lin <- lm(log(lifeExp) ~ gdpPercap, gapminder)
+a_log_lin <- reg_log_lin$coefficients[1]
+b_log_lin <- reg_log_lin$coefficients[2]
+r2_log_lin <- summary(reg_log_lin)$r.squared
+```
+
+$$\log( \widehat{\text{Life Expectancy}_i}) = `r round(a_log_lin, 2)` + `r round(b_log_lin, 6)` \cdot \text{GDP}_i \quad\quad R^2 = `r round(r2_log_lin, 2)`$$
+
+```{R, echo = F, dev = "svg", fig.height = 5.75}
+ggplot(data = gapminder, aes(x = gdpPercap, y = log(lifeExp))) +
+geom_point(alpha = 0.75) +
+scale_x_continuous("GDP per capita", label = scales::comma) +
+ylab("log(Life Expectancy)") +
+stat_smooth(method = "lm", size = 1, color = red_pink, se = F) +
+theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
+```
+
+---
+# Can We Do Better?
+
+```{R, include = F}
+reg_log <- lm(log(lifeExp) ~ log(gdpPercap), gapminder)
+a_log <- reg_log$coefficients[1]
+b_log <- reg_log$coefficients[2]
+r2_log <- summary(reg_log)$r.squared
+```
+
+$$\log ( \widehat{\text{Life Expectancy}_i} ) = `r round(a_log, 2)` + `r round(b_log, 2)` \cdot \log \left( \text{GDP}_i \right) \quad\quad R^2 = `r round(r2_log, 2)`$$
+
+```{R, echo = F, dev = "svg", fig.height = 5.75}
+ggplot(data = gapminder, aes(x = log(gdpPercap), y = log(lifeExp))) +
+geom_point(alpha = 0.75) +
+scale_x_continuous("log(GDP per capita)", label = scales::comma) +
+ylab("log(Life Expectancy)") +
+stat_smooth(method = "lm", size = 1, color = red_pink, se = F) +
+theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
+```
+
+---
+# Can We Do Better?
+
+```{R, include = F}
+reg_lin_log <- lm(lifeExp ~ log(gdpPercap), gapminder)
+a_lin_log <- reg_lin_log$coefficients[1]
+b_lin_log <- reg_lin_log$coefficients[2]
+r2_lin_log <- summary(reg_lin_log)$r.squared
+```
+
+$$( \widehat{\text{Life Expectancy}})_i = `r round(a_lin_log, 2)` + `r round(b_lin_log, 2)` \cdot \log \left( \text{GDP}_i \right) \quad\quad R^2 = `r round(r2_lin_log, 2)`$$
+
+```{R, echo = F, dev = "svg", fig.height = 5.75}
+ggplot(data = gapminder, aes(x = log(gdpPercap), y = lifeExp)) +
+geom_point(alpha = 0.75) +
+scale_x_continuous("log(GDP per capita)", label = scales::comma) +
+ylab("Life Expectancy") +
+stat_smooth(method = "lm", size = 1, color = red_pink, se = F) +
+theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
+```
+
+---
+# Practical Considerations
+
+**Consideration 1:** Do your data take negative numbers or zeros as values?
+
+```{r}
+log(0)
+```
+
+--
+
+**Consideration 2:** What coefficient interpretation do you want? Unit change? Unit-free percent change?
+
+--
+
+**Consideration 3:** Are your data skewed?
+
+.pull-left[
+```{R, skew 1, echo = F, cache = T, dev = "svg", fig.height = 5}
+# Plot
+ggplot(data = df1, aes(x = y)) +
+geom_histogram(color = red_pink, fill = red_pink, alpha = 0.5) +
+xlab("Y") +
+ylab("Count") +
+theme_pander(base_size = 20, base_family = "Fira Sans", fc = met_slate)
+```
+]
+
+.pull-right[
+```{R, skew 2, echo = F, cache = T, dev = "svg", fig.height = 5}
+# Plot
+ggplot(data = df1, aes(x = log(y))) +
+geom_histogram(color = red_pink, fill = red_pink, alpha = 0.5) +
+xlab("log(Y)") +
+ylab("Count") +
+theme_pander(base_size = 20, base_family = "Fira Sans", fc = met_slate)
+```
+]
+
+---
+class: inverse, middle
+
+# Quadratic Regression
+
+---
+# Quadratic Data
+
+```{R, quad plot, echo = F, cache = T, dev = "svg", fig.height = 6.75}
+# Set seed
+set.seed(1234)
+# Sample size
+n <- 1e3
+# Generate data
+quad_df <- tibble(
+  x = runif(n, 0, 10),
+  y = 12 + 16*x - 2.5*x^2 + rnorm(n, sd = 25)
+)
+# regression
+quad_reg <- lm(y ~ x + I(x^2), data = quad_df) 
+b1 <- quad_reg$coefficients[2]
+b2 <- quad_reg$coefficients[3]
+# Plot
+ggplot(data = quad_df, aes(x = x, y = y)) +
+geom_point(size = 3, color = "darkslategrey", alpha = 0.5) +
+xlab("X") +
+ylab("Y") +
+theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
+```
+
+---
+# Quadratic Regression
+
+**Regression Model**
+
+$$Y_i = \beta_0 + \beta_1 X_i + \beta_2 X_i^2 + u_i$$
+
+--
+
+**Interpretation** 
+
+Sign of $\beta_2$ indicates whether the relationship is convex (.mono[+]) or concave (.mono[-])
+
+--
+
+Sign of $\beta_1$?
+--
+🤷
+
+--
+
+Partial derivative of $Y$ with respect to $X$ is the .hi[marginal effect] of $X$ on $Y$:
+
+$$\color{#e64173}{\dfrac{\partial Y}{\partial X} = \beta_1 + 2 \beta_2 X}$$
+
+- Effect of $X$ depends on the level of $X$
+
+---
+# Quadratic Regression
+
+```{r}
+lm(y ~ x + I(x^2), data = quad_df) %>% tidy()
+```
+
+.pink[What is the marginal effect of] $\color{#e64173}{X}$ .pink[on] $\color{#e64173}{Y}$.pink[?]
+--
+<br>
+$\widehat{\dfrac{\partial \text{Y}}{\partial \text{X}} } = \hat{\beta}_1 + 2\hat{\beta}_2 X = `r round(b1, 2)` + `r round(b2*2, 2)`X$
+
+---
+# Quadratic Regression
+
+```{r}
+lm(y ~ x + I(x^2), data = quad_df) %>% tidy()
+```
+
+.pink[What is the marginal effect of] $\color{#e64173}{X}$ .pink[on] $\color{#e64173}{Y}$ .pink[when] $\color{#e64173}{X=0}$.pink[?]
+--
+<br>
+$\widehat{\dfrac{\partial \text{Y}}{\partial \text{X}} }\Bigg|_{\small \text{X}=0} = \hat{\beta}_1 = `r round(b1, 2)`$
+
+---
+# Quadratic Regression
+
+```{r}
+lm(y ~ x + I(x^2), data = quad_df) %>% tidy()
+```
+
+.pink[What is the marginal effect of] $\color{#e64173}{X}$ .pink[on] $\color{#e64173}{Y}$ .pink[when] $\color{#e64173}{X=2}$.pink[?]
+--
+<br>
+$\widehat{\dfrac{\partial \text{Y}}{\partial \text{X}} }\Bigg|_{\small \text{X}=2} = \hat{\beta}_1 + 2\hat{\beta}_2 \cdot (2) = `r round(b1, 2)` `r round(b2*2*2, 2)` = `r round(b1 + b2*2*2, 2)`$
+
+---
+# Quadratic Regression
+
+```{r}
+lm(y ~ x + I(x^2), data = quad_df) %>% tidy()
+```
+
+.pink[What is the marginal effect of] $\color{#e64173}{X}$ .pink[on] $\color{#e64173}{Y}$ .pink[when] $\color{#e64173}{X=7}$.pink[?]
+--
+<br>
+$\widehat{\dfrac{\partial \text{Y}}{\partial \text{X}} }\Bigg|_{\small \text{X}=7} = \hat{\beta}_1 + 2\hat{\beta}_2 \cdot (7) = `r round(b1, 2)` `r round(b2*2*7, 2)` = `r round(b1 + b2*2*7, 2)`$
+
+---
+class: white-slide
+
+```{R, include=F}
+reg <- lm(y ~ x + I(x^2), data = quad_df)
+margs <- cplot(reg, x = "x", dx = "x", 
+               what = "effect", draw = FALSE)
+```
+
+.center[**Fitted Regression Line**]
+```{R, echo = F, cache = T, dev = "svg", fig.height = 7}
+quad_df %>%  
+  ggplot(aes(x = x, y = y)) + 
+  geom_point(color = met_slate, alpha = 0.5, size = 3) +
+  stat_smooth(method = 'lm', formula = y ~ poly(x,2), se = F, linetype = 1, color = red_pink, size = 1) +
+  xlab("X") + 
+  ylab("Y") + 
+  theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
+```
+
+---
+class: white-slide
+
+.center[**Marginal Effect of X on Y**]
+```{R, echo = F, cache = T, dev = "svg", fig.height = 7}
+margs %>%  
+  ggplot(aes(x = xvals)) + 
+  geom_line(aes(y = yvals), color = red_pink, size = 1) +
+  geom_line(aes(y = upper), linetype = 2, color = red_pink, size = 1) +
+  geom_line(aes(y = lower), linetype = 2, color = red_pink, size = 1) +
+  geom_hline(yintercept = 0, linetype = 1, color = met_slate) +
+  xlab("X") + 
+  ylab("Marginal Effect") + 
+  theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
+```
+
+---
+# Quadratic Regression
+
+**Where does the regression** $\hat{Y_i} = \hat{\beta}_0 + \hat{\beta}_1 X_i + \hat{\beta}_2 X_i^2$ ***turn*?**
+
+- In other words, where is the peak (valley) of the fitted relationship?
+
+--
+
+**Step 1:** Take the derivative and set equal to zero.
+
+$$\widehat{\dfrac{\partial \text{Y}}{\partial \text{X}} } = \hat{\beta}_1 + 2\hat{\beta}_2 X = 0$$
+
+--
+
+**Step 2:** Solve for $X$.
+
+$$X = -\dfrac{\hat{\beta}_1}{2\hat{\beta}_2}$$
+
+--
+
+**Example:** Peak of previous regression occurs at $X = `r round(-b1/(2*b2), 2)`$.
+
+---
+class: inverse, middle
+
+# Anscombe's Quartet
+
+---
+class: white-slide
+
+.center[**Four *"identical"* regressions:** Intercept .mono[=] 3, Slope .mono[=] 0.5, R.super[2] .mono[=] 0.67]
+
+```{r, echo = F, dev = "svg", fig.height = 7}
+anscombe_m <- data.frame()
+
+for(i in 1:4)
+  anscombe_m <- rbind(anscombe_m, data.frame(set=i, x=anscombe[,i], y=anscombe[,i+4]))
+
+anscombe_m %>% 
+  ggplot(aes(x, y)) + geom_point(size=3, alpha = 0.8, color = met_slate) + 
+  geom_smooth(method="lm", fill=NA, fullrange=TRUE, color = red_pink) + facet_wrap(~set, ncol=2) + 
+  xlab("X") + 
+  ylab("Y") + 
+  theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
+```
+

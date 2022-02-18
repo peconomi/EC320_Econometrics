@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Model Specifications</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Philip Economides" />
+    <script src="15-Model-Spec_files/header-attrs/header-attrs.js"></script>
+    <link href="15-Model-Spec_files/remark-css/default.css" rel="stylesheet" />
+    <link href="15-Model-Spec_files/remark-css/metropolis.css" rel="stylesheet" />
+    <link href="15-Model-Spec_files/remark-css/metropolis-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="my-css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Model Specifications
+## EC 320: Introduction to Econometrics
+### Philip Economides
+### Winter 2022
+
+---
+
+class: inverse, middle
+
+
+
+# Prologue
+
+---
+# Housekeeping
+
+&lt;br&gt;
+
+.hi-pink[Data Projects] are in!
+
+- I will have those graded by the weekend
+
+- Points based on the quality of submissions and presentation of results
+
+--
+
+.hi-pink[Problem Set 5]
+
+- Due Monday, March 7th
+
+---
+
+# Model Specification
+
+Concerns the following questions of a given model:
+
+--
+
+What are the consequences of including in the regression model a variable that should not be there?
+
+--
+
+.hi-pink[Multicollinearity]
+
+
+--
+
+What are the consequences of excluding a variable that should be featured?
+
+--
+
+.hi-pink[Omitted Variable Bias]
+ 
+--
+ 
+How do we test restrictions to model specifications?
+
+--
+
+.hi-pink[t and F tests]
+
+---
+
+# Model Specification
+
+&lt;br&gt;
+ 
+What happens if you have difficulty finding data on a variable and use a proxy instead?
+
+
+.hi-pink[Today's lesson]
+
+--
+
+We will then go a useful approach to know for policy analysis: the .hi-pink[difference-in-difference] model
+
+
+---
+class: inverse, middle
+
+# Proxies in Model Specifications
+
+---
+# Proxies
+
+&lt;br&gt;
+
+Suppose you are considering the following model
+$$
+`\begin{aligned}
+Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + u
+\end{aligned}`
+$$
+
+While `\(X_1\)` is observed, lets consider a case where `\(X_2\)` is an unobserved variable. Cases of unobservable data could include:
+
+- Vaguely defined with no explicit measure (e.g. quality of education)
+- Intangible and cannot be quantified (e.g. utility, ability)
+- Requires so much time/energy that measurement is infeasible
+- Confidentiality, privacy concerns may limit observed data availability
+
+---
+
+# Proxies
+
+&lt;br&gt;
+
+Rather than exclude the unobservable, you may wish to use an adequate .hi-pink[proxy] variable for `\(X_2\)`.
+
+A .hi-pink[proxy] variable is a substitute variable that may reasonably be supposed to maintain similar properties to our missing variable. 
+
+.hi-blue[Example:] For quality of education, we could use the student-staff ratio to have a measure of how many resources the educational institution makes available to students. Where quality is high, student-staff ratios are low. 
+ 
+---
+
+# Proxies
+
+&lt;br&gt;
+
+Returning to the model, our true data generating process for Y:
+$$
+`\begin{aligned}
+Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + u
+\end{aligned}`
+$$
+In the case where we have no data on `\(X_2\)`, suppose we have an .hi-blue[ideal proxy] for it such that there exists an *exact linear relationship `\(X_2\)` and `\(Z\)`*:
+$$
+`\begin{aligned}
+X_2 = \lambda + \mu Z,
+\end{aligned}`
+$$
+
+where `\(\lambda\)` and `\(\mu\)` are fixed, unknown constants. We cannot estimate them by running a regression of the above relationship, since we have no data on `\(X_2\)`. .hi-pink[Let's sub in our expression and see what using Z achieves].
+
+---
+
+# Inference using Proxies
+
+Using `\(X_2 = \lambda + \mu Z\)`,
+$$
+`\begin{aligned}
+Y = &amp; \beta_0 + \beta_1 X_1 + \beta_2 X_2 + u\\
+  = &amp; \beta_0 + \beta_1 X_1 + \beta_2 (\lambda + \mu Z) + u\\
+  = &amp; (\beta_0 + \beta_2 \lambda) + \beta_1 X_1 + \beta_2 \mu Z + u\\
+  = &amp; \ \ \ \ \ \  \ \alpha \ \ \ \ \ \ \ \ \ + \beta_1 X_1 + \ \ \gamma_2 Z + u
+\end{aligned}`
+$$
+
+
+Takeaways:
+
+1. `\(\beta_1\)`, its standard error and t-stat will be same as if `\(X_2\)` used
+1. `\(R^2\)` will be the same as if `\(X_2\)` was used instead of Z
+1. The coefficient of Z, `\(\gamma_2\)`, will be estimate of `\(\beta_2 \mu\)`, and not possible to estimate `\(\beta_2\)` directly
+1. t-stat for `\(\gamma_1\)` same as `\(\beta_2\)`, so able to assess significance of `\(X_2\)`
+1. Not possible to estimate `\(\beta_0\)` since we now only see `\(\alpha\)`
+
+
+---
+
+# Risks of using Proxies
+
+Validity of all the subsequent takeaways rely on the condition that `\(Z\)` is an ideal proxy for `\(X_2\)`
+
+- In practice, unusual to find a proxy that is exactly linearly related to our missing variable
+
+- If the relationship is close to linear, the results will hold **approximately**
+
+-  The biggest problem faced is that there is never any manner by which to test this condition of whether the approximated difference is sufficiently small
+
+- Critical thinking in explaining your logical link between `\(X_2\)` &amp; `\(Z\)` and accepting that you are relying on a strong assumptions are often required to convince an audience that a proxy is indeed valid 
+
+---
+class: inverse, middle
+
+# Difference-in-Difference (DiD)
+
+---
+
+# DiD: Concept
+
+
+
+---
+
+
+# DiD: Structure
+
+
+
+---
+
+# DiD: Examples
+
+
+
+---
+
+# DiD: Interpretation
+
+
+
+---
+
+# DiD: Required Assumption
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

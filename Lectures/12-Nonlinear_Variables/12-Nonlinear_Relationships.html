@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Nonlinear Relationships</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Philip Economides" />
+    <script src="12-Nonlinear_Relationships_files/header-attrs/header-attrs.js"></script>
+    <link href="12-Nonlinear_Relationships_files/remark-css/default.css" rel="stylesheet" />
+    <link href="12-Nonlinear_Relationships_files/remark-css/metropolis.css" rel="stylesheet" />
+    <link href="12-Nonlinear_Relationships_files/remark-css/metropolis-fonts.css" rel="stylesheet" />
+    <script src="12-Nonlinear_Relationships_files/kePrint/kePrint.js"></script>
+    <link href="12-Nonlinear_Relationships_files/lightable/lightable.css" rel="stylesheet" />
+    <link rel="stylesheet" href="my-css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Nonlinear Relationships
+## EC 320: Introduction to Econometrics
+### Philip Economides
+### Winter 2022
+
+---
+
+class: inverse, middle
+
+
+
+# Prologue
+
+---
+# Housekeeping
+
+.hi-pink[Quiz II]
+
+- Released today, due 23rd
+
+- 8 questions, recapping recent content
+
+- 45mins of time, have notes ready
+
+--
+
+.hi-pink[Data Project]
+
+- Due March 1st
+
+--
+
+.hi-pink[PBS5]
+
+- Will post on Feb 28th
+
+- Due following week
+
+---
+class: inverse, middle
+
+# Nonlinear Relationships
+
+---
+# Can We Do Better?
+
+
+
+
+`$$(\widehat{\text{Life Expectancy})_i} = 53.96 + 8\times 10^{-4} \cdot \text{GDP}_i$$`
+
+&lt;img src="12-Nonlinear_Relationships_files/figure-html/unnamed-chunk-2-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Nonlinear Relationships
+
+Many economic relationships are **nonlinear**.
+
+- *e.g.*, most production functions, profit, diminishing marginal utility, tax revenue as a function of the tax rate, *etc.*
+
+--
+
+## The flexibility of OLS
+
+OLS can accommodate many, but not all, nonlinear relationships.
+
+- Underlying model must be linear-in-parameters.
+
+- Nonlinear transformations of variables are okay.
+
+- Modeling some nonlinear relationships requires advanced estimation techniques, such as *maximum likelihood*.&lt;sup&gt;.pink[†]&lt;/sup&gt; 
+
+.footnote[
+.pink[†] Beyond the scope of this class.
+]
+
+---
+# Linearity
+
+.hi-green[Linear-in-parameters:] .green[Parameters] enter model as a weighted sum, where the weights are functions of the variables.
+
+- One of the assumptions required for the unbiasedness of OLS.
+
+.hi-pink[Linear-in-variables:] .pink[Variables] enter the model as a weighted sum, where the weights are functions of the parameters.
+
+- Not required for the unbiasedness of OLS.
+
+--
+
+The standard linear regression model satisfies both properties:
+
+`$$Y_i = \beta_0 + \beta_1X_{1i} + \beta_2X_{2i} + \dots + \beta_kX_{ki} + u_i$$`
+
+---
+# Linearity
+
+Which of the following is .hi-green[linear-in-parameters], .hi-pink[linear-in-variables], or .hi-purple[neither]?
+
+1. `\(Y_i = \beta_0 + \beta_1X_{i} + \beta_2X_{i}^2 + \dots + \beta_kX_{i}^k + u_i\)`
+
+2. `\(Y_i = \beta_0X_i^{\beta_1}v_i\)`
+
+3. `\(Y_i = \beta_0 + \beta_1\beta_2X_{i} + u_i\)`
+
+---
+count: false
+
+# Linearity
+
+Which of the following is .hi-green[linear-in-parameters], .hi-pink[linear-in-variables], or .hi-purple[neither]?
+
+1. `\(\color{#007935}{Y_i = \beta_0 + \beta_1X_{i} + \beta_2X_{i}^2 + \dots + \beta_kX_{i}^k + u_i}\)`
+
+2. `\(Y_i = \beta_0X_i^{\beta_1}v_i\)`
+
+3. `\(Y_i = \beta_0 + \beta_1\beta_2X_{i} + u_i\)`
+
+Model 1 is .green[linear-in-parameters], but not linear-in-variables. 
+
+---
+count: false
+
+# Linearity
+
+Which of the following is .hi-green[linear-in-parameters], .hi-pink[linear-in-variables], or .hi-purple[neither]?
+
+1. `\(\color{#007935}{Y_i = \beta_0 + \beta_1X_{i} + \beta_2X_{i}^2 + \dots + \beta_kX_{i}^k + u_i}\)`
+
+2. `\(\color{#9370DB}{Y_i = \beta_0X_i^{\beta_1}v_i}\)`
+
+3. `\(Y_i = \beta_0 + \beta_1\beta_2X_{i} + u_i\)`
+
+Model 1 is .green[linear-in-parameters], but not linear-in-variables. 
+
+Model 2 is .purple[neither]. 
+
+---
+count: false
+
+# Linearity
+
+Which of the following is .hi-green[linear-in-parameters], .hi-pink[linear-in-variables], or .hi-purple[neither]?
+
+1. `\(\color{#007935}{Y_i = \beta_0 + \beta_1X_{i} + \beta_2X_{i}^2 + \dots + \beta_kX_{i}^k + u_i}\)`
+
+2. `\(\color{#9370DB}{Y_i = \beta_0X_i^{\beta_1}v_i}\)`
+
+3. `\(\color{#e64173}{Y_i = \beta_0 + \beta_1\beta_2X_{i} + u_i}\)`
+
+Model 1 is .green[linear-in-parameters], but not linear-in-variables. 
+
+Model 2 is .purple[neither]. 
+
+Model 3 is .pink[linear-in-variables], but not linear-in-parameters.
+
+---
+# We're Going to Take Logs
+
+The natural log is the inverse function for the exponential function: &lt;br&gt; `\(\quad \log(e^x) = x\)` for `\(x&gt;0\)`.
+
+## (Natural) Log Rules
+
+1. Product rule: `\(\log(AB) = \log(A) + \log(B)\)`.
+
+--
+
+2. Quotient rule: `\(\log(A/B) = \log(A) - \log(B)\)`.
+
+--
+
+3. Power rule: `\(\log(A^B) = B \cdot \log(A)\)`.
+
+--
+
+4. Derivative: `\(f(x) = \log(x)\)` .mono[=&gt;] `\(f'(x) = \dfrac{1}{x}\)`.
+
+--
+
+5. `\(\log(e) = 1\)`, `\(\log(1) = 0\)`, and `\(\log(x)\)` is undefined for `\(x \leq 0\)`.
+
+---
+# Log-Linear Model
+
+**Nonlinear Model** `$$Y_i = \alpha e^{\beta_1 X_i}v_i$$`
+
+- `\(Y &gt; 0\)`, `\(X\)` is continuous, and `\(v_i\)` is a multiplicative error term.
+- Cannot estimate parameters with OLS directly.
+
+--
+
+**Logarithmic Transformation** `$$\log(Y_i) = \log(\alpha) + \beta_1 X_i + \log(v_i)$$`
+
+- Redefine `\(\log(\alpha) \equiv \beta_0\)` and `\(\log(v_i) \equiv u_i\)`.
+
+--
+
+**Transformed (Linear) Model** `$$\log(Y_i) = \beta_0 + \beta_1 X_i + u_i$$`
+
+- *Can* estimate with OLS, but coefficient interpretation changes.
+
+---
+# Log-Linear Model
+
+**Regression Model**
+
+`$$\log(Y_i) = \beta_0 + \beta_1 X_i + u_i$$`
+
+**Interpretation**
+
+- A one-unit increase in the explanatory variable increases the outcome variable by approximately `\(\beta_1\times 100\)` percent, on average.
+
+- *Example:* If `\(\log(\hat{\text{Pay}_i}) = 2.9 + 0.03 \cdot \text{School}_i\)`, then an additional year of schooling increases pay by approximately 3 percent, on average.
+
+---
+# Log-Linear Model
+
+**Derivation**
+
+Consider the log-linear model
+
+$$ \log(Y) = \beta_0 + \beta_1 \, X + u $$
+
+and differentiate
+
+$$ \dfrac{dY}{Y} = \beta_1 dX $$
+
+--
+
+A marginal (small) change in `\(X\)` (_i.e._, `\(dX\)`) leads to a `\(\beta_1 dX\)` **proportionate change** in `\(Y\)`.
+
+- Multiply by 100 to get the **percentage change** in `\(Y\)`.
+
+---
+# Log-Linear Example
+
+
+
+`$$\log(\hat{Y_i}) = 10.02 + 0.73 \cdot \text{X}_i$$`
+
+&lt;img src="12-Nonlinear_Relationships_files/figure-html/log linear plot-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+count: false
+
+# Log-Linear Example
+
+`$$\log(\hat{Y_i}) = 10.02 + 0.73 \cdot \text{X}_i$$`
+
+&lt;img src="12-Nonlinear_Relationships_files/figure-html/log linear plot 2-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Log-Linear Model 
+
+**Note:** If you have a log-linear model with a binary indicator variable, the interpretation of the coefficient on that variable changes.
+
+Consider
+
+$$ \log(Y_i) = \beta_0 + \beta_1 X_i + u_i $$
+
+for binary variable `\(X\)`.
+
+Interpretation of `\(\beta_1\)`:
+
+- When `\(X\)` changes from 0 to 1, `\(Y\)` will increase by `\(100 \times \left( e^{\beta_1} -1 \right)\)` percent.
+- When `\(X\)` changes from 1 to 0, `\(Y\)` will decrease by `\(100 \times \left( e^{-\beta_1} -1 \right)\)` percent.
+
+---
+# Log-Linear Example
+
+
+
+Binary explanatory variable: `trained`
+
+- `trained == 1` if employee received training.
+- `trained == 0` if employee did not receive training.
+
+
+```r
+lm(log(productivity) ~ trained, data = df2) %&gt;% tidy()
+```
+
+```
+#&gt; # A tibble: 2 x 5
+#&gt;   term        estimate std.error statistic  p.value
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+#&gt; 1 (Intercept)    9.94     0.0446    223.   0       
+#&gt; 2 trained        0.557    0.0631      8.83 4.72e-18
+```
+
+**Q:** How do we interpret the coefficient on `trained`?
+
+--
+
+**A.sub[1]:** Trained workers 64.2 percent more productive than untrained workers.
+
+--
+
+**A.sub[2]:** Untrained workers 21.08 percent less productive than trained workers.
+
+
+---
+# Log-Log Model
+
+**Nonlinear Model**
+
+`$$Y_i = \alpha  X_i^{\beta_1}v_i$$`
+
+- `\(Y &gt; 0\)`, `\(X &gt; 0\)`, and `\(v_i\)` is a multiplicative error term.
+- Cannot estimate parameters with OLS directly.
+
+--
+
+**Logarithmic Transformation**
+
+`$$\log(Y_i) = \log(\alpha) + \beta_1 \log(X_i) + \log(v_i)$$`
+
+- Redefine `\(\log(\alpha) \equiv \beta_0\)` and `\(\log(v_i) \equiv u_i\)`. 
+
+--
+
+**Transformed (Linear) Model**
+
+`$$\log(Y_i) = \beta_0 + \beta_1 \log(X_i) + u_i$$`
+
+- *Can* estimate with OLS, but coefficient interpretation changes.
+
+---
+# Log-Log Model
+
+**Regression Model**
+
+$$ \log(Y_i) = \beta_0 + \beta_1 \log(X_i) + u_i $$
+
+**Interpretation**
+
+- A one-percent increase in the explanatory variable leads to a `\(\beta_1\)`-percent change in the outcome variable, on average.
+
+- Often interpreted as an elasticity.
+
+- *Example:* If `\(\log(\widehat{\text{Quantity Demanded}}_i) = 0.45 - 0.31 \cdot \log(\text{Income}_i)\)`, then each one-percent increase in income decreases quantity demanded by 0.31 percent.
+
+---
+# Log-Log Model
+
+**Derivation**
+
+Consider the log-log model
+
+$$ \log(Y_i) = \beta_0 + \beta_1 \log(X_i) + u $$
+
+and differentiate
+
+$$ \dfrac{dY}{Y} = \beta_1 \dfrac{dX}{X} $$
+
+A one-percent increase in `\(X\)` leads to a `\(\beta_1\)`-percent increase in `\(Y\)`. 
+
+- Rearrange to show elasticity interpretation:
+
+$$ \dfrac{dY}{dX} \dfrac{X}{Y} = \beta_1 $$
+
+---
+# Log-Log Example
+
+
+
+`$$\log(\hat{Y_i}) = 0.01 + 2.99 \cdot \log(\text{X}_i)$$`
+
+&lt;img src="12-Nonlinear_Relationships_files/figure-html/log log plot-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+count: false
+
+# Log-Log Example
+
+`$$\log(\hat{Y_i}) = 0.01 + 2.99 \cdot \log(\text{X}_i)$$`
+
+&lt;img src="12-Nonlinear_Relationships_files/figure-html/log log plot 2-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Linear-Log Model
+
+**Nonlinear Model**
+
+`$$e^{Y_i} = \alpha  X_i^{\beta_1}v_i$$`
+
+- `\(X &gt; 0\)` and `\(v_i\)` is a multiplicative error term.
+- Cannot estimate parameters with OLS directly.
+
+--
+
+**Logarithmic Transformation**
+
+`$$Y_i = \log(\alpha) + \beta_1 \log(X_i) + \log(v_i)$$`
+
+- Redefine `\(\log(\alpha) \equiv \beta_0\)` and `\(\log(v_i) \equiv u_i\)`.
+
+--
+
+**Transformed (Linear) Model**
+
+`$$Y_i = \beta_0 + \beta_1 \log(X_i) + u_i$$`
+
+- *Can* estimate with OLS, but coefficient interpretation changes.
+
+---
+# Linear-Log Model
+
+**Regression Model**
+
+`$$Y_i = \beta_0 + \beta_1 \log(X_i) + u_i$$`
+
+**Interpretation**
+
+- A one-percent increase in the explanatory variable increases the outcome variable by approximately `\(\beta_1 \div 100\)`, on average.
+
+- *Example:* If `\(\hat{(\text{Blood Pressure})_i} = 150 - 9.1 \log(\text{Income}_i)\)`, then a one-percent increase in income decrease blood pressure by 0.091 points.
+
+---
+# Linear-Log Model
+
+**Derivation**
+
+Consider the log-linear model
+
+$$ Y = \beta_0 + \beta_1 \log(X) + u $$
+
+and differentiate
+
+$$ dY = \beta_1 \dfrac{dX}{X} $$
+
+--
+
+A one-percent increase in `\(X\)` leads to a `\(\beta_1 \div 100\)` **change** in `\(Y\)`.
+
+---
+# Linear-Log Example
+
+
+
+`$$\hat{Y_i} = 0 + 0.99 \cdot \log(\text{X}_i)$$`
+
+&lt;img src="12-Nonlinear_Relationships_files/figure-html/linear log plot-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+count: false
+
+# Linear-Log Example
+
+`$$\hat{Y_i} = 0 + 0.99 \cdot \log(\text{X}_i)$$`
+
+&lt;img src="12-Nonlinear_Relationships_files/figure-html/linear log plot 2-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+class: white-slide
+
+.center[**(Approximate) Coefficient Interpretation**] 
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Model &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; \(\beta_1\) Interpretation &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;font-style: italic;color: black !important;vertical-align:top;"&gt; Level-level &lt;br&gt; \(Y_i = \beta_0 + \beta_1 X_i + u_i\) &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: black !important;"&gt; \(\Delta Y = \beta_1 \cdot \Delta X\) &lt;br&gt; A one-unit increase in \(X\) leads to a &lt;br&gt; \(\beta_1\)-unit increase in \(Y\) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;font-style: italic;color: black !important;vertical-align:top;"&gt; Log-level &lt;br&gt; \(\log(Y_i) = \beta_0 + \beta_1 X_i + u_i\) &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: black !important;"&gt; \(\%\Delta Y = 100 \cdot \beta_1 \cdot \Delta X\) &lt;br&gt; A one-unit increase in \(X\) leads to a &lt;br&gt; \(\beta_1 \cdot 100\)-percent increase in \(Y\) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;font-style: italic;color: black !important;vertical-align:top;"&gt; Log-log &lt;br&gt; \(\log(Y_i) = \beta_0 + \beta_1 \log(X_i) + u_i\) &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: black !important;"&gt; \(\%\Delta Y = \beta_1 \cdot \%\Delta X\) &lt;br&gt; A one-percent increase in \(X\) leads to a &lt;br&gt; \(\beta_1\)-percent increase in \(Y\) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;font-style: italic;color: black !important;vertical-align:top;"&gt; Level-log &lt;br&gt; \(Y_i = \beta_0 + \beta_1 \log(X_i) + u_i\) &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: black !important;"&gt; \(\Delta Y = (\beta_1 \div 100) \cdot \%\Delta X\) &lt;br&gt; A one-percent increase in \(X\) leads to a &lt;br&gt; \(\beta_1 \div 100\)-unit increase in \(Y\) &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+# Can We Do Better?
+
+`$$(\widehat{\text{Life Expectancy})_i} = 53.96 + 8\times 10^{-4} \cdot \text{GDP}_i \quad\quad R^2 = 0.34$$`
+
+&lt;img src="12-Nonlinear_Relationships_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Can We Do Better?
+
+
+
+`$$\log( \widehat{\text{Life Expectancy}_i}) = 3.97 + 1.3\times 10^{-5} \cdot \text{GDP}_i \quad\quad R^2 = 0.3$$`
+
+&lt;img src="12-Nonlinear_Relationships_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Can We Do Better?
+
+
+
+`$$\log ( \widehat{\text{Life Expectancy}_i} ) = 2.86 + 0.15 \cdot \log \left( \text{GDP}_i \right) \quad\quad R^2 = 0.61$$`
+
+&lt;img src="12-Nonlinear_Relationships_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Can We Do Better?
+
+
+
+`$$( \widehat{\text{Life Expectancy}})_i = -9.1 + 8.41 \cdot \log \left( \text{GDP}_i \right) \quad\quad R^2 = 0.65$$`
+
+&lt;img src="12-Nonlinear_Relationships_files/figure-html/unnamed-chunk-15-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Practical Considerations
+
+**Consideration 1:** Do your data take negative numbers or zeros as values?
+
+
+```r
+log(0)
+```
+
+```
+#&gt; [1] -Inf
+```
+
+--
+
+**Consideration 2:** What coefficient interpretation do you want? Unit change? Unit-free percent change?
+
+--
+
+**Consideration 3:** Are your data skewed?
+
+.pull-left[
+&lt;img src="12-Nonlinear_Relationships_files/figure-html/skew 1-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+&lt;img src="12-Nonlinear_Relationships_files/figure-html/skew 2-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+---
+class: inverse, middle
+
+# Quadratic Regression
+
+---
+# Quadratic Data
+
+&lt;img src="12-Nonlinear_Relationships_files/figure-html/quad plot-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Quadratic Regression
+
+**Regression Model**
+
+`$$Y_i = \beta_0 + \beta_1 X_i + \beta_2 X_i^2 + u_i$$`
+
+--
+
+**Interpretation** 
+
+Sign of `\(\beta_2\)` indicates whether the relationship is convex (.mono[+]) or concave (.mono[-])
+
+--
+
+Sign of `\(\beta_1\)`?
+--
+🤷
+
+--
+
+Partial derivative of `\(Y\)` with respect to `\(X\)` is the .hi[marginal effect] of `\(X\)` on `\(Y\)`:
+
+`$$\color{#e64173}{\dfrac{\partial Y}{\partial X} = \beta_1 + 2 \beta_2 X}$$`
+
+- Effect of `\(X\)` depends on the level of `\(X\)`
+
+---
+# Quadratic Regression
+
+
+```r
+lm(y ~ x + I(x^2), data = quad_df) %&gt;% tidy()
+```
+
+```
+#&gt; # A tibble: 3 x 5
+#&gt;   term        estimate std.error statistic   p.value
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+#&gt; 1 (Intercept)    13.2     2.26        5.81 8.30e-  9
+#&gt; 2 x              15.7     1.03       15.3  1.99e- 47
+#&gt; 3 I(x^2)         -2.50    0.0982    -25.4  2.46e-110
+```
+
+.pink[What is the marginal effect of] `\(\color{#e64173}{X}\)` .pink[on] `\(\color{#e64173}{Y}\)`.pink[?]
+--
+&lt;br&gt;
+`\(\widehat{\dfrac{\partial \text{Y}}{\partial \text{X}} } = \hat{\beta}_1 + 2\hat{\beta}_2 X = 15.69 + -4.99X\)`
+
+---
+# Quadratic Regression
+
+
+```r
+lm(y ~ x + I(x^2), data = quad_df) %&gt;% tidy()
+```
+
+```
+#&gt; # A tibble: 3 x 5
+#&gt;   term        estimate std.error statistic   p.value
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+#&gt; 1 (Intercept)    13.2     2.26        5.81 8.30e-  9
+#&gt; 2 x              15.7     1.03       15.3  1.99e- 47
+#&gt; 3 I(x^2)         -2.50    0.0982    -25.4  2.46e-110
+```
+
+.pink[What is the marginal effect of] `\(\color{#e64173}{X}\)` .pink[on] `\(\color{#e64173}{Y}\)` .pink[when] `\(\color{#e64173}{X=0}\)`.pink[?]
+--
+&lt;br&gt;
+`\(\widehat{\dfrac{\partial \text{Y}}{\partial \text{X}} }\Bigg|_{\small \text{X}=0} = \hat{\beta}_1 = 15.69\)`
+
+---
+# Quadratic Regression
+
+
+```r
+lm(y ~ x + I(x^2), data = quad_df) %&gt;% tidy()
+```
+
+```
+#&gt; # A tibble: 3 x 5
+#&gt;   term        estimate std.error statistic   p.value
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+#&gt; 1 (Intercept)    13.2     2.26        5.81 8.30e-  9
+#&gt; 2 x              15.7     1.03       15.3  1.99e- 47
+#&gt; 3 I(x^2)         -2.50    0.0982    -25.4  2.46e-110
+```
+
+.pink[What is the marginal effect of] `\(\color{#e64173}{X}\)` .pink[on] `\(\color{#e64173}{Y}\)` .pink[when] `\(\color{#e64173}{X=2}\)`.pink[?]
+--
+&lt;br&gt;
+`\(\widehat{\dfrac{\partial \text{Y}}{\partial \text{X}} }\Bigg|_{\small \text{X}=2} = \hat{\beta}_1 + 2\hat{\beta}_2 \cdot (2) = 15.69 -9.99 = 5.71\)`
+
+---
+# Quadratic Regression
+
+
+```r
+lm(y ~ x + I(x^2), data = quad_df) %&gt;% tidy()
+```
+
+```
+#&gt; # A tibble: 3 x 5
+#&gt;   term        estimate std.error statistic   p.value
+#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+#&gt; 1 (Intercept)    13.2     2.26        5.81 8.30e-  9
+#&gt; 2 x              15.7     1.03       15.3  1.99e- 47
+#&gt; 3 I(x^2)         -2.50    0.0982    -25.4  2.46e-110
+```
+
+.pink[What is the marginal effect of] `\(\color{#e64173}{X}\)` .pink[on] `\(\color{#e64173}{Y}\)` .pink[when] `\(\color{#e64173}{X=7}\)`.pink[?]
+--
+&lt;br&gt;
+`\(\widehat{\dfrac{\partial \text{Y}}{\partial \text{X}} }\Bigg|_{\small \text{X}=7} = \hat{\beta}_1 + 2\hat{\beta}_2 \cdot (7) = 15.69 -34.96 = -19.27\)`
+
+---
+class: white-slide
+
+
+
+.center[**Fitted Regression Line**]
+&lt;img src="12-Nonlinear_Relationships_files/figure-html/unnamed-chunk-22-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+class: white-slide
+
+.center[**Marginal Effect of X on Y**]
+&lt;img src="12-Nonlinear_Relationships_files/figure-html/unnamed-chunk-23-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+# Quadratic Regression
+
+**Where does the regression** `\(\hat{Y_i} = \hat{\beta}_0 + \hat{\beta}_1 X_i + \hat{\beta}_2 X_i^2\)` ***turn*?**
+
+- In other words, where is the peak (valley) of the fitted relationship?
+
+--
+
+**Step 1:** Take the derivative and set equal to zero.
+
+`$$\widehat{\dfrac{\partial \text{Y}}{\partial \text{X}} } = \hat{\beta}_1 + 2\hat{\beta}_2 X = 0$$`
+
+--
+
+**Step 2:** Solve for `\(X\)`.
+
+`$$X = -\dfrac{\hat{\beta}_1}{2\hat{\beta}_2}$$`
+
+--
+
+**Example:** Peak of previous regression occurs at `\(X = 3.14\)`.
+
+---
+class: inverse, middle
+
+# Anscombe's Quartet
+
+---
+class: white-slide
+
+.center[**Four *"identical"* regressions:** Intercept .mono[=] 3, Slope .mono[=] 0.5, R.super[2] .mono[=] 0.67]
+
+&lt;img src="12-Nonlinear_Relationships_files/figure-html/unnamed-chunk-24-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+exclude: true
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

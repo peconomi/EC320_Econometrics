@@ -1,0 +1,895 @@
+---
+title: "Interactive Relationships"
+subtitle: "EC 320: Introduction to Econometrics"
+author: "Philip Economides"
+date: "Winter 2022"
+output:
+  xaringan::moon_reader:
+    css: ['default', 'metropolis', 'metropolis-fonts', 'my-css.css']
+    # self_contained: true
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+class: inverse, middle
+
+```{r Setup, include = F}
+options(htmltools.dir.version = FALSE)
+
+knitr::opts_chunk$set(echo = TRUE, cache=TRUE)
+
+library(pacman)
+p_load(ggthemes, viridis, knitr, AER, extrafont, tidyverse, magrittr, wooldridge, stargazer, latex2exp, parallel, broom, kableExtra, ggforce, margins, furrr, gapminder)
+# Define colors
+red_pink <- "#e64173"
+turquoise <- "#20B2AA"
+orange <- "#FFA500"
+red <- "#fb6107"
+blue <- "#2b59c3"
+green <- "#8bb174"
+grey_light <- "grey70"
+grey_mid <- "grey50"
+grey_dark <- "grey20"
+purple <- "#6A5ACD"
+met_slate <- "#23373b" # metropolis font color
+# Knitr options
+opts_chunk$set(
+  comment = "#>",
+  fig.align = "center",
+  fig.height = 7,
+  fig.width = 10.5,
+  #dpi = 300,
+  #cache = T,
+  warning = F,
+  message = F
+)  
+theme_simple <- theme_bw() + theme(
+  axis.line = element_line(color = met_slate),
+  panel.grid = element_blank(),
+  rect = element_blank(),
+  strip.text = element_blank(),
+  text = element_text(family = "Fira Sans", color = met_slate, size = 14),
+  axis.text.x = element_text(size = 12),
+  axis.text.y = element_text(size = 12),
+  axis.ticks = element_blank(),
+  plot.title = element_blank(),
+  legend.position = "none"
+)
+theme_simple2 <- theme_bw() + theme(
+  axis.line = element_line(color = met_slate),
+  panel.grid = element_blank(),
+  rect = element_blank(),
+  strip.text = element_blank(),
+  text = element_text(family = "Fira Sans", color = met_slate, size = 14),
+  axis.text.x = element_text(size = 12),
+  axis.text.y = element_text(size = 12),
+  axis.ticks = element_blank(),
+  plot.title = element_blank()
+)
+theme_empty <- theme_bw() + theme(
+  line = element_blank(),
+  rect = element_blank(),
+  strip.text = element_blank(),
+  axis.text = element_blank(),
+  plot.title = element_blank(),
+  axis.title = element_blank(),
+  plot.margin = structure(c(0, 0, -1, -1), unit = "lines", valid.unit = 3L, class = "unit"),
+  legend.position = "none"
+)
+theme_axes <- theme_empty + theme(
+  axis.title = element_text(size = 18),
+  text = element_text(family = "Fira Sans", color = met_slate, size = 14),
+  plot.margin = structure(c(0, 0, 0.1, 0), unit = "lines", valid.unit = 3L, class = "unit")
+)
+# Returns education data
+wage2 <- get('wage2')
+# MI school funding and test scores data
+meap01 <- get('meap01') %>% 
+  mutate(spend = exppp/1000)
+```
+
+# Prologue
+
+---
+# Last Time
+
+We considered a model where schooling has the same effect for everyone (**<font color="#e64173">F</font>** and **<font color="#314f4f">M</font>**):
+
+```{R, int data, include = F, cache = T}
+# Set seed
+set.seed(12345)
+# Sample size
+n <- 1e3
+# Parameters
+beta0 <- 20; beta1 <- 0.5; beta2 <- 10; beta3 <- 3
+# Dataset
+int_df <- tibble(
+  male = sample(x = c(F, T), size = n, replace = T),
+  school = runif(n, 3, 9) - 3 * male,
+  pay = beta0 + beta1 * school + beta2 * male + rnorm(n, sd = 7) + beta3 * male * school
+)
+reg_noint <- lm(pay ~ school + male, int_df)
+reg_int <- lm(pay ~ school + male + school:male, int_df)
+```
+
+```{R, int plot 1, echo = F, dev = "svg", fig.height = 5.5}
+ggplot(data = int_df, aes(x = school, y = pay)) +
+geom_point(aes(color = male, shape = male), size = 2.5) +
+geom_hline(yintercept = 0, color = met_slate) +
+geom_vline(xintercept = 0, color = met_slate) +
+geom_abline(
+  intercept = reg_noint$coefficients[1] + reg_noint$coefficients[3],
+  slope = reg_noint$coefficients[2],
+  color = "darkslategrey", size = 1, alpha = 0.8
+) +
+geom_abline(
+  intercept = reg_noint$coefficients[1],
+  slope = reg_noint$coefficients[2],
+  color = red_pink, size = 1, alpha = 0.8
+) +
+xlab("Schooling") +
+ylab("Pay") +
+theme_empty +
+theme(
+  text = element_text(color = met_slate, family = "Fira Sans"),
+  axis.title = element_text(size = 18),
+  plot.margin = structure(c(0, 0, 0.1, 0), unit = "lines", valid.unit = 3L, class = "unit"),
+) +
+scale_color_manual("", values = c(red_pink, "darkslategrey"), labels = c("Female", "Male")) +
+scale_shape_manual("", values = c(16, 1), labels = c("Female", "Male"))
+```
+
+---
+# Today
+
+We will consider models that allow effects to differ by another variable (*e.g.,* by gender: **<font color="#e64173">F</font>** and **<font color="#314f4f">M</font>**):
+
+```{R, int plot 2, echo = F, dev = "svg", fig.height = 5.5}
+ggplot(data = int_df, aes(x = school, y = pay)) +
+geom_point(aes(color = male, shape = male), size = 2.5) +
+geom_hline(yintercept = 0, color = met_slate) +
+geom_vline(xintercept = 0, color = met_slate) +
+geom_abline(
+  intercept = reg_noint$coefficients[1] + reg_noint$coefficients[3],
+  slope = reg_noint$coefficients[2],
+  color = "darkslategrey", size = 0.75, alpha = 0.2
+) +
+geom_abline(
+  intercept = reg_noint$coefficients[1],
+  slope = reg_noint$coefficients[2],
+  color = red_pink, size = 0.75, alpha = 0.2
+) +
+geom_abline(
+  intercept = reg_int$coefficients[1] + reg_int$coefficients[3],
+  slope = reg_int$coefficients[2] + reg_int$coefficients[4],
+  color = "darkslategrey", size = 1, alpha = 0.8
+) +
+geom_abline(
+  intercept = reg_int$coefficients[1],
+  slope = reg_int$coefficients[2],
+  color = red_pink, size = 1, alpha = 0.8
+) +
+xlab("Schooling") +
+ylab("Pay") +
+theme_empty +
+theme(
+  text = element_text(color = met_slate, family = "Fira Sans"),
+  axis.title = element_text(size = 18),
+  plot.margin = structure(c(0, 0, 0.1, 0), unit = "lines", valid.unit = 3L, class = "unit"),
+) +
+scale_color_manual("", values = c(red_pink, "darkslategrey"), labels = c("Female", "Male")) +
+scale_shape_manual("", values = c(16, 1), labels = c("Female", "Male"))
+```
+
+---
+class: inverse, middle
+
+# Interactive Relationships
+
+---
+# Motivation
+
+## *On average?* For whom?
+
+Regression coefficients describe average effects.
+
+- Averages can mask .pink[heterogeneous effects] that differ by group or by the level of another variable.
+
+We can use .hi[interaction terms] to model heterogeneous effects.
+
+- Accommodate complexity and nuance by going beyond *"the effect of* $X$ *on* $Y$ *is* $\beta_1$*."*
+
+---
+# Interaction Terms
+
+**Starting point:** $Y_i = \beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + u_i$
+
+- $X_{1i}$ is the variable of interest
+- $X_{2i}$ is a control variable
+
+--
+
+**A richer model:** Add an interaction term to study whether $X_{2i}$ .pink[*moderates*] the effect of $X_{1i}$:
+
+$$Y_i = \beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + \beta_3 X_{1i} \cdot X_{2i} + u_i$$
+
+--
+
+**Interpretation:** The partial derivative of $Y_i$ with respect to $X_{1i}$ is the .hi[marginal effect] of $X_1$ on $Y_i$:
+
+$$\color{#e64173}{\dfrac{\partial Y}{\partial X_1} = \beta_1 + \beta_3 X_{2i}}$$
+
+--
+
+- Effect of $X_1$ depends on the level of $X_2$ 🤯
+
+---
+class: inverse, middle
+
+# Differential Returns to Education
+
+---
+# Differential Returns to Education
+
+**Research Question:** Do the returns to education vary by race?
+
+Consider the interactive regression model
+
+$$
+\text{Wage}_i = \beta_0 + \beta_1 \text{Education}_i + \beta_2 \text{Black}_i + \beta_3 \text{Education}_i \times \text{Black}_i  + u_i
+$$
+
+What is the marginal effect of an additional year of education?
+
+--
+
+$$
+\dfrac{\partial \text{Wage}}{\partial \text{Education}} = \beta_1 + \beta_3 \text{Black}_i  
+$$
+
+---
+# Differential Returns to Education
+
+```{R, include = F, cache = T}
+reg <- lm(wage ~ educ + black + educ:black, data = wage2)
+# regression coefficients
+a <- reg$coefficients[2]
+b <- reg$coefficients[4]
+```
+
+```{R, echo = T, cache = T}
+lm(wage ~ educ + black + educ:black, data = wage2) %>% tidy()
+```
+
+.green[What is the] .hi-green[return to education] .green[for] .hi-green[black] .green[workers?]
+--
+$\widehat{\left(\dfrac{\partial \text{Wage}}{\partial \text{Education}} \right)}\Bigg|_{\small \text{Black}=1} = \hat{\beta}_1 + \hat{\beta}_3 = `r round(a + b, 2)`$
+
+---
+# Differential Returns to Education
+
+```{R, echo = T, cache = T}
+lm(wage ~ educ + black + educ:black, data = wage2) %>% tidy()
+```
+
+.green[What is the] .hi-green[return to education] .green[for] .hi-green[non-black] .green[workers?]
+--
+$\widehat{\left(\dfrac{\partial \text{Wage}}{\partial \text{Education}} \right)}\Bigg|_{\small \text{Black}=0} = \hat{\beta}_1  = `r round(a, 2)`$
+
+---
+# Differential Returns to Education
+
+**Q:** Does the return to education differ by race?
+
+- For answer, conduct a two-sided *t* test of the null hypothesis that the interaction coefficient equals 0 at the 5% level.
+
+--
+
+```{R, echo = T, cache = T, highlight.output = 7}
+lm(wage ~ educ + black + educ:black, data = wage2) %>% tidy()
+```
+
+--
+
+*p*-value .mono[=] 0.0499 < 0.05 
+--
+.mono[=>] reject null hypothesis.
+
+--
+
+**A:** The return to education is significantly lower for black workers.
+
+---
+# Differential Returns to Education
+
+We can also test hypotheses about specific marginal effects.
+
+- *e.g.,* H.sub[0]: $\left(\dfrac{\partial \text{Wage}}{\partial \text{Education}} \right)\Bigg|_{\small \text{Black}=1} = 0$.
+- Conduct a $t$ test or construct confidence intervals.
+
+--
+
+**Problem 1:** `lm()` output does not include standard errors for the marginal effects.
+
+--
+
+**Problem 2:** The formula for marginal effect standard errors includes covariances between coefficient estimates. The math is messy.<sup>.pink[†]</sup>
+
+.footnote[
+.pink[†] Stay tuned.
+]
+
+--
+
+**Solution:** Construct confidence intervals using the `margins` package.
+
+---
+# Differential Returns to Education
+
+The `margins` function provides standard errors and 95% confidence intervals for each marginal effect.
+
+```{R, echo = T, cache = T, highlight.output = 2}
+p_load(margins)
+
+reg <- lm(wage ~ educ + black + educ:black, data = wage2)
+
+margins(reg, at = list(black = 0:1)) %>% summary() %>% filter(factor == "educ")
+```
+
+.pink[Marginal effect of education on wages for non-black workers.]
+
+---
+count: false
+
+# Differential Returns to Education
+
+The `margins` function provides standard errors and 95% confidence intervals for each marginal effect.
+
+```{R, echo = T, cache = T, highlight.output = 3}
+p_load(margins)
+
+reg <- lm(wage ~ educ + black + educ:black, data = wage2)
+
+margins(reg, at = list(black = 0:1)) %>% summary() %>% filter(factor == "educ")
+```
+
+.pink[Marginal effect of education on wages for black workers.]
+
+---
+# Differential Returns to Education
+
+We can use the `geom_pointrange()` option in `ggplot2` to plot the marginal effects with 95% confidence intervals.
+
+```{R, echo = F, dev = "svg", fig.height = 5.5}
+margs <- summary(margins(reg, at = list(black = 0:1, south = 0:1))) %>% 
+  filter(factor == "educ") %>% 
+  mutate(Term = case_when(black == 1 ~ "Black Workers",
+                          black == 0 ~ "Non-black Workers") %>% as.factor,
+         Race = case_when(black == 1 ~ "Black", 
+                          black == 0 ~ "Non-black") %>% as.factor)
+
+margs %>% 
+  ggplot() + geom_hline(yintercept = 0, linetype = "dashed") +
+  geom_pointrange(aes(x = Term, y = AME, ymin = lower, ymax = upper, color = Race), size = 1) +
+  coord_flip() + theme_simple + xlab("") + ylab("Marginal Effect of Education on Wages") +
+  scale_color_manual("", values = c(red_pink, "darkslategrey"), labels = c("Non-black", "Black"))
+```
+
+---
+# Differential Returns to Education
+
+We can use the `geom_pointrange()` option in `ggplot2` to plot the marginal effects with 95% confidence intervals.
+
+```{R, eval=F}
+margs <- margins(reg, at = list(black = 0:1)) %>% 
+  summary() %>% 
+  filter(factor == "educ") %>% 
+  mutate(Term = case_when(black == 1 ~ "Black Workers",
+                          black == 0 ~ "Non-black Workers"))
+margs %>% 
+  ggplot(aes(x = Term, y = AME, ymin = lower, ymax = upper)) + 
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  geom_pointrange() +
+  coord_flip() +
+  xlab("") + 
+  ylab("Marginal Effect of Education on Wages") 
+```
+
+---
+class: inverse, middle
+
+# Differential Effects of School Funding?
+
+---
+# Differential Effects of School Funding?
+
+**Research Question:** Does the effect of school spending on student achievement vary by the share of students experiencing poverty?
+
+- Does the marginal dollar go further in a school with a relatively affluent student body?
+
+--
+
+**Regression Model**
+
+$$
+\text{Read}_i = \beta_0 + \beta_1 \text{Spend}_i + \beta_2 \text{Lunch}_i + \beta_3 \text{Spend}_i \times \text{Lunch}_i + u_i  
+$$
+
+- $\text{Read}_i$ is the average fourth grade standardized reading test score in school $i$ (100-point scale).
+- $\text{Spend}_i$ measured as thousands of dollars per student.
+- $\text{Lunch}_i$ is the percentage of students on free or reduced-price lunch.
+
+
+---
+# Differential Effects of School Funding?
+
+**Regression Model**
+
+$$
+\text{Read}_i = \beta_0 + \beta_1 \text{Spend}_i + \beta_2 \text{Lunch}_i + \beta_3 \text{Spend}_i \times \text{Lunch}_i + u_i  
+$$
+
+--
+
+**Results**
+
+```{R}
+lm(read4 ~ spend + lunch + spend:lunch, data = meap01) %>% tidy()
+```
+
+---
+# Differential Effects of School Funding?
+
+**Results**
+
+```{R}
+lm(read4 ~ spend + lunch + spend:lunch, data = meap01) %>% tidy()
+```
+
+What is the estimated marginal effect of an additional 1000 dollars per student?
+
+--
+
+$$
+\widehat{\dfrac{\partial \text{Read}}{\partial \text{Spend}}} = \hat{\beta}_1 + \hat{\beta}_3 \text{Lunch}_i
+$$
+
+---
+# Differential Effects of School Funding?
+
+**Q:** Does the effect of school spending on student achievement vary by the share of students experiencing poverty?
+
+If the marginal effects do not vary by poverty levels, then 
+
+$$
+\begin{aligned}
+\dfrac{\partial \text{Read}}{\partial \text{Spend}} &= \beta_1 + \beta_3 \text{Lunch}_i \\ &= \beta_1
+\end{aligned}
+$$
+
+--
+
+H.sub[0]: $\beta_3 = 0$ *vs.* H.sub[a]: $\beta_3 \neq 0$
+
+- Can evaluate using a $t$ test or an $F$ test.
+
+---
+# Differential Effects of School Funding?
+
+**Conduct a two-sided *t* test at the 10% level** 
+
+```{R, echo = T, highlight.output = 7}
+lm(read4 ~ spend + lunch + spend:lunch, data = meap01) %>% tidy()
+```
+
+**H.sub[0]:** $\beta_3 = 0$ *vs.* **H.sub[a]:** $\beta_3 \neq 0$
+
+--
+
+*t* .mono[=] `r round(-0.0293/0.0120, 2)` and *t*.sub[0.95, 1823-4] .mono[=] `r qt(0.95, 1819) %>% round(2)`
+
+--
+
+Reject **H.sub[0]** if |*t*| .mono[=] |`r round(-0.0293/0.0120, 2)`| .mono[>] *t*.sub[0.95, 1823-4] .mono[=] `r qt(0.95, 1819) %>% round(2)`.
+
+--
+
+Statement is true .mono[=>] .hi[reject H.sub[0]] at the 10% level.
+
+---
+# Differential Effects of School Funding?
+
+**Conduct an *F* test at the 10% level** 
+
+```{R, echo = T, highlight.output = 7}
+reg_unrestrict <- lm(read4 ~ spend + lunch + spend:lunch, data = meap01)
+reg_restrict <- lm(read4 ~ spend + lunch, data = meap01)
+anova(reg_unrestrict, reg_restrict)
+```
+
+--
+
+**H.sub[0]:** $\beta_3 = 0$ *vs.* **H.sub[a]:** $\beta_3 \neq 0$
+
+*p*-value .mono[=] 0.01487 .mono[<] 0.1 .mono[=>] .hi[reject H.sub[0]] at the 10% level.
+
+---
+# Differential Effects of School Funding?
+
+**Q:** Is there a statistically significant effect of spending on student achievement for every level of poverty? 
+
+--
+
+One way to answer this question is to construct confidence intervals for the marginal effects.
+
+- Requires standard errors.
+
+- Standard errors will depend on the poverty level (our proxy: $\text{Lunch}_i$).
+
+--
+
+Time for math! 🎉
+
+---
+class: white-slide
+
+
+**Step 1:** Derive the estimated marginal effects.
+
+$$
+\widehat{\dfrac{\partial \text{Read}}{\partial \text{Spend}}} = \hat{\beta}_1 + \hat{\beta}_3 \text{Lunch}_i
+$$
+
+--
+
+<br>
+
+**Step 2:** Derive the variances of the estimated marginal effects.
+
+$\mathop{\text{Var}} \left(\widehat{\dfrac{\partial \text{Read}}{\partial \text{Spend}}} \right)$
+--
+<br> $\quad = \mathop{{\text{Var}}}\left(\hat{\beta}_1 + \hat{\beta}_3 \text{Lunch}_i \right)$
+--
+<br> $\quad = \mathop{{\text{Var}}}\left(\hat{\beta}_1 \right) + \mathop{{\text{Var}}}\left(\hat{\beta}_3 \text{Lunch}_i \right) + 2 \cdot \mathop{{\text{Cov}}}\left(\hat{\beta}_1, \ \hat{\beta}_3 \text{Lunch}_i \right)$
+--
+<br> $\quad = \mathop{{\text{Var}}}\left(\hat{\beta}_1 \right) + \text{Lunch}_i^2 \cdot\mathop{{\text{Var}}}\left(\hat{\beta}_3 \right) + 2 \cdot \text{Lunch}_i \cdot \mathop{{\text{Cov}}}\left(\hat{\beta}_1, \ \hat{\beta}_3 \right)$
+--
+<br> $\quad = \mathop{{\text{SE}}}\left(\hat{\beta}_1 \right)^2 + \text{Lunch}_i^2 \cdot\mathop{{\text{SE}}}\left(\hat{\beta}_3 \right)^2 + 2 \cdot \text{Lunch}_i \cdot \mathop{{\text{Cov}}}\left(\hat{\beta}_1, \ \hat{\beta}_3 \right)$
+
+---
+class: white-slide
+
+**Step 3:** Derive the standard errors of the estimated marginal effects.
+
+$\mathop{\text{SE}} \left(\widehat{\dfrac{\partial \text{Read}}{\partial \text{Spend}}} \right)$
+--
+<br> $\quad = \mathop{\text{Var}} \left(\widehat{\dfrac{\partial \text{Read}}{\partial \text{Spend}}} \right)^{1/2}$
+--
+<br> $\quad = \sqrt{\mathop{{\text{SE}}}\left(\hat{\beta}_1 \right)^2 + \text{Lunch}_i^2 \cdot\mathop{{\text{SE}}}\left(\hat{\beta}_3 \right)^2 + 2 \cdot \text{Lunch}_i \cdot \mathop{{\text{Cov}}}\left(\hat{\beta}_1, \ \hat{\beta}_3 \right)}$
+
+--
+
+<br>
+
+**Step 4:** Calculate the bounds of the confidence interval.
+
+$$
+\begin{aligned}
+\hat{\beta}_1 &+ \hat{\beta}_3 \cdot \text{Lunch}_i 
+\\& \pm t_{\text{crit}} \cdot \sqrt{\mathop{{\text{SE}}}\left(\hat{\beta}_1 \right)^2 + \text{Lunch}_i^2 \cdot\mathop{{\text{SE}}}\left(\hat{\beta}_3 \right)^2 + 2 \cdot \text{Lunch}_i \cdot \mathop{{\text{Cov}}}\left(\hat{\beta}_1, \ \hat{\beta}_3 \right)}
+\end{aligned}
+$$
+
+---
+# Differential Effects of School Funding?
+
+**Confidence Interval**
+$$
+\begin{aligned}
+\hat{\beta}_1 &+ \hat{\beta}_3 \cdot \text{Lunch}_i 
+\\& \pm t_{\text{crit}} \cdot \sqrt{\mathop{{\text{SE}}}\left(\hat{\beta}_1 \right)^2 + \text{Lunch}_i^2 \cdot\mathop{{\text{SE}}}\left(\hat{\beta}_3 \right)^2 + 2 \cdot \text{Lunch}_i \cdot \mathop{{\text{Cov}}}\left(\hat{\beta}_1, \ \hat{\beta}_3 \right)}
+\end{aligned}
+$$
+
+Notice that $\mathop{{\text{Cov}}}\left(\hat{\beta}_1, \ \hat{\beta}_3 \right)$ is not reported in a regression table
+
+- Located in the variance-covariance matrix inside `lm()` object (beyond the scope of this class).
+- Can't calculate by hand without about $\mathop{{\text{Cov}}}\left(\hat{\beta}_1, \ \hat{\beta}_3 \right)$.
+- Special case: $\hat{\beta}_1$ and $\hat{\beta}_3$ are statistically independent .mono[=>] $\mathop{{\text{Cov}}}\left(\hat{\beta}_1, \ \hat{\beta}_3 \right) = 0$.
+
+---
+# Differential Effects of School Funding?
+
+We can use the `cplot` function from `margins` with `ggplot2` to plot the marginal effects with 95% confidence intervals.
+
+```{R, echo = F, dev = "svg", fig.height = 5.5}
+reg <- lm(read4 ~ spend + lunch + spend:lunch, data = meap01)
+margs <- cplot(reg, x = "lunch", dx = "spend", 
+               what = "effect", draw = FALSE)
+margs %>%  
+  ggplot(aes(x = xvals)) + 
+  geom_line(aes(y = yvals), color = red_pink, size = 1) +
+  geom_line(aes(y = upper), linetype = 2, color = red_pink, size = 1) +
+  geom_line(aes(y = lower), linetype = 2, color = red_pink, size = 1) +
+  geom_hline(yintercept = 0, linetype = 2) +
+  xlab("Percentage on Free or Reduced-Price Lunch") + 
+  ylab("Marginal Effect of Spending on Reading Scores") + 
+  theme_simple
+```
+
+---
+# Differential Effects of School Funding?
+
+We can use the `cplot` function from `margins` with `ggplot2` to plot the marginal effects with 95% confidence intervals.
+
+```{R, eval = F}
+# run regression
+reg <- lm(read4 ~ spend + lunch + spend:lunch, data = meap01)
+
+# retrieve marginal effects with 95% CI
+margs <- cplot(reg, x = "lunch", dx = "spend", 
+               what = "effect", draw = FALSE)
+
+# plot the marginal effects
+margs %>%  
+  ggplot(aes(x = xvals)) + 
+  geom_line(aes(y = yvals)) +
+  geom_line(aes(y = upper), linetype = 2) +
+  geom_line(aes(y = lower), linetype = 2) +
+  geom_hline(yintercept = 0, linetype = 3) +
+  xlab("Percentage on Free or Reduced-Price Lunch") + 
+  ylab("Marginal Effect of Spending on Reading Scores")
+```
+
+---
+class: inverse, middle
+
+# Moving to Opportunity
+
+---
+# Moving to Opportunity
+
+## Background
+
+**Policy Question:** How can we lift people out of poverty? 
+
+**Research Agenda:** What kinds of social assistance programs have lasting effects on upward mobility?
+
+Economists study a variety of state and federal social assistance programs.
+
+- .purple[Medicaid], .purple[SNAP] (food stamps), .purple[TANF] (cash welfare), .purple[WIC] (benefits for mothers), .purple[National School Lunch Program], .pink[public housing], .pink[Section 8] (housing vouchers), *etc.*
+
+- Considerable variation in benefits and incentive structures.
+
+--
+
+- Today: .pink[Section 8] *v.s.* .pink[public housing].
+
+---
+# Moving to Opportunity
+
+## Experiment
+
+**Research Question:** Does moving from a public housing project to high-opportunity neighborhood improve well-being?
+
+**Social Experiment:** .hi[Moving to Opportunity (MTO)] 
+
+4600 low-income families living in federal housing projects.
+
+- Recruited by the Department of Housing and Urban Development during the mid-1990s.
+
+- Housing projects in Baltimore, Boston, Chicago, Los Angeles, and New York.
+
+- .pink[Randomly assigned] various forms of housing assistance.
+
+---
+# Moving to Opportunity
+
+## Experiment
+
+**Experimental Design**
+
+Participants randomly assigned into one of three treatments:
+
+- .hi-pink[Experimental group:] Housing voucher for low-poverty neighborhoods only .mono[+] counseling
+
+- .hi-purple[Section 8 group:] Housing voucher for any neighborhood .mono[+] no counseling 
+
+- .hi-slate[Control group:] No housing voucher .mono[+] no counseling (*i.e.,* regular public housing)
+
+---
+# Moving to Opportunity
+
+## Experiment
+
+**Initial Results**
+
+1. Most families in the treatment groups actually used vouchers to move to better neighborhoods.
+
+2. Improvements in physical and mental health.
+
+3. No significant improvements in earnings or employment rates for parents.
+
+---
+# Moving to Opportunity
+
+## Experiment
+
+**What about children?**
+
+[Chetty, Hendren, and Katz (*American Economic Review*, 2016)](https://www.aeaweb.org/articles?id=10.1257/aer.20150572) study the long-run impact of MTO on children. 
+
+- Individual tax data linked to children from original MTO sample.
+
+- Adulthood outcomes: income, marriage, poverty rate in neighborhood of residence, taxes paid, *etc.*
+
+- Test how effects vary by age of child when family received voucher.
+
+---
+class: white-slide
+
+.center[**Long-Run Effects of MTO Experiment**]
+```{R, echo = F, escape = F}
+tab <- data.frame(
+  v1 = c("Experimental", "", "Section 8", "", "Experimental × Age at Randomization", "", "Section 8 × Age at Randomization", "", "Control Group Mean", "Observations"),
+  v2 = c(9441.1, "(3035.8)", 4447.7, "(3111.3)", −723.7, "(255.5)", −338.0, "(266.4)", 16259.9, 20043),
+  v3 = c(8.309, "(3.445)", 7.193, "(3.779)", −0.582, "(0.290)", −0.433, "(0.316)", 6.6, 20043),
+  v4 = c(−4.371, "(1.770)", −1.237, "(2.021)", 0.261, "(0.139)", 0.0109, "(0.156)", 23.7, 15798),
+  v5 = c(831.2, "(279.4)", 521.7, "(287.5)", −65.81, "(23.88)", −42.48, "(24.85)", 627.8, 20043)
+) %>% kable(
+  escape = F,
+  col.names = c("", "Household Income ($)", "Married (%)", "Neighborhood Poverty (%)", "Taxes Paid ($)"),
+  align = c("l", rep("c", 5))#,
+  #caption = "Long-Run Effects of MTO Experiment"
+) %>%
+row_spec(1:10, color = met_slate) %>%
+row_spec(seq(2,8,2), color = "#c2bebe") %>%
+row_spec(1:10, extra_css = "line-height: 110%;") %>%
+column_spec(1, color = "black", italic = T)
+tab %>% column_spec(2, bold = T)
+```
+
+---
+class: white-slide
+
+.center[**Effect of MTO on Household Income in Adulthood**]
+```{r income_margins, echo = F, dev = "svg", fig.height = 7.25}
+income_exp <- tibble(
+  Age = 0:18,
+  Effect = 9441.1 - 723.7 * Age,
+  Group = "Experimental"
+)
+
+income_sec8 <- tibble(
+  Age = 0:18,
+  Effect = 4447.7 − 338.0 * Age,
+  Group = "Section 8"
+)
+
+income <- bind_rows(income_exp, income_sec8)
+
+income %>%  
+  ggplot(aes(x = Age, y = Effect, color = Group)) + 
+  geom_hline(yintercept = 0, linetype = 2) +
+  geom_line(size = 1) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_color_manual(values = c("#e64173", "#9370DB")) +
+  xlab("Age at Randomization") + 
+  ylab("Marginal Effect") + 
+  theme_simple2
+```
+
+---
+class: white-slide
+
+.center[**Long-Run Effects of MTO Experiment**]
+```{R, echo = F, escape = F}
+tab %>% column_spec(3, bold = T)
+```
+
+---
+class: white-slide
+
+.center[**Effect of MTO on Marriage Rates**]
+```{r married_margins, echo = F, dev = "svg", fig.height = 7.25}
+married_exp <- tibble(
+  Age = 0:18,
+  Effect = 8.309 - 0.582 * Age,
+  Group = "Experimental"
+)
+
+married_sec8 <- tibble(
+  Age = 0:18,
+  Effect = 7.193 − 0.433 * Age,
+  Group = "Section 8"
+)
+
+married <- bind_rows(married_exp, married_sec8)
+
+married %>%  
+  ggplot(aes(x = Age, y = Effect, color = Group)) + 
+  geom_hline(yintercept = 0, linetype = 2) +
+  geom_line(size = 1) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_color_manual(values = c("#e64173", "#9370DB")) +
+  xlab("Age at Randomization") + 
+  ylab("Marginal Effect") + 
+  theme_simple2
+```
+
+---
+class: white-slide
+
+.center[**Long-Run Effects of MTO Experiment**]
+```{R, echo = F, escape = F}
+tab %>% column_spec(4, bold = T)
+```
+
+---
+class: white-slide
+
+.center[**Effect of MTO on Poverty Rate in Neighborhood of Residence**]
+```{r poverty_margins, echo = F, dev = "svg", fig.height = 7.25}
+poverty_exp <- tibble(
+  Age = 0:18,
+  Effect = -4.371 + 0.261 * Age,
+  Group = "Experimental"
+)
+
+poverty_sec8 <- tibble(
+  Age = 0:18,
+  Effect = -1.237 + 0.0109 * Age,
+  Group = "Section 8"
+)
+
+poverty <- bind_rows(poverty_exp, poverty_sec8)
+
+poverty %>%  
+  ggplot(aes(x = Age, y = Effect, color = Group)) + 
+  geom_hline(yintercept = 0, linetype = 2) +
+  geom_line(size = 1) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_color_manual(values = c("#e64173", "#9370DB")) +
+  xlab("Age at Randomization") + 
+  ylab("Marginal Effect") + 
+  theme_simple2
+```
+
+---
+class: white-slide
+
+.center[**Long-Run Effects of MTO Experiment**]
+```{R, echo = F, escape = F}
+tab %>% column_spec(5, bold = T)
+```
+
+---
+class: white-slide
+
+.center[**Effect of MTO on Taxes Paid**]
+```{r tax_margins, echo = F, dev = "svg", fig.height = 7.25}
+tax_exp <- tibble(
+  Age = 0:18,
+  Effect = 831.2 - 65.81 * Age,
+  Group = "Experimental"
+)
+
+tax_sec8 <- tibble(
+  Age = 0:18,
+  Effect = 521.7 - 42.48 * Age,
+  Group = "Section 8"
+)
+
+tax <- bind_rows(tax_exp, tax_sec8)
+
+tax %>%  
+  ggplot(aes(x = Age, y = Effect, color = Group)) + 
+  geom_hline(yintercept = 0, linetype = 2) +
+  geom_line(size = 1) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_color_manual(values = c("#e64173", "#9370DB")) +
+  xlab("Age at Randomization") + 
+  ylab("Marginal Effect") + 
+  theme_simple2
+```
