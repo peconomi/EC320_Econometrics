@@ -553,6 +553,213 @@ lm(wage ~ black + nonblack, data = wage_data) %>% tidy()
 Thanks, .mono[R].
 
 ---
+
+# Multiple Categories
+
+So far we have only discussed **binary** categorical variables represented by dummies.
+
+In many cases, there is a wide variety of categories by which we can characterize a set of observations.
+
+**For example**
+* Transport Modes: Rail, Highway, Air, Water
+* Income Range: 1st quartile, 2nd quartile, 3rd quartile, 4th quartile 
+* Geographic Regions: Alabama, Idaho, Oregon etc.
+
+When addressing product diversification and trade, we can end up with an incredible number of categories to consider. [Trade Statistics by Product (HS 6-digit)](wits.worldbank.org/trade/country-byhs6product/aspx?lang=en)
+
+---
+
+class: white-slide
+
+.center[**Categorical Variable Types**] 
+```{r, echo = F}
+cat_interp <- tibble(
+  type = c("Binary Variables",
+             "Nominal Variables",
+             "Ordinal Variables"
+             ),
+  interp = c("Yes/no outcomes",
+             "Groups with no rank or order between them",
+             "Groups that are ranked in a specific order"
+             ),
+  examp = c("Heads/tails in a coin flip <br>
+            Win/lose in a football game",
+            "Specific names <br> Colors <br> Brands",
+            "Rankings in a competition <br> Rating scale responses in survey")
+) %>% 
+  kable(
+  escape = F,
+  col.names = c("Type of Variable", "Represents", "Examples"),
+  align = c("l", "l", "l")
+) %>% 
+  column_spec(1, color = "black", bold = T, italic = T) %>% 
+  column_spec(2, color = "black", italic = T)
+
+cat_interp
+```
+
+
+---
+
+# Beyond Binary
+
+How do we deal with heaps of categories? .hi-pink[It depends].
+
+--
+
+Are these categories your .hi-pink[outcome variable]?
+
+--
+
+**Binary:** *Logistic Regression Model*, where we are determining the probability of an event, given individual characterisitics of $i$.
+
+--
+
+**Ordinal:** *Cumulative/Ordered Logit Model* for categorical variables with an implied order and $J$ choices.
+
+--
+
+**Nominal:** *Generalized Logit Model* which holds characteristics fixed across choices and *Multinomial/Conditional Logit Model* which allows characteristics to differ for different choices. 
+
+--
+
+These items .hi-pink[will not be covered] in this class, nor will their descriptions be tested upon. This is guidance for those interested in reading further and understanding what future econometrics classes deliver. 
+
+---
+
+# Beyond Binary
+
+Are these categories part of an .hi-pink[explanatory variable]?
+
+--
+
+__Approach I:__ Apply a unique dummy variable for each category
+
+--
+
+For example consider $\text{earn}_i = \alpha + \beta_1 \text{HS}_i + \beta_2\text{UG}_i + \beta_3{\text{MS}}_i +\beta_3\text{PhD}_i + u_i$
+
+--
+
+In this case I may have a single categorical variable, $DEG_i$, that lists degree types of individual $i$ across my sample. 
+
+```{r, eval=FALSE}
+educ_df %<>% mutate(HS = if_else(DEG=="Highschool", 1, 0),
+                    UG = if_else(DEG=="Undergraduate", 1, 0),
+                    MS = if_else(DEG=="Masters of Science", 1, 0),
+                    PhD = if_else(DEG=="Doctorate", 1 ,0)
+                    )
+educ_reg <- lm(data=educ_df, earn ~ HS + UG + MS + PhD)
+```
+
+Assuming $i$ w/o any degree, would form my reference group in which for every included individual, $HS + UG + MS + PhD = 0$.
+
+---
+
+# Beyond Binary
+
+What if there are __too many__ categories but I want to create individual dummies?
+
+--
+
+Jacob Kaplan (Princeton) created the `fastDummies` package, which provides a useful function `dummy_cols()` [LINK](https://jacobkap.github.io/fastDummies/)
+
+--
+
+Consider the following example
+
+```{r, echo=FALSE}
+fastDummies_example <- data.frame(numbers = 1:3,
+                    gender  = c("male", "male", "female"),
+                    animals = c("dog", "dog", "cat"),
+                    dates   = as.Date(c("2012-01-01", "2011-12-31",
+                                          "2012-01-01")),
+                    stringsAsFactors = FALSE)
+knitr::kable(fastDummies_example)
+```
+
+---
+
+# Beyond Binary
+
+```{r}
+results <- fastDummies::dummy_cols(fastDummies_example)
+knitr::kable(results) %>% 
+  kable_styling(font_size=10)
+```
+
+--
+
+```{r}
+results <- fastDummies::dummy_cols(fastDummies_example,
+                                   select_columns= c("animals","gender"))
+knitr::kable(results) %>% 
+  kable_styling(font_size=10)
+```
+
+---
+
+# Beyond Binary
+
+Are these categories part of an .hi-pink[explanatory variable]?
+
+--
+
+__Approach II:__ Apply a fixed effect to your model
+
+--
+
+Consider the following model $$\text{earn}_{ij} = \alpha + \beta_1 \text{Age}_i + \beta_2\text{AgeSq}_i + \beta_3{\text{Educ}}_i +\beta_3\text{Female}_i + u_{ij}$$
+
+--
+
+There may be .hi-pink[unobservable] aspects related to groups defined by $j$, that are **fixed** across individuals in each group $j\in\{1,2,\dots,J\}$. 
+
+--
+
+For example, if we were regressing the earnings of service staff across $J$ countries, the USA may see unobserved $\text{tips}_{ij}$ contributing more significantly towards income due to underlying cultural/professional norms.
+
+--
+
+In this case a **country fixed effect** in our regression would do wonders. 
+
+---
+
+# Beyond Binary
+
+Where $u_{ij} = \phi_j + \nu_{ij}$, our new regression would look like $$\text{earn}_{ij} = \alpha + \beta_1 \text{Age}_i + \beta_2\text{AgeSq}_i + \beta_3{\text{Educ}}_i +\beta_3\text{Female}_i + \phi_j+ \nu_{ij},$$
+
+--
+
+Any __unobserved__ contribution towards earnings that .hi-pink[varies across] $J$  __but__ is .hi-pink[constant within] each $j$ for those individuals is controlled for. 
+
+--
+
+**How do we run regressions with fixed-effects?**
+
+> fixed.dum = lm(data=dataset, Y ~ X + factor(category_variable))
+
+Turning your character variables into factors will automatically have the code treat each $j$th category as if it had its own dummy variable [Example](https://rstudio-pubs-static.s3.amazonaws.com/372492_3e05f38dd3f248e89cdedd317d603b9a.html)
+
+`plm` maintained by Yves Croissant [Example Code](https://www.econometrics-with-r.org/10-3-fixed-effects-regression.html)
+
+`fixest` maintained by Laurent Berge and Grant McDermott [Example Code](https://cran.r-project.org/web/packages/fixest/vignettes/fixest_walkthrough.html)
+
+---
+
+# Beyond Binary
+
+I estimate whether productivity rankings across different categories of firm-types, represented by .hi-pink[dummy variables], are consistent with .hi-blue[Melitz(2003)]. 
+
+Unobs .hi-pink[fixed-effects] within industries, years and countries controlled for.
+
+```{r, echo=FALSE, out.width="80%"}
+knitr::include_graphics("research_results.png")
+```
+
+
+---
+
 # Omitted Variable Bias
 
 **Omitted variable bias** (OVB) arises when we omit a variable that

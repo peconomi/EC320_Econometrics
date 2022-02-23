@@ -8,6 +8,8 @@
     <link href="13-Categorical_Variables_files/remark-css/default.css" rel="stylesheet" />
     <link href="13-Categorical_Variables_files/remark-css/metropolis.css" rel="stylesheet" />
     <link href="13-Categorical_Variables_files/remark-css/metropolis-fonts.css" rel="stylesheet" />
+    <script src="13-Categorical_Variables_files/kePrint/kePrint.js"></script>
+    <link href="13-Categorical_Variables_files/lightable/lightable.css" rel="stylesheet" />
     <link rel="stylesheet" href="my-css.css" type="text/css" />
   </head>
   <body>
@@ -346,6 +348,331 @@ lm(wage ~ black + nonblack, data = wage_data) %&gt;% tidy()
 Thanks, .mono[R].
 
 ---
+
+# Multiple Categories
+
+So far we have only discussed **binary** categorical variables represented by dummies.
+
+In many cases, there is a wide variety of categories by which we can characterize a set of observations.
+
+**For example**
+* Transport Modes: Rail, Highway, Air, Water
+* Income Range: 1st quartile, 2nd quartile, 3rd quartile, 4th quartile 
+* Geographic Regions: Alabama, Idaho, Oregon etc.
+
+When addressing product diversification and trade, we can end up with an incredible number of categories to consider. [Trade Statistics by Product (HS 6-digit)](wits.worldbank.org/trade/country-byhs6product/aspx?lang=en)
+
+---
+
+class: white-slide
+
+.center[**Categorical Variable Types**] 
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Type of Variable &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Represents &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Examples &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;font-style: italic;color: black !important;"&gt; Binary Variables &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: black !important;"&gt; Yes/no outcomes &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Heads/tails in a coin flip &lt;br&gt;
+            Win/lose in a football game &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;font-style: italic;color: black !important;"&gt; Nominal Variables &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: black !important;"&gt; Groups with no rank or order between them &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Specific names &lt;br&gt; Colors &lt;br&gt; Brands &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;font-style: italic;color: black !important;"&gt; Ordinal Variables &lt;/td&gt;
+   &lt;td style="text-align:left;font-style: italic;color: black !important;"&gt; Groups that are ranked in a specific order &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Rankings in a competition &lt;br&gt; Rating scale responses in survey &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+---
+
+# Beyond Binary
+
+How do we deal with heaps of categories? .hi-pink[It depends].
+
+--
+
+Are these categories your .hi-pink[outcome variable]?
+
+--
+
+**Binary:** *Logistic Regression Model*, where we are determining the probability of an event, given individual characterisitics of `\(i\)`.
+
+--
+
+**Ordinal:** *Cumulative/Ordered Logit Model* for categorical variables with an implied order and `\(J\)` choices.
+
+--
+
+**Nominal:** *Generalized Logit Model* which holds characteristics fixed across choices and *Multinomial/Conditional Logit Model* which allows characteristics to differ for different choices. 
+
+--
+
+These items .hi-pink[will not be covered] in this class, nor will their descriptions be tested upon. This is guidance for those interested in reading further and understanding what future econometrics classes deliver. 
+
+---
+
+# Beyond Binary
+
+Are these categories part of an .hi-pink[explanatory variable]?
+
+--
+
+__Approach I:__ Apply a unique dummy variable for each category
+
+--
+
+For example consider `\(\text{earn}_i = \alpha + \beta_1 \text{HS}_i + \beta_2\text{UG}_i + \beta_3{\text{MS}}_i +\beta_3\text{PhD}_i + u_i\)`
+
+--
+
+In this case I may have a single categorical variable, `\(DEG_i\)`, that lists degree types of individual `\(i\)` across my sample. 
+
+
+```r
+educ_df %&lt;&gt;% mutate(HS = if_else(DEG=="Highschool", 1, 0),
+                    UG = if_else(DEG=="Undergraduate", 1, 0),
+                    MS = if_else(DEG=="Masters of Science", 1, 0),
+                    PhD = if_else(DEG=="Doctorate", 1 ,0)
+                    )
+educ_reg &lt;- lm(data=educ_df, earn ~ HS + UG + MS + PhD)
+```
+
+Assuming `\(i\)` w/o any degree, would form my reference group in which for every included individual, `\(HS + UG + MS + PhD = 0\)`.
+
+---
+
+# Beyond Binary
+
+What if there are __too many__ categories but I want to create individual dummies?
+
+--
+
+Jacob Kaplan (Princeton) created the `fastDummies` package, which provides a useful function `dummy_cols()` [LINK](https://jacobkap.github.io/fastDummies/)
+
+--
+
+Consider the following example
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; numbers &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; gender &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; animals &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; dates &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; male &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; dog &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2012-01-01 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; male &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; dog &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2011-12-31 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; female &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; cat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2012-01-01 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+# Beyond Binary
+
+
+```r
+results &lt;- fastDummies::dummy_cols(fastDummies_example)
+knitr::kable(results) %&gt;% 
+  kable_styling(font_size=10)
+```
+
+&lt;table class="table" style="font-size: 10px; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; numbers &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; gender &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; animals &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; dates &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; gender_female &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; gender_male &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; animals_cat &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; animals_dog &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; male &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; dog &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2012-01-01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; male &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; dog &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2011-12-31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; female &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; cat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2012-01-01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+--
+
+
+```r
+results &lt;- fastDummies::dummy_cols(fastDummies_example,
+                                   select_columns= c("animals","gender"))
+knitr::kable(results) %&gt;% 
+  kable_styling(font_size=10)
+```
+
+&lt;table class="table" style="font-size: 10px; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; numbers &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; gender &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; animals &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; dates &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; animals_cat &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; animals_dog &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; gender_female &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; gender_male &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; male &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; dog &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2012-01-01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; male &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; dog &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2011-12-31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; female &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; cat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2012-01-01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+# Beyond Binary
+
+Are these categories part of an .hi-pink[explanatory variable]?
+
+--
+
+__Approach II:__ Apply a fixed effect to your model
+
+--
+
+Consider the following model `$$\text{earn}_{ij} = \alpha + \beta_1 \text{Age}_i + \beta_2\text{AgeSq}_i + \beta_3{\text{Educ}}_i +\beta_3\text{Female}_i + u_{ij}$$`
+
+--
+
+There may be .hi-pink[unobservable] aspects related to groups defined by `\(j\)`, that are **fixed** across individuals in each group `\(j\in\{1,2,\dots,J\}\)`. 
+
+--
+
+For example, if we were regressing the earnings of service staff across `\(J\)` countries, the USA may see unobserved `\(\text{tips}_{ij}\)` contributing more significantly towards income due to underlying cultural/professional norms.
+
+--
+
+In this case a **country fixed effect** in our regression would do wonders. 
+
+---
+
+# Beyond Binary
+
+Where `\(u_{ij} = \phi_j + \nu_{ij}\)`, our new regression would look like `$$\text{earn}_{ij} = \alpha + \beta_1 \text{Age}_i + \beta_2\text{AgeSq}_i + \beta_3{\text{Educ}}_i +\beta_3\text{Female}_i + \phi_j+ \nu_{ij},$$`
+
+--
+
+Any __unobserved__ contribution towards earnings that .hi-pink[varies across] `\(J\)`  __but__ is .hi-pink[constant within] each `\(j\)` for those individuals is controlled for. 
+
+--
+
+**How do we run regressions with fixed-effects?**
+
+&gt; fixed.dum = lm(data=dataset, Y ~ X + factor(category_variable))
+
+Turning your character variables into factors will automatically have the code treat each `\(j\)`th category as if it had its own dummy variable [Example](https://rstudio-pubs-static.s3.amazonaws.com/372492_3e05f38dd3f248e89cdedd317d603b9a.html)
+
+`plm` maintained by Yves Croissant [Example Code](https://www.econometrics-with-r.org/10-3-fixed-effects-regression.html)
+
+`fixest` maintained by Laurent Berge and Grant McDermott [Example Code](https://cran.r-project.org/web/packages/fixest/vignettes/fixest_walkthrough.html)
+
+---
+
+# Beyond Binary
+
+I estimate whether productivity rankings across different categories of firm-types, represented by .hi-pink[dummy variables], are consistent with .hi-blue[Melitz(2003)]. 
+
+Unobs .hi-pink[fixed-effects] within industries, years and countries controlled for.
+
+&lt;img src="research_results.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+
+---
+
 # Omitted Variable Bias
 
 **Omitted variable bias** (OVB) arises when we omit a variable that
