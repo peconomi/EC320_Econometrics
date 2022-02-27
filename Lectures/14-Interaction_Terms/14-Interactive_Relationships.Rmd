@@ -893,3 +893,14 @@ tax %>%
   ylab("Marginal Effect") + 
   theme_simple2
 ```
+
+
+---
+
+exclude: true
+
+```{R generate pdfs, include = F, eval = F}
+#remotes::install_github('rstudio/pagedown')
+library(pagedown)
+pagedown::chrome_print("14-Interactive_Relationships.html", output = "14-Interactive_Relationships.pdf")
+```
