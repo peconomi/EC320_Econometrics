@@ -366,20 +366,20 @@ pre code {
 <li>Load your packages and import the “nlsy79.csv” data.</li>
 </ol>
 <p>The data could be described as follows:</p>
-<pre><code>#&gt; # A tibble: 11 x 2
-#&gt;    Name        Description                            
-#&gt;    &lt;chr&gt;       &lt;chr&gt;                                  
-#&gt;  1 CASEID      Unique identifier                      
-#&gt;  2 earn2009    Earnings in 2009                       
-#&gt;  3 hgc         Years of education                     
-#&gt;  4 race        Race and Ethnicity                     
-#&gt;  5 sex         Gender                                 
-#&gt;  6 bmonth      Birth Month                            
-#&gt;  7 byear       Birth Year                             
-#&gt;  8 afqt        Armed Forces Qualifying Test Percentile
-#&gt;  9 region_1979 Region                                 
-#&gt; 10 faminc1978  Family Income in 1978                  
-#&gt; 11 nsibs79     Number of Siblings</code></pre>
+<pre><code>## # A tibble: 11 x 2
+##    Name        Description                            
+##    &lt;chr&gt;       &lt;chr&gt;                                  
+##  1 CASEID      Unique identifier                      
+##  2 earn2009    Earnings in 2009                       
+##  3 hgc         Years of education                     
+##  4 race        Race and Ethnicity                     
+##  5 sex         Gender                                 
+##  6 bmonth      Birth Month                            
+##  7 byear       Birth Year                             
+##  8 afqt        Armed Forces Qualifying Test Percentile
+##  9 region_1979 Region                                 
+## 10 faminc1978  Family Income in 1978                  
+## 11 nsibs79     Number of Siblings</code></pre>
 <ol start="2" style="list-style-type: decimal">
 <li><p>Regress earnings in 2009 on years of education. How much do earnings increase (Level &amp; %) on average for every additional year of schooling? (Note: To place a variable into a % interpretation, you need to log transform your data. First start by filtering out zero and missing values.)</p></li>
 <li><p>Present your regression outputs using <code>stargazer()</code> or <code>export_summs()</code>.</p></li>
@@ -540,6 +540,58 @@ pre code {
 <blockquote>
 <p>Due date: 7 March 2022</p>
 </blockquote>
+<p>For this assignment you will be preparing simulated data. While this may sound complicated, it requires but a few simple sets, as observed in your labs. I will describe the data generating processes, how they overlap and have you prepare the corresponding code for generating these series.</p>
+<hr />
+<div id="q1.-simulate-data-20.-pts" class="section level3">
+<h3>Q1. Simulate Data (20. pts)</h3>
+<p>Consider the following data generating process <span class="math display">\[Y_i = \beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + \gamma W_{i} + \varepsilon_{i}\]</span> In this case we can impact parameter values on our `true’ model to prepare a specific simulation. <span class="math display">\[
+\begin{aligned}
+Y_i = 41.5 + 4.2 &amp; X_{1i} - 2.5 X_{2i} + 8 W_{i} + u_i, \\
+X_{1i} =&amp; \ 0.7 - 4.3 W_i + \nu_i,\\
+X_{2i} =&amp; \ 0.4 + 2.8 W_i + \varepsilon_i,\\
+W_i  \sim&amp; \ \mathop{\text{Uniform}}(0, 8)
+\end{aligned}
+\]</span></p>
+<p>where <span class="math inline">\(u_i \sim N(0,15)\)</span>, <span class="math inline">\(\nu \sim N(0, 12)\)</span>, and <span class="math inline">\(\varepsilon \sim N(0,8)\)</span>.</p>
+<ol style="list-style-type: decimal">
+<li>Generate 1,000 drawn observations <span class="math inline">\((n=1,000)\)</span> for the listed variables. <strong>(10 points)</strong> Use <code>rnorm()</code> to draw normally distributed error terms <span class="math inline">\(\{u_i, \nu_i, \varepsilon_i\}\)</span> and <code>runif()</code> to draw from uniform distributions. Refer to lab code for a frame of reference.</li>
+</ol>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">515151</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Plug in your code for generating a tibble of data</span></span></code></pre></div>
+<p>2.Generate a density plot of <span class="math inline">\(Y_i\)</span> and scatter plot of <span class="math inline">\(Y_i\)</span> and <span class="math inline">\(X_{1i}\)</span>. What is the sample of mean of <span class="math inline">\(Y_i\)</span>? <strong>(5 points)</strong></p>
+<ol start="3" style="list-style-type: decimal">
+<li>Return to your simulated dataframe and introduce an irrelevant variable <span class="math inline">\(Z_i\)</span>, using <code>mutate()</code>. Generate a pareto distribution with a mean of 0.75 and shape parameter of 8. (Hint: After loading <code>EnvStats</code>, examine the function <code>rpareto()</code> using <code>?rpareto</code>.) <strong>(5 points)</strong></li>
+</ol>
+<p><strong>Bonus:</strong> Plot the distribution of <span class="math inline">\(Z_i\)</span>, referring to it within your dataframe. Use the <code>fill</code> &amp; alpha arguments to paint it a light tint of blue.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">p_load</span>(EnvStats)</span></code></pre></div>
+<hr />
+</div>
+<div id="q2.-regressing-on-simulations-20.-pts" class="section level3">
+<h3>Q2. Regressing on Simulations (20. pts)</h3>
+<ol style="list-style-type: decimal">
+<li>Run the following three regressions <code>Y ~ X1</code>, <code>Y ~ X2</code>, <code>Y ~ X1 + X2</code> and present estimates of <span class="math inline">\(\{\hat \beta_1, \hat \beta_2\}\)</span> in a <strong>single</strong> regression table. <strong>(5 points)</strong></li>
+</ol>
+<p>Comment on these results, referring back to the original data generating process we imposed. What may be leading to any noted differences? <strong>(5 points)</strong></p>
+<ol start="2" style="list-style-type: decimal">
+<li>Which specification is the ideal one to run when considering your choice of explanatory variables which include <span class="math inline">\(\{X_1, X_2, W, Z\}\)</span>? Explain your choice of variables. <strong>(5 points)</strong></li>
+</ol>
+<p>Run a regression based on your selected specification and include it in a table with your previous results. <strong>(5 points)</strong></p>
+<hr />
+</div>
+<div id="q3.-freelance-sim-10.-pts" class="section level3">
+<h3>Q3. Freelance Sim (10. pts)</h3>
+<p>Now that you understand how to prepare data generating processes, create your own! Lay out a real world example of multivariate data generating process.</p>
+<ol style="list-style-type: decimal">
+<li>Begin by describing the data generating processes (DGPs) you have in mind. This must include equations, similar to those featured in Q1, that reflect these described data generating processes. Impose your own choice of population parameters and set of key variables that you believe contribute towards these values across individuals.</li>
+</ol>
+<p><em>text here</em></p>
+<ol start="2" style="list-style-type: decimal">
+<li><p>Write out the necessary code that generate these DGPs as a dataset. Be sure to include a seed to ensure reproducablility in the data you generate.</p></li>
+<li><p>Assume that some of these variables may not be directly observable to the econometrician and display what happens if we leave such variables out of our regressions.</p></li>
+</ol>
+</div>
 </div>
 </div>
 
