@@ -175,7 +175,11 @@ While $X_1$ is observed, lets consider a case where $X_2$ is an unobserved varia
 
 Rather than exclude the unobservable, you may wish to use an adequate .hi-pink[proxy] variable for $X_2$.
 
+--
+
 A .hi-pink[proxy] variable is a substitute variable that may reasonably be supposed to maintain similar properties to our missing variable. 
+
+--
 
 .hi-blue[Example:] For quality of education, we could use the student-staff ratio to have a measure of how many resources the educational institution makes available to students. Where quality is high, student-staff ratios are low. 
  
@@ -191,6 +195,9 @@ $$
 Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + u
 \end{aligned}
 $$
+
+--
+
 In the case where we have no data on $X_2$, suppose we have an .hi-blue[ideal proxy] for it such that there exists an *exact linear relationship $X_2$ and $Z$*:
 $$
 \begin{aligned}
@@ -214,6 +221,7 @@ Y = & \beta_0 + \beta_1 X_1 + \beta_2 X_2 + u\\
 \end{aligned}
 $$
 
+--
 
 Takeaways:
 
@@ -245,32 +253,231 @@ class: inverse, middle
 
 ---
 
+# Non-Random Treatment
+
+<br>
+
+Previously we'd talked about binary categorical variables, known as dummies. An important application of .hi-pink[dummy variables] is to study the impact of a treatment. 
+
+--
+
+The estimation of treatment effects is important in a wide range of fields. 
+.hi-blue[Examples:] 
+* impact of cash transfers on child health
+* effect of class size on student achievement
+
+--
+
+In clinical trials of health interventions, a common question is whether use of a medicine will improve health outcomes.
+
+---
+
+# Non-Random Treatment
+
+Ideally treatment effects are evaluated using .hi-pink[randomized controlled trials].
+
+--
+
+If, for convenience, there is only one treatment level, for those treated, then this can be captured by a binary dummy variable, and a simple statistical model can be used:
+
+$$Y_i = \beta_0 + \beta_1 D_i + u_i$$
+
+--
+
+for $i = 1, \dots, n,$ where $Di = 1$ if treated and $Di = 0$ if not treated, and
+where $y_i$ is the outcome for individual $i$.
+
+--
+
+Random assignment: $D_i$ and $u_i$ are .hi-pink[independent (A3.)], and an
+OLS regression will yield an .hi-pink[unbiased] estimate $\hat\beta_1$ of $\beta_1$. 
+Our effect is the diff between mean outcomes for treated and untreated groups,
+$\hat\beta_1 = \bar y_1 - \bar y_0$.
+Also known as the .hi-blue[differences estimator].
+
+---
+
+# Non-Random Treatment
+
+<br>
+
+Often we are analyzing an intervention (or _treatment_) that takes place .hi-pink[over time], and we have data .hi-pink[both before and after] the treatment took place.
+
+--
+
+
+If the policy intervention affected everyone and we have data both in pre- and post-policy periods, might consider the .hi-blue[differences estimator]
+
+> __Problem:__ Implicitly assumes that there are not other reasons for the
+change in mean outcomes before and after the treatment
+
+--
+
+In this case the dummy variable $D_i$ in effect stands for the impact of .hi-pink[all factors], including the treatment, that are different between the pre- and post- periods.
+
+---
+
+# Non-Random Treatment
+
+Since .hi-pink[other factors] may be partially responsible for the change in means, this estimator may be a biased estimate of the treatment effect. 
+
+--
+
+This point emphasizes importance of control group that does not receive the treatment. Occasionally policy changes have randomization built in .hi-blue[(randomized field experiments)].
+
+--
+
+> __Example:__ Oregon Health Plan (OHP) experiment of 2008. 
+Oregon that year decided to expand coverage of its version of Medicaid to groups not previously eligible, but for reasons of expense this expanded coverage was rationed by a lottery: somewhat under half of those who registered were randomly selected and invited to apply for expanded coverage. It is then possible
+to estimate the treatment effect on various outcomes by looking at differences
+in the sample means of the two groups.
+
+
+---
+
 # DiD: Concept
 
+In .hi-pink[most cases], this randomization aspect to policy change does not occur. Due to the paucity of randomized field experiments, applied econometricians have shown great interest in .hi-pink[natural experiments].
 
+--
+
+> __Setting:__ There is a discrete change in policy that affects only part of the population of interest, and that there are both pre- and post-treatment observations for both those who received treatment and those who did not.
+
+--
+
+Although the policy change occurs in a non-experimental setting, in some cases the change may be introduced in a way that makes it appear __as if__ the treatment was __randomly assigned__.
+
+--
+
+The .hi-pink[difference-in-difference (DiD)] method recognizes that in absence of random assignment, treatment and control groups are likely to differ for many reasons. 
 
 ---
 
 
 # DiD: Structure
 
+<br>
+
+Suppose we have data on specific individuals $i = 1,\dots, n$ in each of two time periods $t = 1, 2$ that correspond to before and after the treatment was applied to some of the individuals. A simple statistical formulation of the model is then:
+
+--
+
+$$Y_{it} = \beta_0 + \beta_1 T_t + \beta_2 D_i + \beta_3 (T_t \times D_i) + u_{it}$$
+for $i = 1,\dots,n,$ and $t = 1, 2$. (Note that we have $2n$ data points). 
+
+--
+
+Here $T_t = 1$ if $t = 2$ and $T_t = 0$ if $t = 1$, while $D_i = 1$ if individual $i$ receives treatment and $D_i = 0$ if individual $i$ does not receive treatment. 
 
 
 ---
 
-# DiD: Examples
+# DiD: Structure
 
+In the .hi-pink[pre-treatment period], $t = 1\implies T_t=0$, we have
+
+$$E(y_{i1} | D_i = 0) = \beta_0 \text{ and } E(y_{i1} | D_i = 1) = \beta_0 + \beta_2$$
+
+--
+
+In the above specification, we are allowing for the possibility that in the quasi-experiment there was imperfect control, in the sense that those treated had different pre-treatment means than those not treated. 
+
+--
+
+In the .hi-pink[post-treatment period], $t = 2\implies T_t=1$, we have
+
+$$E(y_{i2} | D_i = 0) = \beta_0 + \beta_1 \text{ and } E(y_{i2} | D_i = 1) = \beta_0 + \beta_1 + \beta_2 + \beta_3$$
+
+--
+
+The .hi-pink[treatment effect] corresponds to $\beta_3$: This is because
+$$
+\begin{aligned}
+\text{Diff Post-Period:} & \ E(y_{i2} | D_i = 1) - E(y_{i2} | D_i = 0) = \beta_2 + \beta_3 \ \  \text{and}\\
+\text{Diff Pre-Period:} & \ E(y_{i1} | D_i = 1) - E(y_{i1} | D_i = 0) = \beta_2
+\end{aligned}
+$$
+
+---
+
+# DiD: Example
+
+_"Monetary Intervention in the Great Depression"_ by .hi-blue[Gary Richardson and William Troost (JPE, 2009)].
+
+--
+
+Consider the 1930s bank failures. Central Bank can prevent bank runs and bank failures by acting as lender of last resort to solvent banks.
+
+--
+
+The twelve different regional Federal Reserve Districts reacted in the 1930s to potential bank failures in different ways.
+
+--
+
+* Atlanta FRB (sixth district) and St Louis FRB (eighth district) followed radically different policies wrt bank runs & border between two regions runs East-West through the center of Mississippi
+
+* Makes for a natural experiment, comparing outcomes for bank failures in Mississippi banks in the two districts
+
+---
+
+# DiD: Example
+
+The .hi-blue[Sixth District policy] favored using the FRB lender of last resort role to lend to troubled banks, while .hi-blue[Eighth District policy] took the view that credit should be restricted in recessions. 
+
+--
+
+R&T analyze this using a .hi-pink[DiD approach].
+
+```{r, echo=FALSE}
+p_load(kableExtra)
+
+df_bank = tibble(Variable = c("No. of Banks open 1930", 
+                    "No. of Banks open 1931", 
+                    "Changes in banks open"),
+       dist_8 = c(165, 132, -33),
+       dist_6 = c(135, 121, -14),
+       diff   = c(-30, -11,  19)) %>%
+  kbl(caption = "Bank Losses by Policy",
+      col.names = c("Variable",
+                    "8th District",
+                    "6th District",
+                    "Diff., 6th-8th")) %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+
+df_bank
+
+```
+
+Estimated to have saved 19 banks, 14% of Sixth District in 1930.
+
+---
+
+# DiD: Required Assumption
+
+A central question in assessing quasi-experiments is the .hi-pink[validity] of the control group, so that the treatment is really _as if_ it was randomly assigned.
+
+A key issue is the implicit .hi-pink[common trends] assumption: in the
+absence of the _"treatment"_, would the number of open banks in the two
+districts have been expected to evolve in the same way?
+
+```{r, out.width="60%", echo=FALSE}
+knitr::include_graphics("common_tr.png")
+```
 
 
 ---
 
 # DiD: Interpretation
 
+One can use this data to get an estimate of the treatment effect $\hat\beta_3$ and a standard error $SE(\hat\beta_3)$ for the effect based on these twelve data points:
 
+$$
+\begin{aligned}
+Y_{dt} = 167 - 49 T_t - 29 D_d  + 20.5(T_t \times D_d) + u_{dt}
+\end{aligned}
+$$
 
----
-
-# DiD: Required Assumption
-
-
+Here $T_t$ is coded 1 for 1931 or later, and $D_d=1$ for the 6th District. 
+With a t-score of 1.9 and using a two-tailed test, significant at 10% level. 
+This is about the most evidence one could hope for with twelve data points.
 
