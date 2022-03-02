@@ -429,6 +429,8 @@ districts have been expected to evolve in the same way?
 
 # DiD: Interpretation
 
+.hi-pink[DiD Model Results]
+
 One can use this data to get an estimate of the treatment effect `\(\hat\beta_3\)` and a standard error `\(SE(\hat\beta_3)\)` for the effect based on these twelve data points:
 
 $$
@@ -439,7 +441,175 @@ $$
 
 Here `\(T_t\)` is coded 1 for 1931 or later, and `\(D_d=1\)` for the 6th District. 
 With a t-score of 1.9 and using a two-tailed test, significant at 10% level. 
+
 This is about the most evidence one could hope for with twelve data points.
+
+---
+
+# DiD: Interpretation
+
+
+
+
+&lt;img src="15-Model-Spec_files/figure-html/plot-banks-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+--
+
+
+Let's do the same .hi-pink[DiD] with other outcome variables!
+
+---
+
+# DiD: Interpretation
+
+&lt;img src="table5_1.png" width="90%" style="display: block; margin: auto;" /&gt;
+--
+
+# DiD 
+
+This .hi-pink[policy change] seems to have prevented a harsher impact on existing firms, when assessing sales performance and numbers of firms.
+
+---
+
+class: inverse, middle
+
+# DiD: MLDA Laws
+
+---
+
+# MLDA Laws
+
+This DiD estimates MLDA-induced deaths among 18-20 year olds, from 1970-1983.
+
+--
+
+**1933:** End of the federal alcohol Prohibition. Most states regulated the .hi-pink[Minimum Legal Drinking Age] to 21. However, some states including Kansas, New York and North Carolina maintained a drinking age of 18. 
+
+--
+
+**1971:** Voting ages were reduced to 18, and many states coincided this policy change of MLDA to 18. Arkansas, California, and Pennsylvania are among states that kept MLDA at 21. 
+
+--
+
+**1984:** National Minimum Drinking Age Act punished states set to 18 by withholding federal highway construction aid. 
+
+--
+
+.hi-blue[What happened between 1970 and 1984 when drinking age was reduced?]
+
+
+---
+
+# MLDA: DiD model
+
+&lt;br&gt;
+
+.hi-blue[Dependent variable:] death rates of 18-20 year olds in state `\(s\)` and year `\(t\)`. For simplicity, sample includes only Alabama (treated) and Arkansas (control). 
+
+--
+
+`$$Y_{st} = \beta_0 + \beta_1 \text{D}_s + \beta_2 \text{T}_t + \beta_3 (D_s \times T_t) + u_{st},$$`
+
+--
+
+where `\(D_s\)` indicates whether a given state is Alabama, and `\(T_t\)` is a post-period dummy for whether observations are from 1975 onward when Alabama introduced an MLDA of 19. 
+
+--
+
+.hi-pink[Key Assumption:] Pre-policy (prior to 1975), Alabama and Arkansas shared parallel trends in their death rates of 18-20 year olds. 
+
+---
+
+# MLDA: DiD model
+
+What about the other states? Would we not want to use more observations?
+Ideally, yes, but this will introduce further econometric challenges.
+
+--
+
+* States did not all lower to 18 at the same time, meaning there is no common post-treatment  period.
+
+* Unobservable differences exist across states, constant across time. 
+
+* Absense of a common treatment variable in a multi-state setting, since states chose ages of 18,19 and 20. 
+
+--
+
+To solve for these issues, use .hi-blue[year dummies], .hi-blue[state fixed effects], and replace `\(T_t \times D_d\)` with a .hi-blue[common treatment variable], `\(LEGAL_{st}\)`, which measures the proportion of 18-20 year-olds allowed to drink in state `\(s\)` and year `\(t\)`. 
+
+---
+
+# MLDA: DiD model
+
+&lt;br&gt;
+
+The .hi-blue[multistate regression] DiD model looks like:
+
+`$$Y_{st} = \alpha_0 + \alpha_1 LEGAL_{st} + \sum_{k=\text{Alaska}}^{\text{Wyoming}} \alpha_k \text{State}_{ks} +\sum_{j=\text{1971}}^{\text{1983}} \alpha_j \text{Year}_{jt} + \nu_{st},$$`
+
+where now we are using state and year dummies to capture fixed effects, which uses Alabama as our reference state and 1970 as our reference year.
+
+--
+
+.hi-blue[State-Year Panel Data:] Including District of Col. we have 51 "states" and 14 years, giving us 714 observations. 
+
+--
+
+Regression results suggest that there was a significant increase in deaths, largely attributed to motor vehicle accidents.
+
+---
+
+# MLDA: Results
+
+&lt;img src="table5_2.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# MLDA: Assumptions
+
+The inclusion of many states and many years of observations allows us to relax the .hi-pink[common trends] assumption. 
+
+Including .hi-blue[state trends] violates this assumption, by allowing for a degree of non-parallel evolution in outcomes between state in the absense of a treatment effect. 
+
+--
+
+With state trends factored in:
+
+$$
+`\begin{aligned}
+Y_{st} =&amp; \alpha_0 + \alpha_1 LEGAL_{st} + \sum_{k=\text{Alaska}}^{\text{Wyoming}} \alpha_k \text{State}_{ks} +\sum_{j=\text{1971}}^{\text{1983}} \alpha_j \text{Year}_{jt}\\
+&amp; \sum_{k=\text{Alaska}}^{\text{Wyoming}} \theta_k (\text{State}_{ks} \times t)+ \varepsilon_{st},
+\end{aligned}`
+$$
+
+.hi-blue[What does this allow us to address?]
+
+---
+
+
+
+# MLDA: Assumptions
+
+&lt;img src="fig5_4.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# MLDA: Assumptions
+
+&lt;img src="fig5_5.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# MLDA: Assumptions
+
+&lt;img src="fig5_6.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+exclude: true
+
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>

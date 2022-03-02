@@ -469,6 +469,8 @@ knitr::include_graphics("common_tr.png")
 
 # DiD: Interpretation
 
+.hi-pink[DiD Model Results]
+
 One can use this data to get an estimate of the treatment effect $\hat\beta_3$ and a standard error $SE(\hat\beta_3)$ for the effect based on these twelve data points:
 
 $$
@@ -479,5 +481,298 @@ $$
 
 Here $T_t$ is coded 1 for 1931 or later, and $D_d=1$ for the 6th District. 
 With a t-score of 1.9 and using a two-tailed test, significant at 10% level. 
+
 This is about the most evidence one could hope for with twelve data points.
 
+---
+
+# DiD: Interpretation
+
+
+```{r, echo=FALSE}
+p_load(lubridate)
+devtools::install_github("jrnold/masteringmetrics", subdir = "masteringmetrics")
+
+data("banks", package="masteringmetrics")
+
+# Only use yearly data in the DiD. Use # of banks on July 1st of each year. 
+banks <- banks %>% 
+  filter( month(date) == 7L, mday(date) == 1L) %>%
+  mutate(year = year(date)) %>%
+  select(year, matches("bi[ob][68]"))
+
+# Generate the counterfactual using the difference between the number of banks in district 8 and district 6.
+banks <- banks %>% 
+  arrange(year) %>%
+  mutate(diff86 = bib8[year == 1930] - bib6[year == 1930],
+          counterfactual = if_else( year >= 1930, bib8 - diff86, NA_integer_)) %>% 
+  select(-diff86)
+
+```
+
+```{r, plot-banks, echo=FALSE, out.width="90%"}
+select(banks, year, bib8, bib6, counterfactual) %>%
+  gather(variable, value, -year, na.rm=TRUE) %>% 
+  mutate(variable = recode(variable, bib8 = "8th district",
+                           bib6 = "6th district", 
+                           counterfactual = "6th Counterfactual")) %>%
+  ggplot(aes(x=year, y=value, color=variable))+
+  geom_point()+
+  geom_line(size=1)+
+  ylab("Number of Banks in Business")+
+  xlab("")+
+  theme_bw()+
+  theme(legend.title = element_blank(),
+        legend.position = "bottom",
+        legend.text = element_text(size=14),
+        axis.text.y = element_text(size=14),
+        axis.text.x = element_text(size=14))
+
+```
+
+--
+
+
+Let's do the same .hi-pink[DiD] with other outcome variables!
+
+---
+
+# DiD: Interpretation
+
+```{r, echo=FALSE, out.width="90%"}
+knitr::include_graphics("table5_1.png")
+```
+--
+
+# DiD 
+
+This .hi-pink[policy change] seems to have prevented a harsher impact on existing firms, when assessing sales performance and numbers of firms.
+
+---
+
+class: inverse, middle
+
+# DiD: MLDA Laws
+
+---
+
+# MLDA Laws
+
+This DiD estimates MLDA-induced deaths among 18-20 year olds, from 1970-1983.
+
+--
+
+**1933:** End of the federal alcohol Prohibition. Most states regulated the .hi-pink[Minimum Legal Drinking Age] to 21. However, some states including Kansas, New York and North Carolina maintained a drinking age of 18. 
+
+--
+
+**1971:** Voting ages were reduced to 18, and many states coincided this policy change of MLDA to 18. Arkansas, California, and Pennsylvania are among states that kept MLDA at 21. 
+
+--
+
+**1984:** National Minimum Drinking Age Act punished states set to 18 by withholding federal highway construction aid. 
+
+--
+
+.hi-blue[What happened between 1970 and 1984 when drinking age was reduced?]
+
+
+---
+
+# MLDA: DiD model
+
+<br>
+
+.hi-blue[Dependent variable:] death rates of 18-20 year olds in state $s$ and year $t$. For simplicity, sample includes only Alabama (treated) and Arkansas (control). 
+
+--
+
+$$Y_{st} = \beta_0 + \beta_1 \text{D}_s + \beta_2 \text{T}_t + \beta_3 (D_s \times T_t) + u_{st},$$
+
+--
+
+where $D_s$ indicates whether a given state is Alabama, and $T_t$ is a post-period dummy for whether observations are from 1975 onward when Alabama introduced an MLDA of 19. 
+
+--
+
+.hi-pink[Key Assumption:] Pre-policy (prior to 1975), Alabama and Arkansas shared parallel trends in their death rates of 18-20 year olds. 
+
+---
+
+# MLDA: DiD model
+
+What about the other states? Would we not want to use more observations?
+Ideally, yes, but this will introduce further econometric challenges.
+
+--
+
+* States did not all lower to 18 at the same time, meaning there is no common post-treatment  period.
+
+* Unobservable differences exist across states, constant across time. 
+
+* Absense of a common treatment variable in a multi-state setting, since states chose ages of 18,19 and 20. 
+
+--
+
+To solve for these issues, use .hi-blue[year dummies], .hi-blue[state fixed effects], and replace $T_t \times D_d$ with a .hi-blue[common treatment variable], $LEGAL_{st}$, which measures the proportion of 18-20 year-olds allowed to drink in state $s$ and year $t$. 
+
+---
+
+# MLDA: DiD model
+
+<br>
+
+The .hi-blue[multistate regression] DiD model looks like:
+
+$$Y_{st} = \alpha_0 + \alpha_1 LEGAL_{st} + \sum_{k=\text{Alaska}}^{\text{Wyoming}} \alpha_k \text{State}_{ks} +\sum_{j=\text{1971}}^{\text{1983}} \alpha_j \text{Year}_{jt} + \nu_{st},$$
+
+where now we are using state and year dummies to capture fixed effects, which uses Alabama as our reference state and 1970 as our reference year.
+
+--
+
+.hi-blue[State-Year Panel Data:] Including District of Col. we have 51 "states" and 14 years, giving us 714 observations. 
+
+--
+
+Regression results suggest that there was a significant increase in deaths, largely attributed to motor vehicle accidents.
+
+---
+
+# MLDA: Results
+
+```{r, echo=FALSE, out.width="90%"}
+knitr::include_graphics("table5_2.png")
+```
+
+---
+
+# MLDA: Assumptions
+
+The inclusion of many states and many years of observations allows us to relax the .hi-pink[common trends] assumption. 
+
+Including .hi-blue[state trends] violates this assumption, by allowing for a degree of non-parallel evolution in outcomes between state in the absense of a treatment effect. 
+
+--
+
+With state trends factored in:
+
+$$
+\begin{aligned}
+Y_{st} =& \alpha_0 + \alpha_1 LEGAL_{st} + \sum_{k=\text{Alaska}}^{\text{Wyoming}} \alpha_k \text{State}_{ks} +\sum_{j=\text{1971}}^{\text{1983}} \alpha_j \text{Year}_{jt}\\
+& \sum_{k=\text{Alaska}}^{\text{Wyoming}} \theta_k (\text{State}_{ks} \times t)+ \varepsilon_{st},
+\end{aligned}
+$$
+
+.hi-blue[What does this allow us to address?]
+
+---
+
+```{r, echo=FALSE, eval=FALSE}
+# For those interested in generating these results, I've left in some code that won't appear in the slides. This is originally prepared by Jeffrey B. Arnold
+
+# LINK: https://jrnold.github.io/masteringmetrics/mlda-difference-in-difference.html
+
+p_load(haven, rlang, broom, clubSandwich)
+data("deaths", package = "masteringmetrics")
+
+deaths <- mutate(deaths, year_fct = factor(year))
+
+# Regression DD Estimates of MLDA-Induced Deaths among 18-20 year-olds, from 1970-1983
+
+dtypes <- c("all" = "All deaths",
+            "MVA" = "Motor vehicle accidents",
+            "suicide" = "Suicide",
+            "internal" = "All internal causes")
+
+# Estimate the DD for MLDA for all causes of death in 18-20 year olds. Run the regression with lm and calculate the cluster robust standard errors using sandwich::vcovCL. Subset the data.
+
+data <- filter(deaths, year <= 1983, agegr == "18-20 yrs", dtype == "all")
+
+
+mod <- lm(mrate ~ 0 + legal + state + year_fct, data = data)
+
+# Calculate cluster robust coefficients. These are calculated using a different method than Stata uses, and thus will be slightly different than those reported in the book.
+
+vcov <- vcovCR(mod, cluster = data[["state"]],
+               type = "CR2")
+coef_test(mod, vcov = vcov) %>%
+  rownames_to_column(var = "term") %>%
+  as_tibble() %>%
+  select(term, estimate = beta, std.error = SE) %>%
+  filter(term == "legal") %>%
+  knitr::kable(digits = 2)
+
+# Function to calculate clustered standard errors and return a tidy data frame of the coefficients and standard errors.
+
+cluster_se <- function(mod, cluster, type = "CR2") {
+  vcov <- vcovCR(mod, cluster = cluster, type = "CR2")
+  coef_test(mod, vcov = vcov) %>%
+    rownames_to_column(var = "term") %>%
+    as_tibble() %>%
+    select(term, estimate = beta, std.error = SE)
+}
+
+run_mlda_dd <- function(i) {
+  data <- filter(deaths, year <= 1983, agegr == "18-20 yrs", dtype == i) # nolint
+  mods <- tribble(
+    ~ name, ~ model,
+    "No trends, no weights",
+    lm(mrate ~ 0 + legal + state + year_fct, data = data),
+    "Time trends, no weights",
+    lm(mrate ~ 0 + legal + year_fct + state + state:year, data = data),
+    "No trends, weights",
+    lm(mrate ~ 0 + legal + year_fct + state, data = data, weights = pop),
+    # nolint start
+    # "Time trends, weights",
+    #   lm(mrate ~ 0 + legal + year_fct + state + state:year,
+    #      data = data, weights = pop)
+    # nolint end
+  ) %>%
+    mutate(coefs = map(model, ~ cluster_se(.x, cluster = data[["state"]],
+                                           type = "CR2"))) %>%
+    unnest(coefs) %>%
+    filter(term == "legal") %>%
+    mutate(response = i) %>%
+    select(name, response, estimate, std.error)
+}
+
+mlda_dd <- map_df(names(dtypes), run_mlda_dd)
+
+mlda_dd %>%
+  knitr::kable(digits = 3)
+
+```
+
+# MLDA: Assumptions
+
+```{r, echo=FALSE, out.width="80%"}
+knitr::include_graphics("fig5_4.png")
+```
+
+---
+
+# MLDA: Assumptions
+
+```{r, echo=FALSE, out.width="80%"}
+knitr::include_graphics("fig5_5.png")
+```
+
+
+---
+
+# MLDA: Assumptions
+
+```{r, echo=FALSE, out.width="80%"}
+knitr::include_graphics("fig5_6.png")
+```
+
+
+---
+
+exclude: true
+
+```{R generate pdfs, include = F, eval = F}
+#remotes::install_github('rstudio/pagedown')
+library(pagedown)
+pagedown::chrome_print("15-Model-Spec.html", output = "15-Model-Spec.pdf")
+```
