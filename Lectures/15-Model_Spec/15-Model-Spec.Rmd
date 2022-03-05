@@ -228,7 +228,7 @@ Takeaways:
 1. $\beta_1$, its standard error and t-stat will be same as if $X_2$ used
 1. $R^2$ will be the same as if $X_2$ was used instead of Z
 1. The coefficient of Z, $\gamma_2$, will be estimate of $\beta_2 \mu$, and not possible to estimate $\beta_2$ directly
-1. t-stat for $\gamma_1$ same as $\beta_2$, so able to assess significance of $X_2$
+1. t-stat for $\gamma_2$ same as $\beta_2$, so able to assess significance of $X_2$
 1. Not possible to estimate $\beta_0$ since we now only see $\alpha$
 
 
