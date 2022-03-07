@@ -1,5 +1,5 @@
 ---
-title: "Nonlinear Relationships"
+title: "Heteroskedasticity"
 subtitle: "EC 320: Introduction to Econometrics"
 author: "Philip Economides"
 date: "Winter 2022"
@@ -38,23 +38,10 @@ opts_chunk$set(
   fig.align = "center",
   fig.height = 7,
   fig.width = 10.5,
-  #dpi = 300,
-  #cache = T,
   warning = F,
   message = F
-)  
-theme_simple <- theme_bw() + theme(
-  axis.line = element_line(color = met_slate),
-  panel.grid = element_blank(),
-  rect = element_blank(),
-  strip.text = element_blank(),
-  text = element_text(family = "Fira Sans", color = met_slate, size = 14),
-  axis.text.x = element_text(size = 12),
-  axis.text.y = element_text(size = 12),
-  axis.ticks = element_blank(),
-  plot.title = element_blank(),
-  legend.position = "none"
 )
+# A blank theme for ggplot
 theme_empty <- theme_bw() + theme(
   line = element_blank(),
   rect = element_blank(),
@@ -62,884 +49,1272 @@ theme_empty <- theme_bw() + theme(
   axis.text = element_blank(),
   plot.title = element_blank(),
   axis.title = element_blank(),
-  plot.margin = structure(c(0, 0, -1, -1), unit = "lines", valid.unit = 3L, class = "unit"),
+  plot.margin = structure(c(0, 0, -0.5, -1), unit = "lines", valid.unit = 3L, class = "unit"),
   legend.position = "none"
 )
-theme_axes <- theme_empty + theme(
-  axis.title = element_text(size = 18),
-  text = element_text(family = "Fira Sans", color = met_slate, size = 14),
-  plot.margin = structure(c(0, 0, 0.1, 0), unit = "lines", valid.unit = 3L, class = "unit")
+theme_simple <- theme_bw() + theme(
+  line = element_blank(),
+  panel.grid = element_blank(),
+  rect = element_blank(),
+  strip.text = element_blank(),
+  axis.text.x = element_text(size = 18, family = "STIXGeneral"),
+  axis.text.y = element_blank(),
+  axis.ticks = element_blank(),
+  plot.title = element_blank(),
+  axis.title = element_blank(),
+  # plot.margin = structure(c(0, 0, -1, -1), unit = "lines", valid.unit = 3L, class = "unit"),
+  legend.position = "none"
 )
-# Returns education data
-wage2 <- get('wage2')
-# MI school funding and test scores data
-meap01 <- get('meap01') %>% 
-  mutate(exppp = exppp/1000)
+theme_axes_math <- theme_void() + theme(
+  text = element_text(family = "MathJax_Math"),
+  axis.title = element_text(size = 22),
+  axis.title.x = element_text(hjust = .95, margin = margin(0.15, 0, 0, 0, unit = "lines")),
+  axis.title.y = element_text(vjust = .95, margin = margin(0, 0.15, 0, 0, unit = "lines")),
+  axis.line = element_line(
+    color = "grey70",
+    size = 0.25,
+    arrow = arrow(angle = 30, length = unit(0.15, "inches")
+  )),
+  plot.margin = structure(c(1, 0, 1, 0), unit = "lines", valid.unit = 3L, class = "unit"),
+  legend.position = "none"
+)
+theme_axes_serif <- theme_void() + theme(
+  text = element_text(family = "MathJax_Main"),
+  axis.title = element_text(size = 22),
+  axis.title.x = element_text(hjust = .95, margin = margin(0.15, 0, 0, 0, unit = "lines")),
+  axis.title.y = element_text(vjust = .95, margin = margin(0, 0.15, 0, 0, unit = "lines")),
+  axis.line = element_line(
+    color = "grey70",
+    size = 0.25,
+    arrow = arrow(angle = 30, length = unit(0.15, "inches")
+  )),
+  plot.margin = structure(c(1, 0, 1, 0), unit = "lines", valid.unit = 3L, class = "unit"),
+  legend.position = "none"
+)
+theme_axes <- theme_void() + theme(
+  text = element_text(family = "Fira Sans Book"),
+  axis.title = element_text(size = 18),
+  axis.title.x = element_text(hjust = .95, margin = margin(0.15, 0, 0, 0, unit = "lines")),
+  axis.title.y = element_text(vjust = .95, margin = margin(0, 0.15, 0, 0, unit = "lines")),
+  axis.line = element_line(
+    color = grey_light,
+    size = 0.25,
+    arrow = arrow(angle = 30, length = unit(0.15, "inches")
+  )),
+  plot.margin = structure(c(1, 0, 1, 0), unit = "lines", valid.unit = 3L, class = "unit"),
+  legend.position = "none"
+)
 ```
 
 # Prologue
 
 ---
+
 # Housekeeping
 
-## Final Exam
+<br>
+
+.hi-pink[Final Exam]
 
 Review lecture this Wednesday.
 
 - Come prepared with questions.
 
-**Exam:** Tuesday, December 10 at 10:15am in Chapman 220.
+**Exam:** Wednesday, March 16 at 14:45pm (here).
 
-Office hours TBA for Monday, December 9.
+Office hours Tuesday, March 14th at 12:00pm.
 
-## Problem Set 5
+.hi-pink[Problem Set 5]
 
-Due Saturday, December 7 by 11:59pm.
+Due today by 11:59pm.
 
-- I will post the key immediately after.
+---
+layout: true
+# Heteroskedasticity
+---
+
+class: inverse, middle
+
+---
+
+Let's revisit assumption \#4:
+
+> 4\. __Homoskedasticity:__ The disurbances have .hi[constant variance] $\sigma^2$,
+>  - $\mathop{\boldsymbol{E}}\left[ u_i^2 \middle| X \right] = \mathop{\text{Var}} \left( u_i \middle| X \right) = \sigma^2 \implies \mathop{\text{Var}} \left( u_i \right) = \sigma^2$
+--
+
+Specifically, we will focus on the assumption of .hi[constant variance] (also known as *homoskedasticity*).
+
+--
+
+**Violation of this assumption:**
+
+.hi[Heteroskedasticity:] $\mathop{\text{Var}} \left( u_i \right) = \sigma^2_i$ and $\sigma^2_i \neq \sigma^2_j$ for some $i\neq j$.
+
+--
+
+In other words: Our disturbances have different variances.
+
+---
+
+An easy way to spot this: plot your residuals against your covariates!
+
+For example, variance of $u_i$ decreases with $X_i$, non-constant.
+
+```{R, het ex1, dev = "svg", echo = F, fig.height = 5.5, message=FALSE, warning=FALSE}
+p_load(latex2exp)
+set.seed(160322)
+n=1e3
+ggplot(data = tibble(
+  x = runif(n, -2.5, 2.5),
+  e = rnorm(n, 0, sd = 4 - 2 * x + 0.3 * x^2)
+), aes(x = x, y = e)) +
+geom_point(color = "darkslategrey", size = 2.75, alpha = 0.5) +
+xlab(TeX("$X_i$"))+
+ylab(TeX("$u_i$")) +
+theme_axes_math
+```
+
+---
+
+Another example of heteroskedasticity: residuals increase in variation as X deviates further from the mean.
+
+Variance of $u_i$ increasing at the extremes of $X_i$.
+
+```{R, het ex2 , dev = "svg", echo = F, fig.height = 5.5, message=FALSE, warning=FALSE}
+set.seed(160321)
+ggplot(data = tibble(
+  x = runif(1e3, -3, 3),
+  e = rnorm(1e3, 0, sd = 2 + x^2)
+), aes(x = x, y = e)) +
+geom_point(color = "darkslategrey", size = 2.75, alpha = 0.5) +
+xlab(TeX("$X_i$"))+
+ylab(TeX("$u_i$")) +
+theme_axes_math
+```
+
+---
+
+Another example of heteroskedasticity:
+
+Differing variances of $u_i$ by group
+
+```{R, het ex3 , dev = "svg", echo = F, fig.height = 5.5, message=FALSE, warning=FALSE}
+set.seed(160321)
+ggplot(data = tibble(
+  g = sample(c(F,T), 1e3, replace = T),
+  x = runif(1e3, -3, 3),
+  e = rnorm(1e3, 0, sd = 0.5 + 2 * g)
+), aes(x = x, y = e, color = g, shape = g, alpha = g)) +
+geom_point(size = 2.75) +
+scale_color_manual(values = c("darkslategrey", red_pink)) +
+scale_shape_manual(values = c(16, 1)) +
+scale_alpha_manual(values = c(0.5, 0.8)) +
+xlab(TeX("$X_i$"))+
+ylab(TeX("$u_i$")) +
+theme_axes_math
+```
+---
+
+.hi-pink[Heteroskedasticity] is present when the variance of $u_i$ changes with any combination of our explanatory variables $X_1$, through $X_j$.
+
+--
+
+(Very common in practice)
+
+--
+
+.hi-blue[Why we care:] Heteroskedasticity shows us how small violations of our assumptions can affect OLS's performance.
+
+--
+
+* If we do not account for heteroskedasticity, our standard error are mispecified
+
+---
+
+
+## Consequences
+
+So what are the consquences of heteroskedasticity? Bias? Inefficiency?
+
+First, let's check if it has consquences for the the unbiasedness of OLS.
+
+--
+
+**Recall<sub>1</sub>:** OLS being unbiased means $\mathop{\boldsymbol{E}}\left[ \hat{\beta}_j \middle| X \right] = \beta_j$ for all $j$ covariates.
+
+--
+
+**Recall<sub>2</sub>:** We previously showed $\hat{\beta}_1 = \dfrac{\sum_i\left(y_i-\overline{y}\right)\left(x_{1i}-\overline{x}_1\right)}{\sum_i\left(x_{1i} -\overline{x}_1\right)^2}$
+
+--
+
+It will actually help us to rewrite this estimator as
+
+$$\hat{\beta}_1 = \beta_1 + \dfrac{\sum_{i} \left( x_{1i} - \overline{x}_1 \right) u_i}{\sum_i \left( x_{1i} - \overline{x}_1 \right)^2}$$
+---
+
+**Proof:** Assuming $y_i = \beta_0 + \beta_1 x_i + u_i$
+
+$$
+\begin{aligned}
+  \hat{\beta}_1
+  &= \dfrac{\sum_i\left(y_i-\overline{y}\right)\left(x_{1i}-\overline{x}_1\right)}{\sum_i\left(x_{1i} -\overline{x}_1\right)^2} \\
+  &= \dfrac{\sum_i\left(\left[ \beta_0 + \beta_1 x_{1i} + u_i \right]- \left[ \beta_0 + \beta_1 \overline{x}_1 + \overline{u} \right] \right)\left(x_{1i}-\overline{x}_1\right)}{\sum_i\left(x_{1i} -\overline{x}_1\right)^2} \\
+  &= \dfrac{\sum_i\left(\beta_1 \left[ x_{1i} - \overline{x}_1 \right] + \left[u_i - \overline{u}\right]  \right)\left(x_{1i}-\overline{x}_1\right)}{\sum_i\left(x_{1i} -\overline{x}_1\right)^2} \\
+  &= \dfrac{\sum_i\left(\beta_1 \left[ x_{1i} - \overline{x}_1 \right]^2 + \left[ x_{1i} - \overline{x}_1 \right] \left[u_i - \overline{u}\right]\right)}{\sum_i\left(x_{1i} -\overline{x}_1\right)^2} \\
+  &= \beta_1 + \dfrac{\sum_i\left(x_{1i} - \overline{x}_1\right) \left(u_i - \overline{u}\right)}{\sum_i\left(x_{1i} -\overline{x}_1\right)^2}
+\end{aligned}
+$$
+
+---
+
+$$
+\begin{aligned}
+  \hat{\beta}_1
+  &= \cdots = \beta_1 + \dfrac{\sum_i\left(x_{1i} - \overline{x}_1\right) \left(u_i - \overline{u}\right)}{\sum_i\left(x_{1i} -\overline{x}_1\right)^2} \\
+  &= \beta_1 + \dfrac{\sum_i\left(x_{1i} - \overline{x}_1\right) u_i - \overline{u} \sum_i\left(x_{1i} - \overline{x}_1\right)}{\sum_i\left(x_{1i} -\overline{x}_1\right)^2} \\
+  &= \beta_1 + \dfrac{\sum_i\left(x_{1i} - \overline{x}_1\right) u_i - \overline{u} \left(\sum_i x_{1i} - \sum_i \overline{x}_1\right)}{\sum_i\left(x_{1i} -\overline{x}_1\right)^2} \\
+  &= \beta_1 + \dfrac{\sum_i\left(x_{1i} - \overline{x}_1\right) u_i - \overline{u} \left(\sum_i x_{1i} - n \overline{x}_1\right)}{\sum_i\left(x_{1i} -\overline{x}_1\right)^2} \\
+  &= \beta_1 + \dfrac{\sum_i\left(x_{1i} - \overline{x}_1\right) u_i - \overline{u} \color{#e64173}{\left(\sum_i x_{1i} - \sum_i x_{1i}\right)}}{\sum_i\left(x_{1i} -\overline{x}_1\right)^2} \\
+  &= \beta_1 + \dfrac{\sum_i\left(x_{1i} - \overline{x}_1\right) u_i}{\sum_i\left(x_{1i} -\overline{x}_1\right)^2} \quad \text{😅}
+\end{aligned}
+$$
+
+---
+
+## Consequences: Bias
+
+We now want to see if heteroskedasticity biases the OLS estimator for $\beta_1$.
+
+--
+
+$$
+\begin{aligned}
+  \mathop{\boldsymbol{E}}\left[ \hat{\beta}_1 \middle| X \right]
+  &= \mathop{\boldsymbol{E}}\left[ \beta_1 + \dfrac{\sum_i\left(x_i - \overline{x}\right) u_i}{\sum_i\left(x_i -\overline{x}\right)^2} \middle| X \right] \\[0.5em]
+  &= \beta_1 + \mathop{\boldsymbol{E}}\left[ \dfrac{\sum_i\left(x_i - \overline{x}\right) u_i}{\sum_i\left(x_i -\overline{x}\right)^2} \middle| X \right] \\[0.5em]
+  &= \beta_1 + \dfrac{\sum_i\left(x_i - \overline{x}\right)}{\sum_i\left(x_i -\overline{x}\right)^2} \color{#e64173}{\underbrace{\mathop{\boldsymbol{E}}\left[ u_i \middle| X \right]}_{=0}} \\[0.5em]
+  &= \beta_1
+\end{aligned}
+$$
+
+--
+
+.hi[OLS is still unbiased] for the $\beta_k$.
+---
+
+## Consequences: Efficiency
+
+OLS's efficiency and inference do not survive heteroskedasticity.
+
+- In the presence of heteroskedasticity, OLS is .hi[no longer the most efficient] (best) linear unbiased estimator.
+
+--
+
+- It would be more informative (efficient) to .hi[weight observations] inversely to their $u_i$'s variance.
+
+  - Downweight high-variance $u_i$'s (too noisy to learn much).
+
+  - Upweight observations with low-variance $u_i$'s (more 'trustworthy').
+
+  - Now you have the idea of weighted least squares (WLS)
+
+---
+
+## Consequences: Inference
+
+OLS .hi[standard errors are biased] in the presence of heteroskedasticity.
+
+- Wrong confidence intervals
+
+- Problems for hypothesis testing (both $t$ and $F$ tests)
+
+--
+
+- It's hard to learn much without sound inference.
+---
+
+## Solutions
+
+1. **Tests** to determine whether heteroskedasticity is present.
+
+2. **Remedies** for (1) efficiency and (2) inference
+
+---
+layout: true
+# Testing for heteroskedasticity
 
 ---
 class: inverse, middle
 
-# Nonlinear Relationships
-
 ---
-# Can We Do Better?
 
-```{R, include = F}
-reg_lin <- lm(lifeExp ~ gdpPercap, gapminder)
-a_lin <- reg_lin$coefficients[1]
-b_lin <- reg_lin$coefficients[2]
-r2_lin <- summary(reg_lin)$r.squared
-```
+While we *might* have solutions for heteroskedasticity, the efficiency of our estimators depends upon whether or not heteroskedasticity is present.
 
+1. The **Goldfeld-Quandt test**
 
-$$(\widehat{\text{Life Expectancy})_i} = `r round(a_lin, 2)` + `r round(b_lin, 4)` \cdot \text{GDP}_i$$
+1. The **Breusch-Pagan test**
 
-```{R, echo = F, dev = "svg", fig.height = 5.75}
-ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
-geom_point(alpha = 0.75) +
-scale_x_continuous("GDP per capita", label = scales::comma) +
-ylab("Life Expectancy") +
-stat_smooth(method = "lm", size = 1, color = red_pink, se = F) +
-theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
-```
-
----
-# Nonlinear Relationships
-
-Many economic relationships are **nonlinear**.
-
-- *e.g.*, most production functions, profit, diminishing marginal utility, tax revenue as a function of the tax rate, *etc.*
+1. The **White test**
 
 --
 
-## The flexibility of OLS
+Each of these tests centers on the fact that we can .hi[use the OLS residual] $\color{#e64173}{\hat u_i}$ .hi[to estimate the population disturbance] $\color{#e64173}{u_i}$.
 
-OLS can accommodate many, but not all, nonlinear relationships.
+---
+layout: true
+# Testing for heteroskedasticity
+## The Goldfeld-Quandt test
+---
 
-- Underlying model must be linear-in-parameters.
+Focuses on a specific type of heteroskedasticity: whether the variance of $u_i$ differs .hi[between two groups].<sup>†</sup>
 
-- Nonlinear transformations of variables are okay.
+Remember how we used our residuals to estimate the $\sigma^2$?
 
-- Modeling some nonlinear relationships requires advanced estimation techniques, such as *maximum likelihood*.<sup>.pink[†]</sup> 
+$$ s^2 = \dfrac{\text{RSS}}{n-1} = \dfrac{\sum_i \hat u_i^2}{n-1} $$
+
+We will use this same idea to determine whether there is evidence that our two groups differ in the variances of their disturbances, effectively comparing $s^2_1$ and $s^2_2$ from our two groups.
 
 .footnote[
-.pink[†] Beyond the scope of this class.
+[†]: The G-Q test was one of the early tests of heteroskedasticity (1965).
+]
+---
+
+Operationally,
+
+.pseudocode-small[
+
+1. Order your the observations by $x$
+
+2. Split the data into two groups of size n.super[⭑]
+  - G<sub>1</sub>: The first third
+  - G<sub>2</sub>: The last third
+
+3. Run separate regressions of $y$ on $x$ for G.sub[1] and G.sub[2]
+
+4. Record RSS.sub[1] and RSS.sub[2]
+
+5. Calculate the G-Q test statistic
+
+]
+---
+
+The G-Q test statistic
+
+$$ F_{\left(n^{\star}-k,\, n^{\star}-k\right)} = \dfrac{\text{RSS}_2/(n^\star-k)}{\text{RSS}_1/(n^\star-k)} = \dfrac{\text{RSS}_2}{\text{RSS}_1} $$
+
+follows an $F$ distribution (under the null hypothesis) with $n^{\star}-k$ and $n^{\star}-k$ degrees of freedom.<sup>†</sup>
+
+--
+
+**Notes**
+
+- The G-Q test requires the disturbances follow normal distributions.
+- The G-Q assumes a very specific type/form of heteroskedasticity.
+- Performs very well if we know the form of potentially heteroskedasticity.
+
+.footnote[
+[†]: Goldfeld and Quandt suggested $n^{\star}$ of $(3/8)n$. $k$ gives number of estimated parameters (_i.e._, $\hat{\beta}_j$'s).
+]
+---
+
+```{R, gq1a, echo = F, dev = "svg", fig.height = 4}
+set.seed(12345)
+# Data
+gq_df <- tibble(
+  x = runif(1e3, -3, 3),
+  e = rnorm(1e3, 0, sd = 4 + 1.5 * x),
+  y = 1 + 3 * x + e
+)
+# Quantiles
+gq_x <- quantile(gq_df$x, probs = c(3/8, 5/8))
+# Regressions
+sse1 <- lm(y ~ x, data = gq_df %>% filter(x < gq_x[1])) %>%
+  residuals() %>% raise_to_power(2) %>% sum()
+sse2 <- lm(y ~ x, data = gq_df %>% filter(x > gq_x[2])) %>%
+  residuals() %>% raise_to_power(2) %>% sum()
+ggplot(data = gq_df, aes(x = x, y = e)) +
+geom_point(color = "darkslategrey", size = 2.75, alpha = 0.5) +
+labs(x = "x", y = "u") +
+theme_axes_math
+```
+---
+
+```{R, gq1b, echo = F, dev = "svg", fig.height = 4}
+ggplot(data = gq_df, aes(
+  x = x, y = e,
+  color = cut(x, c(-Inf, gq_x, Inf)),
+  alpha = cut(x, c(-Inf, gq_x, Inf)),
+  shape = cut(x, c(-Inf, gq_x, Inf))
+)) +
+geom_vline(
+  xintercept = gq_x,
+  color = grey_mid,
+  size = 0.25
+) +
+geom_point(size = 2.75) +
+labs(x = "x", y = "u") +
+scale_color_manual(values = c("darkslategrey", grey_mid, red_pink)) +
+scale_shape_manual(values = c(19, 1, 19)) +
+scale_alpha_manual(values = c(0.5, 0.8, 0.6)) +
+theme_axes_math
+```
+
+$F_{375,\,375} = \dfrac{\color{#e64173}{\text{RSS}_2 = `r format(round(sse2, 1), nsmall = 0L, big.mark = ",")`}}{\color{#314f4f}{\text{RSS}_1 = `r format(round(sse1, 1), nsmall = 0L, big.mark = ",")`}} \approx `r format(round(sse2/sse1, 1), nsmall = 0L, big.mark = ",")` \implies$ *p*-value $< 0.001$
+
+$\therefore$ We reject H.sub[0]: $\sigma^2_1 = \sigma^2_2$ and conclude there is statistically significant evidence of heteroskedasticity.
+
+---
+
+```{R, gq2, echo = F, dev = "svg", fig.height = 4}
+set.seed(12345)
+# Data
+gq2_df <- tibble(
+  x = runif(1e3, -3, 3),
+  e = rnorm(1e3, 0, sd = 2 + x^2),
+  y = 1 + 3 * x + e
+)
+# Quantiles
+gq_x <- quantile(gq2_df$x, probs = c(3/8, 5/8))
+# Regressions
+sse1b <- lm(y ~ x, data = gq2_df %>% filter(x < gq_x[1])) %>%
+  residuals() %>% raise_to_power(2) %>% sum()
+sse2b <- lm(y ~ x, data = gq2_df %>% filter(x > gq_x[2])) %>%
+  residuals() %>% raise_to_power(2) %>% sum()
+ggplot(data = gq2_df, aes(
+  x = x, y = e,
+  color = cut(x, c(-Inf, gq_x, Inf)),
+  alpha = cut(x, c(-Inf, gq_x, Inf)),
+  shape = cut(x, c(-Inf, gq_x, Inf))
+)) +
+geom_vline(
+  xintercept = gq_x,
+  color = grey_mid,
+  size = 0.25
+) +
+geom_point(size = 2.75) +
+labs(x = "x", y = "u") +
+scale_color_manual(values = c("darkslategrey", grey_mid, red_pink)) +
+scale_shape_manual(values = c(19, 1, 19)) +
+scale_alpha_manual(values = c(0.5, 0.8, 0.6)) +
+theme_axes_math
+```
+
+$F_{375,\,375} = \dfrac{\color{#e64173}{\text{RSS}_2 = `r format(round(sse2b, 1), nsmall = 0L, big.mark = ",")`}}{\color{#314f4f}{\text{RSS}_1 = `r format(round(sse1b, 1), nsmall = 0L, big.mark = ",")`}} \approx `r format(round(sse2b/sse1b, 1), nsmall = 0L, big.mark = ",")` \implies$ *p*-value $\approx `r round(pf(sse2b/sse1b, 375, 375, lower.tail = F), 3)`$
+
+$\therefore$ We fail to reject H.sub[0]: $\sigma^2_1 = \sigma^2_2$ while heteroskedasticity is present.
+---
+layout: true
+# Testing for heteroskedasticity
+## The Breusch-Pagan test
+---
+
+Breusch and Pagan (1981) attempted to solve this issue of being too specific with the functional form of the heteroskedasticity.
+
+- Allows the data to show if/how the variance of $u_i$ correlates with $X$.
+
+- If $\sigma_i^2$ correlates with $X$, then we have heteroskedasticity.
+
+- Regresses $\hat u_i^2$ on $X = \left[ 1,\, x_1,\, x_2,\, \ldots,\, x_k \right]$ and tests for joint significance.
+---
+
+How to implement:
+
+.pseudocode-small[
+
+1\. Regress y on an intercept, x.sub[1], x.sub[2], …, x.sub[k].
+
+2\. Record residuals $\hat u_i$.
+
+3\. Regress $\hat u_i$.super[2] on an intercept, x.sub[1], x.sub[2], …, x.sub[k].
+
+$$\hat u_i^2 = \alpha_0 + \alpha_1 x_{1i} + \alpha_2 x_{2i} + \cdots + \alpha_k x_{ki} + v_i$$
+
+4\. Record R.super[2].
+
+5\. Test hypothesis H.sub[0]: $\alpha_1 = \alpha_2 = \cdots = \alpha_k = 0$
+
 ]
 
 ---
-# Linearity
 
-.hi-green[Linear-in-parameters:] .green[Parameters] enter model as a weighted sum, where the weights are functions of the variables.
+The B-P test statistic<sup>†</sup> is
 
-- One of the assumptions required for the unbiasedness of OLS.
+$$ \text{LM} = n \times R^2_{u} $$
 
-.hi-pink[Linear-in-variables:] .pink[Variables] enter the model as a weighted sum, where the weights are functions of the parameters.
+where $R^2_u$ is the $R^2$ from the regression
 
-- Not required for the unbiasedness of OLS.
+$$ \hat u\_i^2 = \alpha\_0 + \alpha\_1 x\_{1i} + \alpha\_2 x\_{2i} + \cdots + \alpha\_k x\_{ki} + v\_i $$
 
---
-
-The standard linear regression model satisfies both properties:
-
-$$Y_i = \beta_0 + \beta_1X_{1i} + \beta_2X_{2i} + \dots + \beta_kX_{ki} + u_i$$
-
----
-# Linearity
-
-Which of the following is .hi-green[linear-in-parameters], .hi-pink[linear-in-variables], or .hi-purple[neither]?
-
-1. $Y_i = \beta_0 + \beta_1X_{i} + \beta_2X_{i}^2 + \dots + \beta_kX_{i}^k + u_i$
-
-2. $Y_i = \beta_0X_i^{\beta_1}v_i$
-
-3. $Y_i = \beta_0 + \beta_1\beta_2X_{i} + u_i$
-
----
-count: false
-
-# Linearity
-
-Which of the following is .hi-green[linear-in-parameters], .hi-pink[linear-in-variables], or .hi-purple[neither]?
-
-1. $\color{#007935}{Y_i = \beta_0 + \beta_1X_{i} + \beta_2X_{i}^2 + \dots + \beta_kX_{i}^k + u_i}$
-
-2. $Y_i = \beta_0X_i^{\beta_1}v_i$
-
-3. $Y_i = \beta_0 + \beta_1\beta_2X_{i} + u_i$
-
-Model 1 is .green[linear-in-parameters], but not linear-in-variables. 
-
----
-count: false
-
-# Linearity
-
-Which of the following is .hi-green[linear-in-parameters], .hi-pink[linear-in-variables], or .hi-purple[neither]?
-
-1. $\color{#007935}{Y_i = \beta_0 + \beta_1X_{i} + \beta_2X_{i}^2 + \dots + \beta_kX_{i}^k + u_i}$
-
-2. $\color{#9370DB}{Y_i = \beta_0X_i^{\beta_1}v_i}$
-
-3. $Y_i = \beta_0 + \beta_1\beta_2X_{i} + u_i$
-
-Model 1 is .green[linear-in-parameters], but not linear-in-variables. 
-
-Model 2 is .purple[neither]. 
-
----
-count: false
-
-# Linearity
-
-Which of the following is .hi-green[linear-in-parameters], .hi-pink[linear-in-variables], or .hi-purple[neither]?
-
-1. $\color{#007935}{Y_i = \beta_0 + \beta_1X_{i} + \beta_2X_{i}^2 + \dots + \beta_kX_{i}^k + u_i}$
-
-2. $\color{#9370DB}{Y_i = \beta_0X_i^{\beta_1}v_i}$
-
-3. $\color{#e64173}{Y_i = \beta_0 + \beta_1\beta_2X_{i} + u_i}$
-
-Model 1 is .green[linear-in-parameters], but not linear-in-variables. 
-
-Model 2 is .purple[neither]. 
-
-Model 3 is .pink[linear-in-variables], but not linear-in-parameters.
-
----
-# We're Going to Take Logs
-
-The natural log is the inverse function for the exponential function: <br> $\quad \log(e^x) = x$ for $x>0$.
-
-## (Natural) Log Rules
-
-1. Product rule: $\log(AB) = \log(A) + \log(B)$.
+Under the null, $\text{LM}$ is asymptotically distributed as $\chi^2_k$.
 
 --
 
-2. Quotient rule: $\log(A/B) = \log(A) - \log(B)$.
+This test statistic tests H.sub[0]: $\alpha_1 = \alpha_2 = \cdots = \alpha_k = 0$.
 
---
+Rejecting the null hypothesis implies evidence of heteroskedasticity.
 
-3. Power rule: $\log(A^B) = B \cdot \log(A)$.
-
---
-
-4. Derivative: $f(x) = \log(x)$ .mono[=>] $f'(x) = \dfrac{1}{x}$.
-
---
-
-5. $\log(e) = 1$, $\log(1) = 0$, and $\log(x)$ is undefined for $x \leq 0$.
-
----
-# Log-Linear Model
-
-**Nonlinear Model** $$Y_i = \alpha e^{\beta_1 X_i}v_i$$
-
-- $Y > 0$, $X$ is continuous, and $v_i$ is a multiplicative error term.
-- Cannot estimate parameters with OLS directly.
-
---
-
-**Logarithmic Transformation** $$\log(Y_i) = \log(\alpha) + \beta_1 X_i + \log(v_i)$$
-
-- Redefine $\log(\alpha) \equiv \beta_0$ and $\log(v_i) \equiv u_i$.
-
---
-
-**Transformed (Linear) Model** $$\log(Y_i) = \beta_0 + \beta_1 X_i + u_i$$
-
-- *Can* estimate with OLS, but coefficient interpretation changes.
-
----
-# Log-Linear Model
-
-**Regression Model**
-
-$$\log(Y_i) = \beta_0 + \beta_1 X_i + u_i$$
-
-**Interpretation**
-
-- A one-unit increase in the explanatory variable increases the outcome variable by approximately $\beta_1\times 100$ percent, on average.
-
-- *Example:* If $\log(\hat{\text{Pay}_i}) = 2.9 + 0.03 \cdot \text{School}_i$, then an additional year of schooling increases pay by approximately 3 percent, on average.
-
----
-# Log-Linear Model
-
-**Derivation**
-
-Consider the log-linear model
-
-$$ \log(Y) = \beta_0 + \beta_1 \, X + u $$
-
-and differentiate
-
-$$ \dfrac{dY}{Y} = \beta_1 dX $$
-
---
-
-A marginal (small) change in $X$ (_i.e._, $dX$) leads to a $\beta_1 dX$ **proportionate change** in $Y$.
-
-- Multiply by 100 to get the **percentage change** in $Y$.
-
----
-# Log-Linear Example
-
-```{R, include = F}
-# Set seed
-set.seed(1234)
-# Sample size
-n <- 1e3
-# Generate data
-df1 <- tibble(
-  x = runif(n, 0, 3),
-  y = exp(10 + 0.75 * x + rnorm(n, sd = 0.5))
-)
-reg1 <- lm(log(y) ~ x, df1)
-a1 <- reg1$coefficients[1]
-b1 <- reg1$coefficients[2]
-```
-
-$$\log(\hat{Y_i}) = `r round(a1, 2)` + `r round(b1, 2)` \cdot \text{X}_i$$
-
-```{R, log linear plot, echo = F, cache = T, dev = "svg", fig.height = 6}
-# Plot
-ggplot(data = df1, aes(x = x, y = y)) +
-geom_point(size = 3, color = "darkslategrey", alpha = 0.5) +
-geom_smooth(color = red_pink, se = F) +
-xlab("X") +
-ylab("Y") +
-theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
-```
-
----
-count: false
-
-# Log-Linear Example
-
-$$\log(\hat{Y_i}) = `r round(a1, 2)` + `r round(b1, 2)` \cdot \text{X}_i$$
-
-```{R, log linear plot 2, echo = F, cache = T, dev = "svg", fig.height = 6}
-# Plot
-ggplot(data = df1, aes(x = x, y = log(y))) +
-geom_point(size = 3, color = "darkslategrey", alpha = 0.5) +
-geom_smooth(color = red_pink, se = F, method = "lm") +
-xlab("X") +
-ylab("log(Y)") +
-theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
-```
-
----
-# Log-Linear Model 
-
-**Note:** If you have a log-linear model with a binary indicator variable, the interpretation of the coefficient on that variable changes.
-
-Consider
-
-$$ \log(Y_i) = \beta_0 + \beta_1 X_i + u_i $$
-
-for binary variable $X$.
-
-Interpretation of $\beta_1$:
-
-- When $X$ changes from 0 to 1, $Y$ will increase by $100 \times \left( e^{\beta_1} -1 \right)$ percent.
-- When $X$ changes from 1 to 0, $Y$ will decrease by $100 \times \left( e^{-\beta_1} -1 \right)$ percent.
-
----
-# Log-Linear Example
-
-```{R, include = F}
-# Set seed
-set.seed(1234)
-# Sample size
-n <- 1e3
-# Generate data
-df2 <- tibble(
-  trained = rep(c(1, 0), each = n/2),
-  productivity = exp(10 + 0.5 * trained + rnorm(n, sd = 1))
-)
-reg2 <- lm(log(productivity) ~ trained, df2)
-b2 <- reg2$coefficients[2]
-```
-
-Binary explanatory variable: `trained`
-
-- `trained == 1` if employee received training.
-- `trained == 0` if employee did not receive training.
-
-```{r}
-lm(log(productivity) ~ trained, data = df2) %>% tidy()
-```
-
-**Q:** How do we interpret the coefficient on `trained`?
-
---
-
-**A.sub[1]:** Trained workers `r round(exp(b2-1)*100, 2)` percent more productive than untrained workers.
-
---
-
-**A.sub[2]:** Untrained workers `r round(exp(-b2-1)*100, 2)` percent less productive than trained workers.
-
-
----
-# Log-Log Model
-
-**Nonlinear Model**
-
-$$Y_i = \alpha  X_i^{\beta_1}v_i$$
-
-- $Y > 0$, $X > 0$, and $v_i$ is a multiplicative error term.
-- Cannot estimate parameters with OLS directly.
-
---
-
-**Logarithmic Transformation**
-
-$$\log(Y_i) = \log(\alpha) + \beta_1 \log(X_i) + \log(v_i)$$
-
-- Redefine $\log(\alpha) \equiv \beta_0$ and $\log(v_i) \equiv u_i$. 
-
---
-
-**Transformed (Linear) Model**
-
-$$\log(Y_i) = \beta_0 + \beta_1 \log(X_i) + u_i$$
-
-- *Can* estimate with OLS, but coefficient interpretation changes.
-
----
-# Log-Log Model
-
-**Regression Model**
-
-$$ \log(Y_i) = \beta_0 + \beta_1 \log(X_i) + u_i $$
-
-**Interpretation**
-
-- A one-percent increase in the explanatory variable leads to a $\beta_1$-percent change in the outcome variable, on average.
-
-- Often interpreted as an elasticity.
-
-- *Example:* If $\log(\widehat{\text{Quantity Demanded}}_i) = 0.45 - 0.31 \cdot \log(\text{Income}_i)$, then each one-percent increase in income decreases quantity demanded by 0.31 percent.
-
----
-# Log-Log Model
-
-**Derivation**
-
-Consider the log-log model
-
-$$ \log(Y_i) = \beta_0 + \beta_1 \log(X_i) + u $$
-
-and differentiate
-
-$$ \dfrac{dY}{Y} = \beta_1 \dfrac{dX}{X} $$
-
-A one-percent increase in $X$ leads to a $\beta_1$-percent increase in $Y$. 
-
-- Rearrange to show elasticity interpretation:
-
-$$ \dfrac{dY}{dX} \dfrac{X}{Y} = \beta_1 $$
-
----
-# Log-Log Example
-
-```{R, include = F}
-# Set seed
-set.seed(1234)
-# Sample size
-n <- 1e3
-# Generate data
-log_df <- tibble(
-  x = runif(n, 0, 10),
-  y = exp(3 * log(x) + rnorm(n, sd = 0.5))
-)
-reg3 <- lm(log(y) ~ log(x), log_df)
-a3 <- reg3$coefficients[1]
-b3 <- reg3$coefficients[2]
-```
-
-$$\log(\hat{Y_i}) = `r round(a3, 2)` + `r round(b3, 2)` \cdot \log(\text{X}_i)$$
-
-```{R, log log plot, echo = F, cache = T, dev = "svg", fig.height = 6}
-# Plot
-ggplot(data = log_df, aes(x = x, y = y)) +
-geom_point(size = 3, color = "darkslategrey", alpha = 0.5) +
-geom_smooth(color = red_pink, se = F) +
-xlab("X") +
-ylab("Y") +
-theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
-```
-
----
-count: false
-
-# Log-Log Example
-
-$$\log(\hat{Y_i}) = `r round(a3, 2)` + `r round(b3, 2)` \cdot \log(\text{X}_i)$$
-
-```{R, log log plot 2, echo = F, cache = T, dev = "svg", fig.height = 6}
-# Plot
-ggplot(data = log_df, aes(x = log(x), y = log(y))) +
-geom_point(size = 3, color = "darkslategrey", alpha = 0.5) +
-geom_smooth(color = red_pink, se = F, method = "lm") +
-xlab("log(X)") +
-ylab("log(Y)") +
-theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
-```
-
----
-# Linear-Log Model
-
-**Nonlinear Model**
-
-$$e^{Y_i} = \alpha  X_i^{\beta_1}v_i$$
-
-- $X > 0$ and $v_i$ is a multiplicative error term.
-- Cannot estimate parameters with OLS directly.
-
---
-
-**Logarithmic Transformation**
-
-$$Y_i = \log(\alpha) + \beta_1 \log(X_i) + \log(v_i)$$
-
-- Redefine $\log(\alpha) \equiv \beta_0$ and $\log(v_i) \equiv u_i$.
-
---
-
-**Transformed (Linear) Model**
-
-$$Y_i = \beta_0 + \beta_1 \log(X_i) + u_i$$
-
-- *Can* estimate with OLS, but coefficient interpretation changes.
-
----
-# Linear-Log Model
-
-**Regression Model**
-
-$$Y_i = \beta_0 + \beta_1 \log(X_i) + u_i$$
-
-**Interpretation**
-
-- A one-percent increase in the explanatory variable increases the outcome variable by approximately $\beta_1 \div 100$, on average.
-
-- *Example:* If $\hat{(\text{Blood Pressure})_i} = 150 - 9.1 \log(\text{Income}_i)$, then a one-percent increase in income decrease blood pressure by 0.091 points.
-
----
-# Linear-Log Model
-
-**Derivation**
-
-Consider the log-linear model
-
-$$ Y = \beta_0 + \beta_1 \log(X) + u $$
-
-and differentiate
-
-$$ dY = \beta_1 \dfrac{dX}{X} $$
-
---
-
-A one-percent increase in $X$ leads to a $\beta_1 \div 100$ **change** in $Y$.
-
----
-# Linear-Log Example
-
-```{R, include = F}
-# Set seed
-set.seed(1234)
-# Sample size
-n <- 1e3
-# Generate data
-lin_log_df <- tibble(
-  x = runif(n, 0, 3),
-  y = log(x) + rnorm(n, sd = 0.25)
-)
-reg4 <- lm(y ~ log(x), lin_log_df)
-a4 <- reg4$coefficients[1]
-b4 <- reg4$coefficients[2]
-```
-
-$$\hat{Y_i} = `r round(a4, 2)` + `r round(b4, 2)` \cdot \log(\text{X}_i)$$
-
-```{R, linear log plot, echo = F, cache = T, dev = "svg", fig.height = 6}
-# Plot
-ggplot(data = lin_log_df, aes(x = x, y = y)) +
-geom_point(size = 3, color = "darkslategrey", alpha = 0.5) +
-xlab("X") +
-ylab("Y") +
-theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
-```
-
----
-count: false
-
-# Linear-Log Example
-
-$$\hat{Y_i} = `r round(a4, 2)` + `r round(b4, 2)` \cdot \log(\text{X}_i)$$
-
-```{R, linear log plot 2, echo = F, cache = T, dev = "svg", fig.height = 6}
-# Plot
-ggplot(data = lin_log_df, aes(x = log(x), y = y)) +
-geom_point(size = 3, color = "darkslategrey", alpha = 0.5) +
-geom_smooth(color = red_pink, se = F, method = "lm") +
-xlab("log(X)") +
-ylab("Y") +
-theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
-```
-
----
-class: white-slide
-
-.center[**(Approximate) Coefficient Interpretation**] 
-```{r, echo = F}
-cont_interp <- tibble(
-  model = c("Level-level <br> \\(Y_i = \\beta_0 + \\beta_1 X_i + u_i\\)",
-             "Log-level <br> \\(\\log(Y_i) = \\beta_0 + \\beta_1 X_i + u_i\\)",
-             "Log-log <br> \\(\\log(Y_i) = \\beta_0 + \\beta_1 \\log(X_i) + u_i\\)",
-             "Level-log <br> \\(Y_i = \\beta_0 + \\beta_1 \\log(X_i) + u_i\\)"),
-  interp = c("\\(\\Delta Y = \\beta_1 \\cdot \\Delta X\\) <br> A one-unit increase in \\(X\\) leads to a <br> \\(\\beta_1\\)-unit increase in \\(Y\\)",
-             "\\(\\%\\Delta Y = 100 \\cdot \\beta_1 \\cdot \\Delta X\\) <br> A one-unit increase in \\(X\\) leads to a <br> \\(\\beta_1 \\cdot 100\\)-percent increase in \\(Y\\)",
-             "\\(\\%\\Delta Y = \\beta_1 \\cdot \\%\\Delta X\\) <br> A one-percent increase in \\(X\\) leads to a <br> \\(\\beta_1\\)-percent increase in \\(Y\\)",
-             "\\(\\Delta Y = (\\beta_1 \\div 100) \\cdot \\%\\Delta X\\) <br> A one-percent increase in \\(X\\) leads to a <br> \\(\\beta_1 \\div 100\\)-unit increase in \\(Y\\)")
-) %>% 
-  kable(
-  escape = F,
-  col.names = c("Model", "\\(\\beta_1\\) Interpretation"),
-  align = c("l", "l")
-) %>% 
-  column_spec(1, color = "black", bold = T, italic = T, extra_css = "vertical-align:top;") %>% 
-  column_spec(2, color = "black", italic = T)
-
-cont_interp
-```
-
----
-# Can We Do Better?
-
-$$(\widehat{\text{Life Expectancy})_i} = `r round(a_lin, 2)` + `r round(b_lin, 4)` \cdot \text{GDP}_i \quad\quad R^2 = `r round(r2_lin, 2)`$$
-
-```{R, echo = F, dev = "svg", fig.height = 5.75}
-ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
-geom_point(alpha = 0.75) +
-scale_x_continuous("GDP per capita", label = scales::comma) +
-ylab("Life Expectancy") +
-stat_smooth(method = "lm", size = 1, color = red_pink, se = F) +
-theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
-```
-
----
-# Can We Do Better?
-
-```{R, include = F}
-reg_log_lin <- lm(log(lifeExp) ~ gdpPercap, gapminder)
-a_log_lin <- reg_log_lin$coefficients[1]
-b_log_lin <- reg_log_lin$coefficients[2]
-r2_log_lin <- summary(reg_log_lin)$r.squared
-```
-
-$$\log( \widehat{\text{Life Expectancy}_i}) = `r round(a_log_lin, 2)` + `r round(b_log_lin, 6)` \cdot \text{GDP}_i \quad\quad R^2 = `r round(r2_log_lin, 2)`$$
-
-```{R, echo = F, dev = "svg", fig.height = 5.75}
-ggplot(data = gapminder, aes(x = gdpPercap, y = log(lifeExp))) +
-geom_point(alpha = 0.75) +
-scale_x_continuous("GDP per capita", label = scales::comma) +
-ylab("log(Life Expectancy)") +
-stat_smooth(method = "lm", size = 1, color = red_pink, se = F) +
-theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
-```
-
----
-# Can We Do Better?
-
-```{R, include = F}
-reg_log <- lm(log(lifeExp) ~ log(gdpPercap), gapminder)
-a_log <- reg_log$coefficients[1]
-b_log <- reg_log$coefficients[2]
-r2_log <- summary(reg_log)$r.squared
-```
-
-$$\log ( \widehat{\text{Life Expectancy}_i} ) = `r round(a_log, 2)` + `r round(b_log, 2)` \cdot \log \left( \text{GDP}_i \right) \quad\quad R^2 = `r round(r2_log, 2)`$$
-
-```{R, echo = F, dev = "svg", fig.height = 5.75}
-ggplot(data = gapminder, aes(x = log(gdpPercap), y = log(lifeExp))) +
-geom_point(alpha = 0.75) +
-scale_x_continuous("log(GDP per capita)", label = scales::comma) +
-ylab("log(Life Expectancy)") +
-stat_smooth(method = "lm", size = 1, color = red_pink, se = F) +
-theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
-```
-
----
-# Can We Do Better?
-
-```{R, include = F}
-reg_lin_log <- lm(lifeExp ~ log(gdpPercap), gapminder)
-a_lin_log <- reg_lin_log$coefficients[1]
-b_lin_log <- reg_lin_log$coefficients[2]
-r2_lin_log <- summary(reg_lin_log)$r.squared
-```
-
-$$( \widehat{\text{Life Expectancy}})_i = `r round(a_lin_log, 2)` + `r round(b_lin_log, 2)` \cdot \log \left( \text{GDP}_i \right) \quad\quad R^2 = `r round(r2_lin_log, 2)`$$
-
-```{R, echo = F, dev = "svg", fig.height = 5.75}
-ggplot(data = gapminder, aes(x = log(gdpPercap), y = lifeExp)) +
-geom_point(alpha = 0.75) +
-scale_x_continuous("log(GDP per capita)", label = scales::comma) +
-ylab("Life Expectancy") +
-stat_smooth(method = "lm", size = 1, color = red_pink, se = F) +
-theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
-```
-
----
-# Practical Considerations
-
-**Consideration 1:** Do your data take negative numbers or zeros as values?
-
-```{r}
-log(0)
-```
-
---
-
-**Consideration 2:** What coefficient interpretation do you want? Unit change? Unit-free percent change?
-
---
-
-**Consideration 3:** Are your data skewed?
-
-.pull-left[
-```{R, skew 1, echo = F, cache = T, dev = "svg", fig.height = 5}
-# Plot
-ggplot(data = df1, aes(x = y)) +
-geom_histogram(color = red_pink, fill = red_pink, alpha = 0.5) +
-xlab("Y") +
-ylab("Count") +
-theme_pander(base_size = 20, base_family = "Fira Sans", fc = met_slate)
-```
+.footnote[
+[†]: This specific form of the test statistic actually comes form Koenker (1981).
 ]
-
-.pull-right[
-```{R, skew 2, echo = F, cache = T, dev = "svg", fig.height = 5}
-# Plot
-ggplot(data = df1, aes(x = log(y))) +
-geom_histogram(color = red_pink, fill = red_pink, alpha = 0.5) +
-xlab("log(Y)") +
-ylab("Count") +
-theme_pander(base_size = 20, base_family = "Fira Sans", fc = met_slate)
-```
-]
+---
+layout: true
+# Testing for heteroskedasticity
+## The $\chi^2$ distribution
 
 ---
+
+We just mentioned that under the null, the B-P test statistic is distributed as a $\chi^2$ random variable with $k$ degrees of freedom.
+
+The $\chi^2$ distribution is just another example of a common (named) distribution (like the Normal distribution, the $t$ distribution, and the $F$).
+---
+
+Three examples of $\chi_k^2$: $\color{#314f4f}{k = 1}$, $\color{#e64173}{k = 2}$, and $\color{orange}{k = 9}$
+
+```{R, chisq1, echo = F, dev = "svg", fig.height = 5.5}
+ggplot(data = tibble(x = c(0, 20)), aes(x)) +
+  geom_area(
+    stat = "function", fun = dchisq, args = list(df = 2),
+    fill = "darkslategrey", alpha = 0.3
+  ) +
+  stat_function(
+    fun = dchisq, args = list(df = 2), n = 1e3,
+    color = "darkslategrey"
+  ) +
+  geom_area(
+    stat = "function", fun = dchisq, args = list(df = 3),
+    fill = red_pink, alpha = 0.3
+  ) +
+  stat_function(
+    fun = dchisq, args = list(df = 3), n = 1e3,
+    color = red_pink
+  ) +
+  geom_area(
+    stat = "function", fun = dchisq, args = list(df = 9),
+    fill = "orange", alpha = 0.3
+  ) +
+  stat_function(
+    fun = dchisq, args = list(df = 9), n = 1e3,
+    color = "orange"
+  ) +
+  labs(x = "x", y = "f") +
+  theme_axes_math
+```
+---
+
+Probability of observing a more extreme test statistic $\widehat{\text{LM}}$ under H.sub[0]
+
+```{R, chisq2, echo = F, dev = "svg", fig.height = 5.5}
+ggplot(data = tibble(x = c(0, 8)), aes(x)) +
+  geom_area(
+    stat = "function", fun = dchisq, args = list(df = 2),
+    fill = "darkslategrey", alpha = 0.05
+  ) +
+  geom_area(
+    stat = "function", fun = dchisq, args = list(df = 2),
+    fill = red_pink, alpha = 0.85,
+    xlim = c(5, 8)
+  ) +
+  stat_function(
+    fun = dchisq, args = list(df = 2), n = 1e3,
+    color = "darkslategrey"
+  ) +
+  geom_vline(xintercept = 5, color = grey_dark, size = 0.5, linetype = "dotted") +
+  annotate("text", x = 5, y = 1.55 * dchisq(5, df = 2), label = TeX("$\\widehat{LM}$"), family = "MathJax_Main", size = 7) +
+  labs(x = "x", y = "f") +
+  theme_axes_math
+```
+---
+layout: true
+# Testing for heteroskedasticity
+## The Breusch-Pagan test
+---
+
+**Problem:** We're still assuming a fairly restrictive .hi[functional form] between our explanatory variables $X$ and the variances of our disturbances $\sigma^2_i$.
+
+--
+
+**Result:** B-P *may* still miss fairly simple forms of heteroskedasticity.
+
+---
+
+Breusch-Pagan tests are still .hi[sensitive to functional form].
+
+```{R, bp1, echo = F, dev = "svg", fig.height = 3.75}
+set.seed(12345)
+# Data
+bp_df <- tibble(
+  x = runif(1e3, -3, 3),
+  e = rnorm(1e3, 0, sd = 2 + x^2),
+  y = 1 + 3 * x + e
+)
+# Regressions
+lm_bp1 <- lm(residuals(lm(y ~ x, bp_df))^2 ~ 1 + bp_df$x) %>%
+  summary() %$% r.squared %>% multiply_by(1e3)
+lm_bp2 <- lm(residuals(lm(y ~ x, bp_df))^2 ~ 1 + bp_df$x + I(bp_df$x^2)) %>%
+  summary() %$% r.squared %>% multiply_by(1e3)
+# The figure
+ggplot(data = bp_df, aes(x = x, y = e)) +
+geom_point(size = 2.75, color = "darkslategrey", alpha = 0.5) +
+labs(x = "x", y = "u") +
+theme_axes_math
+```
+
+$$
+\begin{aligned}
+  \hat u_i^2 &= \hat{\alpha}_0 + \hat{\alpha}_1 x_{1i} & \widehat{\text{LM}} &= `r round(lm_bp1, 2)` &\mathit{p}\text{-value} \approx `r round(pchisq(lm_bp1, 1, lower.tail = F), 3)` \\
+  \hat u_i^2 &= \hat{\alpha}_0 + \hat{\alpha}_1 x_{1i} \color{#e64173}{+ \hat{\alpha}_2 x^2_{1i}} & \widehat{\text{LM}} &= `r round(lm_bp2, 2)` &\mathit{p}\text{-value} < 0.001
+\end{aligned}
+$$
+---
+layout: true
+# Testing for heteroskedasticity
+## The White test
+---
+
+So far we've been testing for specific relationships between our explanatory variables and the variances of the disturbances, _e.g._,
+
+- H.sub[0]: $\sigma_1^2 = \sigma_2^2$ for two groups based upon $x_j$ (**G-Q**)
+
+- H.sub[0]: $\alpha_1 = \cdots = \alpha_k = 0$ from $\hat u_i^2 = \alpha_0 + \alpha_1 x_{1i} + \cdots + \alpha_k x_{ki} + v_i$ (**B-P**)
+
+--
+
+However, we actually want to know if
+
+$$ \sigma_1^2 = \sigma_2^2 = \cdots = \sigma_n^2 $$
+
+**Q:** Can't we just test this hypothesis?
+--
+ **A:** Sort of.
+---
+
+Toward this goal, Hal White took advantage of the fact that we can .hi[replace the homoskedasticity requirement with a weaker assumption]:
+
+- **Old:** $\mathop{\text{Var}} \left( u_i \middle| X \right) = \sigma^2$
+
+- **New:** $u^2$ is *uncorrelated* with the explanatory variables (_i.e._,  $x_j$ for all $j$), their squares (_i.e._, $x_j^2$), and the first-degree interactions (_i.e._, $x_j x_h$).
+
+--
+
+This new assumption is easier to explicitly test (*hint:* regression).
+---
+
+An outline of White's test for heteroskedasticity:
+
+.pseudocode-small[
+
+1\. Regress y on x.sub[1], x.sub[2], …, x.sub[k]. Save residuals e.
+
+2\. Regress squared residuals on all explanatory variables, their squares, and interactions.
+
+$$ \hat u^2 = \alpha\_0 + \sum\_{h=1}^k \alpha\_h x\_h + \sum\_{j=1}^k \alpha\_{k+j} x\_j^2 + \sum\_{\ell = 1}^{k-1} \sum\_{m = \ell + 1}^k \alpha\_{\ell,m} x\_\ell x\_m + v\_i $$
+
+3\. Record R.sub[u].super[2].
+
+4\. Calculate test statistic to test H.sub[0]: $\alpha_p = 0$ for all $p\neq0$.
+
+]
+---
+
+Just as with the Breusch-Pagan test, White's test statistic is
+
+$$ \text{LM} = n \times R_u^2 \qquad \text{Under H}_0,\, \text{LM} \overset{\text{d}}{\sim} \chi_k^2 $$
+
+but now the $R^2_u$ comes from the regression of $\hat u_i^2$ on the explanatory variables, their squares, and their interactions.
+
+$$ \hat u^2 = \alpha\_0 + \underbrace{\sum\_{h=1}^k \alpha\_h x\_h}\_{\text{Expl. variables}} + \underbrace{\sum\_{j=1}^k \alpha\_{k+j} x\_j^2}\_{\text{Squared terms}} + \underbrace{\sum\_{\ell = 1}^{k-1} \sum\_{m = \ell + 1}^k \alpha\_{\ell,m} x\_\ell x\_m}\_{\text{Interactions}} + v\_i $$
+
+**Note:** The $k$ (for our $\chi_k^2$) equals the number of estimated parameters in the regression above (the $\alpha_j$), excluding the intercept $\left( \alpha_0 \right)$.
+---
+
+**Practical note:** If a variable is equal to its square (_e.g._, binary variables), then you don't (can't) include it. The same rule applies for interactions.
+---
+
+*Example:* Consider the model.super[†] $y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \beta_3 x_3 + u$
+
+**Step 1:** Estimate the model; obtain residuals $(\hat u_i)$.
+
+**Step 2:** Regress $\hat u^2$ on explanatory variables, squares, and interactions.
+$$
+\begin{aligned}
+  \hat u^2 =
+  &\alpha_0 + \alpha_1 x_1 + \alpha_2 x_2 + \alpha_3 x_3 + \alpha_4 x_1^2 + \alpha_5 x_2^2 + \alpha_6 x_3^2 \\
+  &+ \alpha_7 x_1 x_2 + \alpha_8 x_1 x_3 + \alpha_9 x_2 x_3 + v
+\end{aligned}
+$$
+
+Record the R.super[2] from this equation (call it $R_u^2$).
+
+**Step 3:** Test H.sub[0]: $\alpha_1 = \alpha_2 = \cdots = \alpha_9 = 0$ using $\text{LM} = n R^2_u \overset{\text{d}}{\sim} \chi_9^2$.
+
+.footnote[
+[†]: To simplify notation here, I'm dropping the $i$ subscripts.
+]
+---
+
+```{R, white1, echo = F, dev = "svg", fig.height = 4}
+set.seed(12345)
+# The figure
+ggplot(data = bp_df, aes(x = x, y = e)) +
+geom_point(size = 2.75, color = "darkslategrey", alpha = 0.5) +
+labs(x = "x", y = "u") +
+theme_axes_math
+```
+
+We've already done the White test for this simple linear regression.
+
+$$
+\begin{aligned}
+ \hat u_i^2 &= \hat{\alpha}_0 + \hat{\alpha}_1 x_{1i} \color{#e64173}{+ \hat{\alpha}_2 x^2_{1i}} & \widehat{\text{LM}} &= `r round(lm_bp2, 2)` &\mathit{p}\text{-value} < 0.001
+\end{aligned}
+$$
+
+---
+layout: false
 class: inverse, middle
 
-# Quadratic Regression
+# Testing for Heteroskedasticity
+## Examples
+---
+layout: true
+# Testing for heteroskedasticity
+## Examples
+---
+
+**Goal:** Estimate the relationship between standardized test scores (outcome variable) and (1) student-teacher ratio and (2) income, _i.e._,
+
+$$ \left(\text{Test score}\right)\_i = \beta\_0 + \beta\_1 \text{Ratio}\_{i} + \beta\_2 \text{Income}\_{i} + u\_i \tag{1} $$
+
+**Potential issue:** Heteroskedasticity... and we do not observe $u_i$.
+
+**Solution:**
+
+1. Estimate the relationship in $(1)$ using OLS
+2. Use the residuals $\left( \hat u_i \right)$ to test for heteroskedasticity
+  - Goldfeld-Quandt
+  - Breusch-Pagan
+  - White
+---
+
+We will use testing data from the dataset `Caschool` in the `Ecdat` .mono[R] package.
+
+```{R, ex data}
+# Load packages
+library(pacman)
+p_load(tidyverse, Ecdat)
+# Select and rename desired variables; assign to new dataset
+test_df <- select(Caschool, test_score = testscr, ratio = str, income = avginc)
+# Format as tibble
+test_df <- as_tibble(test_df)
+# View first 2 rows of the dataset
+head(test_df, 2)
+```
 
 ---
-# Quadratic Data
 
-```{R, quad plot, echo = F, cache = T, dev = "svg", fig.height = 6.75}
-# Set seed
-set.seed(1234)
-# Sample size
-n <- 1e3
-# Generate data
-quad_df <- tibble(
-  x = runif(n, 0, 10),
-  y = 12 + 16*x - 2.5*x^2 + rnorm(n, sd = 25)
+Let's begin by estimating our model
+
+$$ \left(\text{Test score}\right)\_i = \beta\_0 + \beta\_1 \text{Ratio}\_{i} + \beta\_2 \text{Income}\_{i} + u\_i $$
+
+```{R, ex gq1}
+# Estimate the model
+est_model <- lm(test_score ~ ratio + income, data = test_df)
+# Summary of the estimate
+tidy(est_model)
+```
+---
+
+Now, let's see what the residuals suggest about heteroskedasticity
+
+```{R, ex gq2}
+# Add the residuals to our dataset
+test_df$e <- residuals(est_model)
+```
+
+```{R, gq3, echo = F, dev = "svg", fig.height = 4.25}
+# Plot residuals against income
+plot1 <- ggplot(data = test_df, aes(x = income, y = e)) +
+  geom_point(size = 2.5, alpha = 0.5, color = red_pink) +
+xlab("Income")+
+ylab(TeX("${u}_i$")) +
+  theme_axes_serif
+# Plot residuals against student-teacher ratio
+plot2 <- ggplot(data = test_df, aes(x = ratio, y = e)) +
+  geom_point(size = 2.5, alpha = 0.5, color = "darkslategrey") +
+xlab("Student-to-teacher ratio")+
+ylab(TeX("${u}_i$")) +
+  theme_axes_serif
+# The grid
+gridExtra::grid.arrange(plot1, plot2, nrow = 1)
+```
+---
+layout: true
+# Testing for heteroskedasticity
+## Example: Goldfeld-Quandt
+---
+
+Income looks potentially heteroskedastic; let's test via Goldfeld-Quandt.
+
+```{R, ex gq4, eval = F}
+# Arrange the data by income
+test_df <- arrange(test_df, income)
+```
+---
+count: false
+
+Income looks potentially heteroskedastic; let's test via Goldfeld-Quandt.
+
+```{R, ex gq5, eval = F}
+# Arrange the data by income
+test_df <- arrange(test_df, income)
+# Re-estimate the model for the last and first 158 observations
+est_model1 <- lm(test_score ~ ratio + income, data = tail(test_df, 158))
+est_model2 <- lm(test_score ~ ratio + income, data = head(test_df, 158))
+```
+---
+count: false
+
+Income looks potentially heteroskedastic; let's test via Goldfeld-Quandt.
+
+```{R, ex gq6, eval = F}
+# Arrange the data by income
+test_df <- arrange(test_df, income)
+# Re-estimate the model for the last and first 158 observations
+est_model1 <- lm(test_score ~ ratio + income, data = tail(test_df, 158))
+est_model2 <- lm(test_score ~ ratio + income, data = head(test_df, 158))
+# Grab the residuals from each regression
+e_model1 <- residuals(est_model1)
+e_model2 <- residuals(est_model2)
+```
+---
+count: false
+
+Income looks potentially heteroskedastic; let's test via Goldfeld-Quandt.
+
+```{R, ex gq7}
+# Arrange the data by income
+test_df <- arrange(test_df, income)
+# Re-estimate the model for the last and first 158 observations
+est_model1 <- lm(test_score ~ ratio + income, data = tail(test_df, 158))
+est_model2 <- lm(test_score ~ ratio + income, data = head(test_df, 158))
+# Grab the residuals from each regression
+e_model1 <- residuals(est_model1)
+e_model2 <- residuals(est_model2)
+# Calculate SSE for each regression
+(sse_model1 <- sum(e_model1^2))
+(sse_model2 <- sum(e_model2^2))
+```
+---
+
+Remember the Goldfeld-Quandt test statistic?
+
+$F_{n^\star-k,\,n^\star-k} = \dfrac{\text{RSS}_2}{\text{RSS}_1}$
+--
+$\approx\dfrac{`r round(sse_model2, 2) %>% format(big.mark = ",")`}{`r round(sse_model1, 2) %>% format(big.mark = ",")`}$
+--
+$\approx`r round(sse_model2/sse_model1, 2)`$
+--
+ Test via $F_{158-3,\,158-3}$
+--
+```{R, ex gq8}
+# G-Q test statistic
+(f_gq <- sse_model2/sse_model1)
+```
+--
+```{R, ex gq9}
+# p-value
+pf(q = f_gq, df1 = 158-3, df2 = 158-3, lower.tail = F)
+```
+---
+
+The Goldfeld-Quandt test statistic and its null distribution
+
+```{R, ex gq10, echo = F, dev = "svg", fig.height = 5}
+ggplot(data = tibble(x = c(0, f_gq * 1.3)), aes(x)) +
+  geom_area(
+    stat = "function", fun = df, args = list(df1 = 158, df2 = 158),
+    fill = "darkslategrey", alpha = 0.05
+  ) +
+  geom_area(
+    stat = "function", fun = df, args = list(df1 = 158, df2 = 158),
+    fill = red_pink, alpha = 0.85,
+    xlim = c(f_gq, f_gq * 1.3)
+  ) +
+  stat_function(
+    fun = df, args = list(df1 = 158, df2 = 158), n = 1e3,
+    color = "darkslategrey"
+  ) +
+  geom_vline(xintercept = f_gq, color = grey_dark, size = 0.5, linetype = "dotted") +
+  annotate(
+    "text", x = f_gq, y = 5 * df(f_gq, df1 = 158, df2 = 158),
+    label = TeX("$\\widehat{F}=1.53$"),
+    family = "MathJax_Main", size = 7
+  ) +
+  labs(x = "x", y = "f") +
+  theme_axes_math
+```
+---
+
+Putting it all together:
+
+H.sub[0]: $\sigma_1^2 = \sigma_2^2$ *vs.* H.sub[A]: $\sigma_1^2 \neq \sigma_2^2$
+
+Goldfeld-Quandt test statistic: $F \approx `r round(f_gq, 2)`$
+
+*p*-value $\approx `r round(pf(q = f_gq, df1 = 158-3, df2 = 158-3, lower.tail = F), 5)`$
+
+∴ Reject H.sub[0] (*p*-value is less than 0.05).
+
+**Conclusion:** There is statistically significant evidence that $\sigma_1^2 \neq \sigma_2^2$. Therefore, we find statistically significant evidence of heteroskedasticity (at the 5-percent level).
+
+---
+
+What if we had chosen to focus on student-to-teacher ratio?
+--
+```{R, ex gq11}
+# Arrange the data by ratio
+test_df <- arrange(test_df, ratio)
+# Re-estimate the model for the last and first 158 observations
+est_model3 <- lm(test_score ~ ratio + income, data = tail(test_df, 158))
+est_model4 <- lm(test_score ~ ratio + income, data = head(test_df, 158))
+# Grab the residuals from each regression
+e_model3 <- residuals(est_model3)
+e_model4 <- residuals(est_model4)
+# Calculate SSE for each regression
+(sse_model3 <- sum(e_model3^2))
+(sse_model4 <- sum(e_model4^2))
+```
+---
+
+$F_{n^\star-k,\,n^\star-k} = \dfrac{\text{RSS}_4}{\text{RSS}_3} \approx\dfrac{`r round(sse_model4, 2) %>% format(big.mark = ",")`}{`r round(sse_model3, 2) %>% format(big.mark = ",")`} \approx`r round(sse_model4 / sse_model3, 2)`$
+
+which has a *p*-value of approximately `r round(pf(sse_model4 / sse_model3, 158-3, 158-3, lower.tail = F), 4)`.
+
+--
+
+∴ We would have failed to reject H.sub[0], concluding that we failed to find statistically significant evidence of heteroskedasticity.
+
+--
+
+**Lesson:** Understand the limitations of estimators, tests, *etc.*
+
+---
+layout: true
+# Testing for heteroskedasticity
+## Example: Breusch-Pagan
+---
+
+Let's test the same model with the Breusch Pagan.
+
+*Recall:* We saved our residuals as `e` in our dataset, _i.e._,
+
+```{R, bp recall, eval = F}
+test_df$e <- residuals(est_model)
+```
+
+---
+
+In B-P, we first regress $e_i^2$ on the explanatory variables,
+
+```{R, ex bp1}
+# Regress squared residuals on explanatory variables
+bp_model <- lm(I(e^2) ~ ratio + income, data = test_df)
+```
+---
+count: false
+
+and use the resulting $R^2$ to calculate a test statistic.
+
+```{R, ex bp2}
+# Regress squared residuals on explanatory variables
+bp_model <- lm(I(e^2) ~ ratio + income, data = test_df)
+# Grab the R-squared
+(bp_r2 <- summary(bp_model)$r.squared)
+```
+
+---
+
+The Breusch-Pagan test statistic is
+
+$\text{LM} = n \times R^2_u$
+--
+ $\approx 420 \times `r bp_r2 %>% round(7) %>% format(nsmall = 7, scientific = F)`$
+--
+ $\approx `r round(nrow(test_df) * bp_r2, 4)`$
+
+which we test against a $\chi_k^2$ distribution (here: $k=2$).<sup>†</sup>
+
+--
+```{R, ex bp3}
+# B-P test statistic
+bp_stat <- 420 * bp_r2
+# Calculate the p-value
+pchisq(q = bp_stat, df = 2, lower.tail = F)
+```
+
+.footnote[
+[†]: $k$ is the number of explanatory variables (excluding the intercept).
+]
+---
+
+H.sub[0]: $\alpha_1 = \alpha_2 = 0$ *vs.* H.sub[A]: $\alpha_1 \neq 0$ and/or $\alpha_2 \neq 0$
+
+for the model $u_i^2 = \alpha_0 + \alpha_1 \text{Ratio}_i + \alpha_2 \text{Income}_i + w_i$
+
+--
+
+Breusch-Pagan test statistic: $\widehat{\text{LM}} \approx `r round(bp_stat, 3)`$
+
+--
+
+*p*-value $\approx `r pchisq(q = bp_stat, df = 2, lower.tail = F) %>% round(3)`$
+
+--
+
+∴ Fail to reject H.sub[0] (the *p*-value is greater than 0.05)
+
+--
+
+**Conclusion:** We do not find statistically significant evidence of heteroskedasticity at the 5-percent level.
+--
+ (We find no evidence of a *linear* relationship between $u_i^2$ and the explanatory variables.)
+---
+
+The Breusch-Pagan test statistic and its null distribution
+
+```{R, ex bp plot, echo = F, dev = "svg", fig.height = 5}
+ggplot(data = tibble(x = c(0, 7)), aes(x)) +
+  geom_area(
+    stat = "function", fun = dchisq, args = list(df = 2),
+    fill = "darkslategrey", alpha = 0.05
+  ) +
+  geom_area(
+    stat = "function", fun = dchisq, args = list(df = 2),
+    fill = red_pink, alpha = 0.85,
+    xlim = c(bp_stat, 7)
+  ) +
+  stat_function(
+    fun = dchisq, args = list(df = 2), n = 1e3,
+    color = "darkslategrey"
+  ) +
+  geom_vline(xintercept = bp_stat, color = grey_dark, size = 0.5, linetype = "dotted") +
+  annotate(
+    "text", x = bp_stat, y = 5 * dchisq(bp_stat, df = 2),
+    label = TeX("$\\widehat{LM}=0.014$"),
+    family = "MathJax_Main", size = 7,
+    hjust = 0
+  ) +
+  labs(x = "x", y = "f") +
+  theme_axes_math
+```
+---
+layout: true
+# Heteroskedasticity
+## Example: White
+---
+
+The .pink[**White test** adds squared terms and interactions] to the .slate[**B-P test**].
+$$
+\begin{align}
+ \color{#314f4f}{u_{i}^2} =& \color{#314f4f}{\alpha_{0} + \alpha_{1} \text{Ratio}_{i} + \alpha_{2} \text{Income}_{i} } \\
+ &+ \color{#e64173}{\alpha_{3} \text{Ratio}_{i}^2 + \alpha_{4} \text{Income}_{i}^2 + \alpha_{5} \text{Ratio}_{i}\times\text{Income}_{i}} \\
+ &+ \color{#314f4f}{w_{i}}
+\end{align}
+$$
+which moves the null hypothesis from
+<br>.slate[H.sub[0]:] $\color{#314f4f}{\alpha_1 = \alpha_2 = 0}$ to
+<br>.pink[H.sub[0]:] $\color{#e64173}{\alpha_1 = \alpha_2 = \alpha_3 = \alpha_4 = \alpha_5 = 0}$
+
+--
+
+So we just need to update our .mono[R] code, and we're set.
+---
+
+*Aside:* .mono[R] has funky notation for squared terms and interactions in `lm()`:
+
+- **Squared terms** use `I()`, _e.g._, `lm(y ~ I(x^2))`
+
+- **Interactions** use `:` between the variables, _e.g._, `lm(y ~ x1:x2)`
+
+*Example:* Regress `y` on quadratic of `x1` and `x2`:
+
+```{R, ex quad, eval = F}
+# Pretend quadratic regression w/ interactions
+lm(y ~ x1 + x2 + I(x1^2) + I(x2^2) + x1:x2, data = pretend_df)
+```
+---
+
+**Step 1:** Regress $\hat u_i^2$ on 1.super[st] degree, 2.super[nd] degree, and interactions
+
+```{R, ex white1, eval = F}
+# Regress squared residuals on quadratic of explanatory variables
+white_model <- lm(
+  I(e^2) ~ ratio + income + I(ratio^2) + I(income^2) + ratio:income,
+  data = test_df
 )
-# regression
-quad_reg <- lm(y ~ x + I(x^2), data = quad_df) 
-b1 <- quad_reg$coefficients[2]
-b2 <- quad_reg$coefficients[3]
-# Plot
-ggplot(data = quad_df, aes(x = x, y = y)) +
-geom_point(size = 3, color = "darkslategrey", alpha = 0.5) +
-xlab("X") +
-ylab("Y") +
-theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
+# Grab the R-squared
+(white_r2 <- summary(white_model)$r.squared)
+```
+---
+count: false
+
+**Step 2:** Collect $R_u^2$ from the regression.
+
+```{R, ex white2, eval = T}
+# Regress squared residuals on quadratic of explanatory variables
+white_model <- lm(
+  I(e^2) ~ ratio + income + I(ratio^2) + I(income^2) + ratio:income,
+  data = test_df
+)
+# Grab the R-squared
+(white_r2 <- summary(white_model)$r.squared)
+```
+---
+count: false
+
+**Step 3:** Calculate White test statistic $\text{LM} = n \times R_u^2 \approx 420 \times `r round(white_r2, 3)`$
+
+```{R, ex white3, eval = T}
+# Regress squared residuals on quadratic of explanatory variables
+white_model <- lm(
+  I(e^2) ~ ratio + income + I(ratio^2) + I(income^2) + ratio:income,
+  data = test_df
+)
+# Grab the R-squared
+white_r2 <- summary(white_model)$r.squared
+# Calculate the White test statistic
+(white_stat <- 420 * white_r2)
 ```
 
 ---
-# Quadratic Regression
+count: false
 
-**Regression Model**
+**Step 4:** Calculate the associated *p*-value (where $\text{LM} \overset{d}{\sim} \chi_k^2$); here, $k=5$
 
-$$Y_i = \beta_0 + \beta_1 X_i + \beta_2 X_i^2 + u_i$$
-
---
-
-**Interpretation** 
-
-Sign of $\beta_2$ indicates whether the relationship is convex (.mono[+]) or concave (.mono[-])
-
---
-
-Sign of $\beta_1$?
---
-🤷
-
---
-
-Partial derivative of $Y$ with respect to $X$ is the .hi[marginal effect] of $X$ on $Y$:
-
-$$\color{#e64173}{\dfrac{\partial Y}{\partial X} = \beta_1 + 2 \beta_2 X}$$
-
-- Effect of $X$ depends on the level of $X$
-
+```{R, ex white4, eval = T}
+# Regress squared residuals on quadratic of explanatory variables
+white_model <- lm(
+  I(e^2) ~ ratio + income + I(ratio^2) + I(income^2) + ratio:income,
+  data = test_df
+)
+# Grab the R-squared
+white_r2 <- summary(white_model)$r.squared
+# Calculate the White test statistic
+white_stat <- 420 * white_r2
+# Calculate the p-value
+pchisq(q = white_stat, df = 5, lower.tail = F)
+```
 ---
-# Quadratic Regression
 
-```{r}
-lm(y ~ x + I(x^2), data = quad_df) %>% tidy()
+Putting everything together...
+
+--
+
+H.sub[0]: $\alpha_1 = \alpha_2 = \alpha_3 = \alpha_4 = \alpha_5 = 0$
+--
+ *vs.* H.sub[A]: $\alpha_i \neq 0$ for some $i \in \{1,\, 2,\,\ldots,\, 5\}$
+--
+$$
+\begin{align}
+u_i^2 =& \alpha_0 + \alpha_1 \text{Ratio}_i + \alpha_2 \text{Income}_i \\
+&+ \alpha_3 \text{Ratio}_i^2 + \alpha_4 \text{Income}_i^2 \\
+&+ \alpha_5 \text{Ratio}_i \times \text{Income}_i + w_i
+\end{align}
+$$
+
+--
+
+Our White test statistic: $\text{LM} = n \times R_e^2 \approx 420 \times `r round(white_r2, 3)` \approx `r round(white_stat, 2)`$
+
+--
+
+Under the $\chi_5^2$ distribution, this $\widehat{\text{LM}}$ has a *p*-value less than 0.001.
+
+--
+
+∴ We .hi[reject H.sub[0]]
+--
+
+ and conclude there is .hi[statistically significant evidence of heteroskedasticity] (at the 5-percent level).
+---
+
+The White test statistic and its null distribution
+
+```{R, ex white plot, echo = F, dev = "svg", fig.height = 5}
+ggplot(data = tibble(x = c(0, white_stat * 1.1)), aes(x)) +
+  geom_area(
+    stat = "function", fun = dchisq, args = list(df = 5),
+    fill = "darkslategrey", alpha = 0.05
+  ) +
+  geom_area(
+    stat = "function", fun = dchisq, args = list(df = 5),
+    fill = red_pink, alpha = 0.85,
+    xlim = c(white_stat, white_stat * 1.1)
+  ) +
+  stat_function(
+    fun = dchisq, args = list(df = 5), n = 1e3,
+    color = "darkslategrey"
+  ) +
+  geom_vline(xintercept = white_stat, color = grey_dark, size = 0.5, linetype = "dotted") +
+  annotate(
+    "text", x = white_stat, y = 0.01,
+    label = TeX("$\\widehat{LM}=30.8$"),
+    family = "MathJax_Main", size = 7,
+    hjust = 0.5
+  ) +
+  labs(x = "x", y = "f") +
+  theme_axes_math
 ```
 
-.pink[What is the marginal effect of] $\color{#e64173}{X}$ .pink[on] $\color{#e64173}{Y}$.pink[?]
---
-<br>
-$\widehat{\dfrac{\partial \text{Y}}{\partial \text{X}} } = \hat{\beta}_1 + 2\hat{\beta}_2 X = `r round(b1, 2)` + `r round(b2*2, 2)`X$
 
 ---
-# Quadratic Regression
 
-```{r}
-lm(y ~ x + I(x^2), data = quad_df) %>% tidy()
-```
-
-.pink[What is the marginal effect of] $\color{#e64173}{X}$ .pink[on] $\color{#e64173}{Y}$ .pink[when] $\color{#e64173}{X=0}$.pink[?]
---
-<br>
-$\widehat{\dfrac{\partial \text{Y}}{\partial \text{X}} }\Bigg|_{\small \text{X}=0} = \hat{\beta}_1 = `r round(b1, 2)`$
+layout: true
+# Heteroskedasticity
+## Review questions
 
 ---
-# Quadratic Regression
-
-```{r}
-lm(y ~ x + I(x^2), data = quad_df) %>% tidy()
-```
-
-.pink[What is the marginal effect of] $\color{#e64173}{X}$ .pink[on] $\color{#e64173}{Y}$ .pink[when] $\color{#e64173}{X=2}$.pink[?]
---
-<br>
-$\widehat{\dfrac{\partial \text{Y}}{\partial \text{X}} }\Bigg|_{\small \text{X}=2} = \hat{\beta}_1 + 2\hat{\beta}_2 \cdot (2) = `r round(b1, 2)` `r round(b2*2*2, 2)` = `r round(b1 + b2*2*2, 2)`$
-
----
-# Quadratic Regression
-
-```{r}
-lm(y ~ x + I(x^2), data = quad_df) %>% tidy()
-```
-
-.pink[What is the marginal effect of] $\color{#e64173}{X}$ .pink[on] $\color{#e64173}{Y}$ .pink[when] $\color{#e64173}{X=7}$.pink[?]
---
-<br>
-$\widehat{\dfrac{\partial \text{Y}}{\partial \text{X}} }\Bigg|_{\small \text{X}=7} = \hat{\beta}_1 + 2\hat{\beta}_2 \cdot (7) = `r round(b1, 2)` `r round(b2*2*7, 2)` = `r round(b1 + b2*2*7, 2)`$
-
----
-class: white-slide
-
-```{R, include=F}
-reg <- lm(y ~ x + I(x^2), data = quad_df)
-margs <- cplot(reg, x = "x", dx = "x", 
-               what = "effect", draw = FALSE)
-```
-
-.center[**Fitted Regression Line**]
-```{R, echo = F, cache = T, dev = "svg", fig.height = 7}
-quad_df %>%  
-  ggplot(aes(x = x, y = y)) + 
-  geom_point(color = met_slate, alpha = 0.5, size = 3) +
-  stat_smooth(method = 'lm', formula = y ~ poly(x,2), se = F, linetype = 1, color = red_pink, size = 1) +
-  xlab("X") + 
-  ylab("Y") + 
-  theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
-```
-
----
-class: white-slide
-
-.center[**Marginal Effect of X on Y**]
-```{R, echo = F, cache = T, dev = "svg", fig.height = 7}
-margs %>%  
-  ggplot(aes(x = xvals)) + 
-  geom_line(aes(y = yvals), color = red_pink, size = 1) +
-  geom_line(aes(y = upper), linetype = 2, color = red_pink, size = 1) +
-  geom_line(aes(y = lower), linetype = 2, color = red_pink, size = 1) +
-  geom_hline(yintercept = 0, linetype = 1, color = met_slate) +
-  xlab("X") + 
-  ylab("Marginal Effect") + 
-  theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
-```
-
----
-# Quadratic Regression
-
-**Where does the regression** $\hat{Y_i} = \hat{\beta}_0 + \hat{\beta}_1 X_i + \hat{\beta}_2 X_i^2$ ***turn*?**
-
-- In other words, where is the peak (valley) of the fitted relationship?
 
 --
 
-**Step 1:** Take the derivative and set equal to zero.
+- **Q:** What is the definition of heteroskedasticity?
 
-$$\widehat{\dfrac{\partial \text{Y}}{\partial \text{X}} } = \hat{\beta}_1 + 2\hat{\beta}_2 X = 0$$
+- **Q:** Why are we concerned about heteroskedasticity?
 
---
+- **Q:** Does plotting $y$ against $x$, tell us anything about heteroskedasticity?
 
-**Step 2:** Solve for $X$.
+- **Q:** Does plotting $\hat u_i$ against $x$, tell us anything about heteroskedasticity?
 
-$$X = -\dfrac{\hat{\beta}_1}{2\hat{\beta}_2}$$
+- **Q:** Since we cannot observe the $u_i$'s, what do we use to *learn about* heteroskedasticity?
 
---
+- **Q:** Which test do you recommend to test for heteroskedasticity? Why?
 
-**Example:** Peak of previous regression occurs at $X = `r round(-b1/(2*b2), 2)`$.
-
----
-class: inverse, middle
-
-# Anscombe's Quartet
 
 ---
-class: white-slide
 
-.center[**Four *"identical"* regressions:** Intercept .mono[=] 3, Slope .mono[=] 0.5, R.super[2] .mono[=] 0.67]
+layout: true
+# Heteroskedasticity
+## Remedies
 
-```{r, echo = F, dev = "svg", fig.height = 7}
-anscombe_m <- data.frame()
+---
 
-for(i in 1:4)
-  anscombe_m <- rbind(anscombe_m, data.frame(set=i, x=anscombe[,i], y=anscombe[,i+4]))
+1. Ensure your specification doesn't cause heteroskedasticity
 
-anscombe_m %>% 
-  ggplot(aes(x, y)) + geom_point(size=3, alpha = 0.8, color = met_slate) + 
-  geom_smooth(method="lm", fill=NA, fullrange=TRUE, color = red_pink) + facet_wrap(~set, ncol=2) + 
-  xlab("X") + 
-  ylab("Y") + 
-  theme_pander(base_size = 17, base_family = "Fira Sans", fc = met_slate)
+1.  Increase efficiency by weighting our observations
+
+1. Ignore OLS's inefficiency, focus on unbiased estimates for our standard errors which leads to correct inference
+
+
+.hi-pink[For details], see Chapter 7 of Dougherty. Future metrics classes such as EC421 will go into the weeds on this matter. 
+
+---
+
+exclude: true
+
+```{R generate pdfs, include = F, eval = F}
+#remotes::install_github('rstudio/pagedown')
+library(pagedown)
+pagedown::chrome_print("16-Heteroskedasticity.html", output = "16-Heteroskedasticity.pdf")
 ```
-
