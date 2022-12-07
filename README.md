@@ -28,21 +28,25 @@ The HTML versions of the lecture slides allow you to view animations and interac
 
 8. **Classical Assumptions** <br> [.html](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/08_Classical_Assumptions/08-Classical_Assumptions.html) | [.pdf](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/08_Classical_Assumptions/08-Classical_Assumptions.pdf)
 
-9. **Midterm Review** <br> [.html]() | [.pdf]()
+9. **Midterm Review** <br> 
 
-10. **Simple Linear Regression: Inference** <br> [.html]() | [.pdf]()
+10. **Simple Linear Regression: Inference** <br> [.html](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/09-SimpleLR_III/09-Simple_LR_Inference.html) | [.pdf](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/09-SimpleLR_III/09-Simple_LR_Inference.pdf)
 
-11. **Multiple Linear Regression: Estimation** <br> [.html]() | [.pdf]()
+11. **Multiple Linear Regression: Estimation** <br> [.html](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/10-MultipleLR_I/10-Multiple_LR_Est.html) | [.pdf](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/10-MultipleLR_I/10-Multiple_LR_Est.pdf)
 
-12. **Multiple Linear Regression: Inference** <br> [.html]() | [.pdf]()
+12. **Multiple Linear Regression: Inference** <br> [.html](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/11-MultipleLR_II/11-MLR_Inference.html) | [.pdf](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/11-MultipleLR_II/11-MLR_Inference.pdf)
 
-13. **Categorical Variables** <br> [.html]() | [.pdf]()
+13. **Nonlinear Relationships** <br> [.html](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/12-Nonlinear_Variables/12-Nonlinear_Relationships.html) | [.pdf](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/12-Nonlinear_Variables/12-Nonlinear_Relationships.pdf)
 
-14. **Interactive Relationships** <br> [.html]() | [.pdf]()
+14. **Categorical Variables** <br> [.html](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/13-Categorical_Variables/13-Categorical_Variables.html) | [.pdf](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/13-Categorical_Variables/13-Categorical_Variables.pdf)
 
-15. **Nonlinear Relationships** <br> [.html]() | [.pdf]()
+15. **Interactive Relationships** <br> [.html](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/14-Interaction_Terms/14-Interactive_Relationships.html) | [.pdf](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/14-Interaction_Terms/14-Interactive_Relationships.pdf)
 
-16. **Final Review** <br> [.html]() | [.pdf]()
+16. **Model Specifications** <br> [.html](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/15-Model_Spec/15-Model-Spec.html) | [.pdf](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/15-Model_Spec/15-Model-Spec.pdf)
+
+17. **Heteroskedasticity** <br> [.html](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/16-Heteroskedasticity/16-Heteroskedasticity.html) | [.pdf](https://raw.githack.com/peconomi/EC320_Econometrics/main/Lectures/16-Heteroskedasticity/16-Heteroskedasticity.pdf)
+
+18. **Final Review** <br> 
 
 ## Assignment Due Dates
 
